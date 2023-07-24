@@ -1,0 +1,42 @@
+h1:ordinary-least-squares Ordinary Least Squares
+h2:linear-regression-model Linear Regression Model
+h2:parameter-estimation Parameter Estimation
+h4:example Example
+h2:model-assumptions Model Assumptions
+h3:linearity Linearity
+h3:multicollinearity Multicollinearity
+h4:example-1 Example
+h4:example-2 Example
+h3:normality Normality
+h3:equal-variances Equal Variances
+h2:prediction Prediction
+h4:example-3 Example
+h4:example-4 Example
+h2:inference Inference
+h3:t-test -Test
+h4:example-5 Example
+h3:f-test -Test
+h4:example-6 Example
+h2:interpretation Interpretation
+h2:model-validation Model Validation
+h3:accuracy-metrics Accuracy Metrics
+h4:r-squared R-Squared
+h4:rmse RMSE
+h4:rse RSE
+h4:mae MAE
+h4:adjusted-r-squared Adjusted R-squared
+h4:aic AIC
+h4:aicc AICc
+h4:bic BIC
+h4:mallows-cp Mallows Cp
+h5:example-7 Example
+h3:cross-validation Cross-Validation
+h4:validation-set Validation Set
+h5:example-8 Example
+h4:loocv LOOCV
+h4:k-fold-cross-validation K-fold Cross-Validation
+h4:repeated-k-fold-cv Repeated K-fold CV
+h4:bootstrapping Bootstrapping
+h3:gain-curve Gain Curve
+h2:ols-reference OLS Reference
+
