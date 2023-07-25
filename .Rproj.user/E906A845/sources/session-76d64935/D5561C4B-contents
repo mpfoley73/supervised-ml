@@ -10,29 +10,37 @@ I'll learn by example, using the `ISLR::Default` data set to predict which custo
 
 ```{r warning=FALSE, message=FALSE}
 library(tidyverse)
+library(tidymodels)
+library(janitor)
+library(scales)
+library(patchwork)
+
 library(caret)
 library(recipes)
-library(janitor)  # for tabyl()
 library(tictoc)
 
-dat <- ISLR::Default
-skimr::skim(dat)
+set.seed(123)
+dat <- ISLR::Default %>% slice_sample(n = 1000)
+glimpse(dat)
 ```
 
-I'll build and compare models the customary way, splitting `dat` (n = 10,000) into `dat_train` (80%, n = 8001) to fit models, and `dat_test` (20%, n = 1999) to compare performance on new data.
+I'll build and compare models the customary way, splitting `dat` (*n* = `r comma(nrow(dat), 1)`) into `dat_train` (80%, *n* = `r nrow(dat) * .80`) to fit models, and `dat_test` (20%, *n* = `r nrow(dat) * .20`) to evaluate.
 
 ```{r}
 set.seed(123)
-train_index <- createDataPartition(y = dat$default, p = 0.8, list = FALSE)
-dat_train <- dat[train_index, ]
-dat_test <- dat[-train_index, ]
+
+# initial_split() partitions by `strata`, then samples `prop` percent. This 
+# ensures the outcome is proportionally represented in data sets.
+dat_split <- initial_split(dat, prop = .8, strata = default)
+dat_train <- training(dat_split)
+dat_test <- testing(dat_split)
 ```
 
-`createDataPartition()` is nice because it creates equal representation of the response variable in the partition. Only 3.3% of applicants default, so this is a difficult prediction problem.
+Only `r percent(mean(dat$default == "Yes"), .1)` of applicants default, so this is a difficult prediction problem.
+
 ```{r}
 tabyl(dat$default)
 ```
-
 
 ## Maximal Margin Classifier
 
@@ -42,13 +50,39 @@ $$y_i \left(x_i^{'} \beta + \beta_0 \right) > 0$$
 
 This *separating hyperplane* is a simple classifier, and the magnitude of $\left(x_i^{'} \beta + \beta_0 \right)$ is an indicator of confidence in the predicted classification.
 
-If you constrain $\beta$ to be a unit vector, $||\beta|| = \sum\beta^2 = 1$, then the products of the hyperplane and response variables, $\left(x_i^{'} \beta + \beta_0 \right)$, are the positive perpendicular distances from the hyperplane. If a separating hyperplane exists, there are probably an infinite number of possible hyperplanes. One way to evaluate a hyperplane is to measure its *margin*, $M$, the perpendicular distance to the closest observation. 
+If you constrain $\beta$ to be a unit vector, $||\beta|| = \sum\beta^2 = 1$, then the products of the hyperplane and response variables, $\left(x_i^{'} \beta + \beta_0 \right)$, are the positive perpendicular distances from the hyperplane. If a separating hyperplane exists, there are an infinite number of possible hyperplanes. Evaluate a hyperplane by its *margin*, $M$, the perpendicular distance to the closest observation. 
 
 $$M = \min \left\{y_i (x_i^{'} \beta + \beta_0) \right\}.$$
 
-The *maximal margin classifier* is the hyperplane that maximizes $M.$ The figure below (figure 9.3 from [@James2013]) shows a maximal marginal classifier. The three vectors shown in the figure anchor the hyperplane and are called the *support vectors*. Interestingly, it is only these three observations that factor into the determination of the maximal marginal classifier.
+The *maximal margin classifier* is the hyperplane that maximizes $M.$ The figure below (adapted from figure 9.3 from [@James2013]) shows a maximal marginal classifier. The three vectors shown in the figure anchor the hyperplane and are called the *support vectors*. Interestingly, it is only these three observations that factor into the determination of the maximal marginal classifier.
 
-![FIGURE 9.3 from An Introduction to Statistical Learning](./images/svm_mmc.png)
+```{r echo=FALSE, fig.height=3, fig.width=5}
+xform1 <- function(x) {2 * x + runif(1, 0.5, 2)}
+xform2 <- function(x) {2 * x + runif(1, -2, -0.5)}
+
+set.seed(1234)
+x <- data.frame(x = runif(20, -1, 3), grp = c(rep("b", 10), rep("r", 10))) %>%
+  mutate(
+    y1 = map_dbl(x, xform1),
+    y2 = map_dbl(x, xform2),
+    y = if_else(grp == "b", y1, y2)
+  )
+
+x %>%
+  ggplot(aes(x = x, y = y, color = grp)) +
+  geom_point(show.legend = FALSE) +
+  geom_abline(slope = 2, intercept = 0, linewidth = 1) +
+  geom_abline(slope = 2, intercept = -.70, linetype = 2) +
+  geom_abline(slope = 2, intercept = +.66, linetype = 2) +
+  annotate("segment", x = x[10,]$x, y = x[10,]$y, xend = 1.125, yend = 2.2, 
+           linetype = 3, linewidth = 1, color = "red") +
+  annotate("segment", x = x[4,]$x, y = x[4,]$y, xend = 1.565, yend = 3.03, 
+           linetype = 3, linewidth = 1, color = "red") +
+  annotate("segment", x = x[20,]$x, y = x[20,]$y, xend = -.125, yend = -.32, 
+           linetype = 3, linewidth = 1, color = "skyblue") +
+  labs(x = NULL, y = NULL, color = NULL) +
+  theme_minimal()
+```
 
 So, to put it all together, if a separating hyperplane exists, one could calculate it by maximizing $M$  subject to $||\beta|| = 1$ and $y_i (x_i^{'} \beta + \beta_0) \ge M$ for all $i$. However, a separating hyperplane rarely exists. In fact, even if a separating hyperplane does exist, its maximal margin classifier is probably undesirably narrow. A maximal margin classifier is sensitive to outliers so it tends to overfit data.
 
@@ -59,9 +93,35 @@ The maximal margin classifier can be generalized to non-separable cases using a 
 
 The support vector classifier maximizes $M$ subject to $||\beta|| = 1$ and $y_i (x_i^{'} \beta + \beta_0) \ge M(1 - \xi_i)$ and $\sum \xi_i \le \Xi$ for all $i$. The $\xi_i$ are *slack variables* whose sum is bounded by some constant tuning parameter $\Xi$. The slack variable values indicate where the observation lies:  $\xi_i = 0$ observations lie on the correct side of the margin;  $\xi_i > 0$ observation lie on the wrong side of the margin;  $\xi_i > 1$ observations lie on the wrong side of the hyperplane.  $\Xi$ sets the tolerance for margin violation.  If $\Xi = 0$, then all observations must reside on the correct side of the margin, as in the maximal margin classifier.  $\Xi$ controls the bias-variance trade-off: as $\Xi$ increases, the margin widens and allows more violations, increasing bias and decreasing variance. Similar to the maximal margin classifier, only the observations that are on the margin or that violate the margin factor into the determination of the support vector classifier. These observations are the support vectors.
 
-The figure below (figure 9.7 from [@James2013]) shows two support vector classifiers. The one on the left uses a large $\Xi$ and as a result includes many support vectors. The one on the right uses a smaller $\Xi.$
+The figure below (adaptation of figure 9.7 from [@James2013]) shows two support vector classifiers. The one on the left uses a large $\Xi$ and as a result includes many support vectors. The one on the right uses a smaller $\Xi.$
 
-![FIGURE 9.7 from An Introduction to Statistical Learning](./images/svm_svc.png)
+```{r echo=FALSE, fig.height=3, fig.width=7}
+x <- data.frame(
+  x = c(runif(10, -2, 1), runif(10, -1, 2)),
+  y = runif(20, -3, 3),
+  grp = c(rep("b", 10), rep("r", 10))
+)
+
+p <- x %>%
+  ggplot(aes(x = x, y = y, color = grp)) +
+  geom_point(show.legend = FALSE) +
+  geom_abline(slope = 2.5, intercept = 0, linewidth = 1) +
+  labs(x = NULL, y = NULL, color = NULL) +
+  theme_minimal()
+
+p1 <- p +
+  geom_abline(slope = 2.5, intercept = -2, linetype = 2) +
+  geom_abline(slope = 2.5, intercept = +2, linetype = 2) +
+  labs(title = "Large tuning paramater")
+
+p2 <- p +
+  geom_abline(slope = 2.5, intercept = -.8, linetype = 2) +
+  geom_abline(slope = 2.5, intercept = +.8, linetype = 2) +
+  labs(title = "Small tuning paramater")
+
+p1 + p2
+```
+
 
 As $\Xi$ increases, the number of violating observations increase, and thus the number of support vectors increases. This property makes the algorithm robust to the extreme observations far away from the hyperplane. The only shortcoming with the algorithm is that it presumes a linear decision boundary.
 

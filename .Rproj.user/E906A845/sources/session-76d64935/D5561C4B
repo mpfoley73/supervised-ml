@@ -3,7 +3,7 @@
     "path": "~/GitHub/supervised-ml/06-support_vector_machines.Rmd",
     "project_path": "06-support_vector_machines.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "1790450048",
     "contents": "",
     "dirty": false,
     "created": 1690186503603.0,
@@ -12,15 +12,16 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "8,487",
-        "scrollLine": "6"
+        "cursorPosition": "97,43",
+        "scrollLine": "91",
+        "docOutlineVisible": "1"
     },
     "folds": "",
-    "lastKnownWriteTime": 1680740840,
+    "lastKnownWriteTime": 1690279446,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1680740840,
+    "last_content_update": 1690279446155,
     "read_only": false,
     "read_only_alternatives": []
 }

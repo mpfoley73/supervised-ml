@@ -1,0 +1,5 @@
+"0","set.seed(123)"
+"0","train_index <- createDataPartition(y = dat$default, p = 0.8, list = FALSE)"
+"2","Error in createDataPartition(y = dat$default, p = 0.8, list = FALSE) : 
+  could not find function ""createDataPartition""
+"

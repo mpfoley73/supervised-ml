@@ -1,3 +1,187 @@
+--- 
+title: "Supervised Machine Learning"
+subtitle: "My handbook"
+author: "Michael Foley"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+description: "These are my personal notes related to supervised machine learning techniques."
+---
+--- 
+title: "Supervised Machine Learning"
+subtitle: "My handbook"
+author: "Michael Foley"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+description: "These are my personal notes related to supervised machine learning techniques."
+---
+
+# Intro {-}
+
+Machine learning (ML) develops algorithms to identify patterns in data (unsupervised ML) or make predictions and inferences (supervised ML). 
+
+Supervised ML trains the machine to learn from prior examples to *predict* either a categorical outcome (classification) or a numeric outcome (regression), or to *infer* the relationships between the outcome and its explanatory variables.  
+
+Two early forms of supervised ML are *[linear regression (OLS)](http://rpubs.com/mpfoley73/527767)* and *[generalized linear models (GLM)](http://rpubs.com/mpfoley73/527573)* (Poisson and logistic regression).  These methods have been improved with advanced linear methods, including *stepwise selection*, [*regularization*](http://rpubs.com/mpfoley73/521922) (ridge, lasso, elastic net), *principal components regression*, and *partial least squares*.  With greater computing capacity, non-linear models are now in use, including *polynomial regression*, *step functions*, *splines*, and generalized additive models (*GAM*).  [Decision trees](http://rpubs.com/mpfoley73/529130) (*bagging*, *random forests*, and, *boosting*) are additional options for regression and classification, and *support vector machines* is an additional option for classification.
+
+<!--chapter:end:index.Rmd-->
+
+
+# Ordinary Least Squares
+
+Placeholder
+
+
+## Linear Regression Model
+## Parameter Estimation
+#### Example
+## Model Assumptions
+### Linearity
+### Multicollinearity
+#### Example
+#### Example
+### Normality
+### Equal Variances
+## Prediction
+#### Example
+#### Example 
+## Inference
+### *t*-Test
+#### Example
+### *F*-Test
+#### Example
+## Interpretation
+## Model Validation
+### Accuracy Metrics
+#### R-Squared
+#### RMSE
+#### RSE
+#### MAE
+#### Adjusted R-squared
+#### AIC
+#### AICc
+#### BIC
+#### Mallows Cp
+##### Example
+### Cross-Validation
+#### Validation Set
+##### Example
+#### LOOCV
+#### K-fold Cross-Validation
+#### Repeated K-fold CV
+#### Bootstrapping
+### Gain Curve
+## OLS Reference
+
+<!--chapter:end:01-linear_regression.Rmd-->
+
+
+# Generalized Linear Models (GLM)
+
+Placeholder
+
+
+## Binomial Logistic Regression {#binomiallogistic}
+## Case Study 1 {.unnumbered #cs1}
+### The Model {-}
+### Interpretation {-}
+### Assumptions {-}
+### Model Fit {-}
+### Reporting {-}
+## Multinomial Logistic Regression {#multinomiallogistic}
+## Case Study 2 {.unnumbered #cs2}
+### The Model {-}
+### Interpretation {-}
+### Assumptions {-}
+### Model Fit {-}
+#### Lack of Fit {-}
+#### Likelihood Ratio Test {-}
+### Reporting {-}
+## Ordinal Logistic Regression {#ordinallogistic}
+## Case Study 3 {.unnumbered #cs3}
+### Fit the Model {-}
+### Verify Assumptions {-}
+#### Multicollinearity {-}
+#### Proportional Odds {-}
+### Assess the Model Fit {-}
+#### Deviance and Pearson {-}
+#### Pseudo-R2 Measures {-}
+#### Likelihood Ratio Test {-}
+### Interpret Results {-}
+### Reporting {-}
+## Poisson Regression {#poissonregression}
+## Case Study 4 {.unnumbered #cs4}
+
+<!--chapter:end:02-generalized_linear_models.Rmd-->
+
+
+# Regularization
+
+Placeholder
+
+
+## Ridge
+#### Example {-}
+## Lasso
+#### Example {-}
+## Elastic Net
+#### Example {-}
+## Model Summary {-}
+
+<!--chapter:end:03-regularization.Rmd-->
+
+
+# Decision Trees
+
+Placeholder
+
+
+## Classification Tree
+### Measuring Performance
+#### Confusion Matrix
+#### ROC Curve
+#### Gain Curve
+### Training with Caret
+## Regression Tree
+### Training with Caret
+## Bagged Trees
+### Bagged Classification Tree
+### Bagging Regression Tree
+## Random Forests
+#### Random Forest Classification Tree
+#### Random Forest Regression Tree
+## Gradient Boosting
+#### Gradient Boosting Classification Tree
+##### GBM
+##### XGBoost
+#### Gradient Boosting Regression Tree
+##### GBM
+##### XGBoost
+## Summary
+### Classification Trees
+### Regression Trees
+
+<!--chapter:end:04-decision_trees.Rmd-->
+
+
+# Non-linear Models
+
+Placeholder
+
+
+## Splines
+## MARS
+## GAM
+
+<!--chapter:end:05-nonlinear_regression.Rmd-->
+
 # Support Vector Machines
 
 These notes rely on [@James2013], [@Hastie2017], [@Kuhn2016], [PSU STAT 508](https://online.stat.psu.edu/stat508/), and the [e1071 SVM vignette](https://cran.r-project.org/web/packages/e1071/vignettes/svmdoc.pdf).
@@ -11,36 +195,36 @@ I'll learn by example, using the `ISLR::Default` data set to predict which custo
 ```{r warning=FALSE, message=FALSE}
 library(tidyverse)
 library(tidymodels)
-library(janitor)
-library(scales)
+# library(caret)
+# library(recipes)
+library(janitor)  # for tabyl()
+# library(tictoc)
 library(patchwork)
-
-library(caret)
-library(recipes)
-library(tictoc)
 
 set.seed(123)
 dat <- ISLR::Default %>% slice_sample(n = 1000)
 glimpse(dat)
 ```
 
-I'll build and compare models the customary way, splitting `dat` (*n* = `r comma(nrow(dat), 1)`) into `dat_train` (80%, *n* = `r nrow(dat) * .80`) to fit models, and `dat_test` (20%, *n* = `r nrow(dat) * .20`) to evaluate.
+I'll build and compare models the customary way, splitting `dat` (n = 10,000) into `dat_train` (80%, n = 8001) to fit models, and `dat_test` (20%, n = 1999) to compare performance on new data.
 
 ```{r}
 set.seed(123)
-
-# initial_split() partitions by `strata`, then samples `prop` percent. This 
-# ensures the outcome is proportionally represented in data sets.
+# train_index <- createDataPartition(y = dat$default, p = 0.8, list = FALSE)
+# dat_train <- dat[train_index, ]
+# dat_test <- dat[-train_index, ]
 dat_split <- initial_split(dat, prop = .8, strata = default)
 dat_train <- training(dat_split)
 dat_test <- testing(dat_split)
 ```
 
-Only `r percent(mean(dat$default == "Yes"), .1)` of applicants default, so this is a difficult prediction problem.
-
+`createDataPartition()` is nice because it creates equal representation of the response variable in the partition. Only 3.3% of applicants default, so this is a difficult prediction problem.
 ```{r}
 tabyl(dat$default)
+tabyl(dat_train$default)
+tabyl(dat_test$default)
 ```
+
 
 ## Maximal Margin Classifier
 
@@ -50,13 +234,13 @@ $$y_i \left(x_i^{'} \beta + \beta_0 \right) > 0$$
 
 This *separating hyperplane* is a simple classifier, and the magnitude of $\left(x_i^{'} \beta + \beta_0 \right)$ is an indicator of confidence in the predicted classification.
 
-If you constrain $\beta$ to be a unit vector, $||\beta|| = \sum\beta^2 = 1$, then the products of the hyperplane and response variables, $\left(x_i^{'} \beta + \beta_0 \right)$, are the positive perpendicular distances from the hyperplane. If a separating hyperplane exists, there are an infinite number of possible hyperplanes. Evaluate a hyperplane by its *margin*, $M$, the perpendicular distance to the closest observation. 
+If you constrain $\beta$ to be a unit vector, $||\beta|| = \sum\beta^2 = 1$, then the products of the hyperplane and response variables, $\left(x_i^{'} \beta + \beta_0 \right)$, are the positive perpendicular distances from the hyperplane. If a separating hyperplane exists, there are probably an infinite number of possible hyperplanes. One way to evaluate a hyperplane is to measure its *margin*, $M$, the perpendicular distance to the closest observation. 
 
 $$M = \min \left\{y_i (x_i^{'} \beta + \beta_0) \right\}.$$
 
 The *maximal margin classifier* is the hyperplane that maximizes $M.$ The figure below (adapted from figure 9.3 from [@James2013]) shows a maximal marginal classifier. The three vectors shown in the figure anchor the hyperplane and are called the *support vectors*. Interestingly, it is only these three observations that factor into the determination of the maximal marginal classifier.
 
-```{r echo=FALSE, fig.height=3, fig.width=5}
+```{r}
 xform1 <- function(x) {2 * x + runif(1, 0.5, 2)}
 xform2 <- function(x) {2 * x + runif(1, -2, -0.5)}
 
@@ -74,14 +258,15 @@ x %>%
   geom_abline(slope = 2, intercept = 0, linewidth = 1) +
   geom_abline(slope = 2, intercept = -.70, linetype = 2) +
   geom_abline(slope = 2, intercept = +.66, linetype = 2) +
-  annotate("segment", x = x[10,]$x, y = x[10,]$y, xend = 1.125, yend = 2.2, 
+  annotate("segment", x = x[10,]$x, y = x[10,]$y, xend = 1.12, yend = 2.2, 
            linetype = 3, linewidth = 1, color = "red") +
-  annotate("segment", x = x[4,]$x, y = x[4,]$y, xend = 1.565, yend = 3.03, 
+  annotate("segment", x = x[4,]$x, y = x[4,]$y, xend = 1.56, yend = 3.03, 
            linetype = 3, linewidth = 1, color = "red") +
-  annotate("segment", x = x[20,]$x, y = x[20,]$y, xend = -.125, yend = -.32, 
+  annotate("segment", x = x[20,]$x, y = x[20,]$y, xend = -.12, yend = -.32, 
            linetype = 3, linewidth = 1, color = "skyblue") +
   labs(x = NULL, y = NULL, color = NULL) +
   theme_minimal()
+
 ```
 
 So, to put it all together, if a separating hyperplane exists, one could calculate it by maximizing $M$  subject to $||\beta|| = 1$ and $y_i (x_i^{'} \beta + \beta_0) \ge M$ for all $i$. However, a separating hyperplane rarely exists. In fact, even if a separating hyperplane does exist, its maximal margin classifier is probably undesirably narrow. A maximal margin classifier is sensitive to outliers so it tends to overfit data.
@@ -95,7 +280,7 @@ The support vector classifier maximizes $M$ subject to $||\beta|| = 1$ and $y_i 
 
 The figure below (adaptation of figure 9.7 from [@James2013]) shows two support vector classifiers. The one on the left uses a large $\Xi$ and as a result includes many support vectors. The one on the right uses a smaller $\Xi.$
 
-```{r echo=FALSE, fig.height=3, fig.width=7}
+```{r}
 x <- data.frame(
   x = c(runif(10, -2, 1), runif(10, -1, 2)),
   y = runif(20, -3, 3),
@@ -429,4 +614,46 @@ bind_rows(
 ```
 
 You can see the slight curvature in the hyperplane now. The polynomial and the radial models look pretty much identical to me.
+
+
+<!--chapter:end:06-support_vector_machines.Rmd-->
+
+```{r include=FALSE}
+library(tidyverse)
+library(emmeans)
+```
+
+# Topics: EMMs {#EMMs}
+
+This section is an overview of estimated marginal means, and its implementation in in the **emmeans** package. 
+
+```{r}
+pigs
+```
+
+
+## References
+
+This [Very statisticious](https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/) blog post is helpful. I also worked through the **emmeans** vignettes on [CRAN](https://cran.r-project.org/web/packages/emmeans/).
+
+<!--chapter:end:07-emmeans.Rmd-->
+
+
+# Bayesian Regression {#BayesRegression}
+
+Placeholder
+
+
+## Compared to Frequentist Regression
+## Model Evaluation
+### Model Comparison
+### Visualization
+
+<!--chapter:end:08-bayesian_regression.Rmd-->
+
+`r if (knitr::is_html_output()) '
+# References {-}
+'`
+
+<!--chapter:end:09-references.Rmd-->
 
