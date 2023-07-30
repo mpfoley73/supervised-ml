@@ -1,0 +1,1 @@
+"0","lm(mpg ~ hp, data = mt_cars) %>% plot(which = 1, main = ""hp"")"

@@ -91,3 +91,5 @@ compared-to-frequentist-regression
 model-evaluation
 model-comparison
 visualization
+rmse-rse-mae
+aic-bic

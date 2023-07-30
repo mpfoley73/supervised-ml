@@ -1,0 +1,5 @@
+"0","sum(abs(mt_cars$mpg - fit$fitted.values)) / n"
+"1","[1]"
+"1"," 1.72274"
+"1","
+"

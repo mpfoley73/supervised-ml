@@ -1,0 +1,18 @@
+"0","set.seed(123)"
+"0",""
+"0","mt_cars_split <- initial_split(mt_cars, prop = 0.7, strata = mpg)"
+"2","Warning: The number of observations in each quantile is below the recommended threshold of 20.
+[36m•[39m Stratification will use 1 breaks instead."
+"2","Warning: Too little data to stratify.
+[36m•[39m Resampling will be unstratified."
+"0","mt_cars_training <- mt_cars_split %>% training()"
+"0","mt_cars_testing <- mt_cars_split %>% testing"
+"0",""
+"0","fit_validation <- linear_reg() %>% "
+"0","  set_engine(""lm"") %>% "
+"0","  set_mode(""regression"") %>%"
+"0","  fit(mpg ~ ., data = mt_cars_training) %>%"
+"0","  predict(new_data = mt_cars_testing) %>%"
+"0","  bind_cols(mt_cars_testing)"
+"0",""
+"0","fit_validation %>% rmse(truth = mpg, estimate = .pred)"

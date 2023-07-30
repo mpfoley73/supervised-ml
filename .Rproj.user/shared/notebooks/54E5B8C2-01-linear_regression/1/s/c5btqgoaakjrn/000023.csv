@@ -1,0 +1,4 @@
+"0",""
+"0","# After"
+"0","fit_boxcox <- lm(mpg ~ ., data = mt_cars_boxcox %>% select(-c(gear, carb)))"
+"0","fit_boxcox %>% glance()"

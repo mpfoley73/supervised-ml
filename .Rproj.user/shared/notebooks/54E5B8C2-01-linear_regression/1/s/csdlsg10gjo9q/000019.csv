@@ -1,0 +1,7 @@
+"0","mt_cars %>%"
+"0","  select(where(is.numeric)) %>%"
+"0","  pivot_longer(cols = everything()) %>%"
+"0","  ggplot(aes(x = value)) +"
+"0","  geom_histogram() +"
+"0","  facet_wrap(facets = vars(name), scales = ""free_x"") +"
+"0","  labs(title = ""Histogram of numeric vars"")"

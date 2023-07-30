@@ -1,0 +1,8 @@
+"0","ssr2 <- var(fitted(fit)) * (n - 1)"
+"0","sse2 <- var(residuals(fit)) * (n - 1)"
+"0","sst2 <- var(mt_cars$mpg) * (n - 1)"
+"0","ssr2 / sst2"
+"1","[1]"
+"1"," 0.8690158"
+"1","
+"

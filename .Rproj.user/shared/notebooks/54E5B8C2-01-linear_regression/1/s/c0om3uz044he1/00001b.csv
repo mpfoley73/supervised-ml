@@ -1,0 +1,1 @@
+"0","fit_validation %>% rsq(truth = mpg, estimate = .pred)"
