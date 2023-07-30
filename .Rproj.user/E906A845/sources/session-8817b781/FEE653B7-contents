@@ -2,6 +2,7 @@
 
 ```{r include=FALSE}
 library(tidyverse)
+library(tidymodels)
 library(broom)  # for augment()
 library(WVPlots)  # for GainCurvePlot()
 library(caret)  # for RMSE()

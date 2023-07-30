@@ -3,7 +3,7 @@
     "path": "~/GitHub/supervised-ml/01-linear_regression.Rmd",
     "project_path": "01-linear_regression.Rmd",
     "type": "r_markdown",
-    "hash": "2770085317",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1690718572002.0,
@@ -12,16 +12,16 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "589,8",
-        "scrollLine": "579",
+        "cursorPosition": "621,28",
+        "scrollLine": "612",
         "docOutlineVisible": "1"
     },
     "folds": "",
-    "lastKnownWriteTime": 1690738274,
+    "lastKnownWriteTime": 1690738422,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1690738274378,
+    "last_content_update": 1690738422573,
     "read_only": false,
     "read_only_alternatives": []
 }

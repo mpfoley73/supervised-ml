@@ -1,6 +1,6 @@
 # Ordinary Least Squares
 
-```{r message=FALSE, warning=FALSE}
+```{r include=FALSE}
 library(tidyverse)
 library(tidymodels)
 ```
