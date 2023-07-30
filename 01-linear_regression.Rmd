@@ -587,7 +587,7 @@ AIC(fit)
 AIC(fit) + (2 * k * (k + 1)) / (n - k - 1)
 ```
 
-The Basiean information criteria (**BIC**) is like AIC, but with a stronger penalty for additional variables.
+The Bayesian information criteria (**BIC**) is like AIC, but with a stronger penalty for additional variables.
 
 ```{r}
 BIC(fit)
