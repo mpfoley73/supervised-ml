@@ -15,11 +15,9 @@ h4:rmse-rse-mae RMSE, RSE, MAE
 h4:aic-bic AIC, BIC
 h3:cross-validation Cross-Validation
 h4:validation-set Validation Set
-h1:alternatively-last_fit-i-splits-traintest-ii-fits-and-iii-predicts. Alternatively, last_fit() i) splits train/test, ii) fits, and iii) predicts.
 h4:loocv LOOCV
 h4:k-fold-cross-validation K-fold Cross-Validation
 h4:repeated-k-fold-cv Repeated K-fold CV
 h4:bootstrapping Bootstrapping
 h3:gain-curve Gain Curve
-h2:ols-reference OLS Reference
 
