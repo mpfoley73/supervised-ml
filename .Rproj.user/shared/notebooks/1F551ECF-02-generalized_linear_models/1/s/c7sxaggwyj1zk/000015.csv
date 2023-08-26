@@ -1,0 +1,5 @@
+"0","oddsratio::or_glm("
+"0","  cs1$dat, "
+"0","  cs1$result, "
+"0","  incr = list(age = 10, weight = 25, VO2max = -12)"
+"0",")"

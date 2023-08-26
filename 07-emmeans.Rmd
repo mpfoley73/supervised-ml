@@ -5,6 +5,10 @@ library(emmeans)
 
 # Topics: EMMs {#EMMs}
 
+:::rmdnote
+Today we're talking about pigs.
+:::
+
 This section is an overview of estimated marginal means, and its implementation in in the **emmeans** package. 
 
 ```{r}

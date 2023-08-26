@@ -1,32 +1,25 @@
 h1:generalized-linear-models-glm Generalized Linear Models (GLM)
 h2:binomiallogistic Binomial Logistic Regression
-h2:cs1 Case Study 1
-h3:the-model The Model
+h3:cs1 Case Study
+h3:fit-the-model Fit the Model
 h3:interpretation Interpretation
 h3:assumptions Assumptions
-h3:model-fit Model Fit
+h3:evaluate-the-fit Evaluate the Fit
 h3:reporting Reporting
 h2:multinomiallogistic Multinomial Logistic Regression
-h2:cs2 Case Study 2
-h3:the-model-1 The Model
+h3:cs2 Case Study
+h3:fit-the-model-1 Fit the Model
 h3:interpretation-1 Interpretation
 h3:assumptions-1 Assumptions
-h3:model-fit-1 Model Fit
-h4:lack-of-fit Lack of Fit
-h4:likelihood-ratio-test Likelihood Ratio Test
+h3:evaluate-the-fit-1 Evaluate the Fit
 h3:reporting-1 Reporting
 h2:ordinallogistic Ordinal Logistic Regression
-h2:cs3 Case Study 3
-h3:fit-the-model Fit the Model
-h3:verify-assumptions Verify Assumptions
-h4:multicollinearity Multicollinearity
-h4:proportional-odds Proportional Odds
-h3:assess-the-model-fit Assess the Model Fit
-h4:deviance-and-pearson Deviance and Pearson
-h4:pseudo-r2-measures Pseudo-R2 Measures
-h4:likelihood-ratio-test-1 Likelihood Ratio Test
+h3:cs3 Case Study
+h3:fit-the-model-2 Fit the Model
+h3:assumptions-2 Assumptions
+h3:evaluate-the-fit-2 Evaluate the Fit
 h3:interpret-results Interpret Results
 h3:reporting-2 Reporting
 h2:poissonregression Poisson Regression
-h2:cs4 Case Study 4
+h3:cs4 Case Study 4
 

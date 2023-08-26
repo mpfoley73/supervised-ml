@@ -1,5 +1,3 @@
-tab:unnamed-chunk-156
-tab:unnamed-chunk-188
 ordinary-least-squares
 parameter-estimation
 model-assumptions

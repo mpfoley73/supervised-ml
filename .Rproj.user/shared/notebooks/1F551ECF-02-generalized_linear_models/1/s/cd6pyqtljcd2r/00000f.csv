@@ -1,0 +1,3 @@
+"0","cs2 <- list()"
+"0",""
+"0","cs2$dat <- foreign::read.dta(""./input/hsbdemo.dta"")"

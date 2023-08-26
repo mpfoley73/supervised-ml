@@ -1,0 +1,8 @@
+"0","r2 <- lm(age ~ weight + VO2max + gender, data = cs1$dat_training) %>%"
+"0","  summary() %>% pluck(""r.squared"")"
+"0",""
+"0","(vif <- 1 / (1 - r2))"
+"1","[1]"
+"1"," 1.049814"
+"1","
+"

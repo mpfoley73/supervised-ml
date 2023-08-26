@@ -1,0 +1,6 @@
+"0","# Using non-centered vars to avoid log(0) errors."
+"0","cs2$boxtidwell <- cs2$dat %>%"
+"0","  mutate(write_tx = log(write) * write) %>%"
+"0","  fit(cs2$model, prog ~ ses + write + write_tx, data = .)"
+"0",""
+"0","tidy(cs2$boxtidwell) %>% filter(term == ""write_tx"") %>% mutate(adj_p = p.value * 10)"

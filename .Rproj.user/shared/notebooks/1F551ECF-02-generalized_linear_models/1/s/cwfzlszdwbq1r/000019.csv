@@ -1,0 +1,7 @@
+"0","cs2$dat_normalized %>%"
+"0","  bind_cols(predict(cs2$fit, new_data = cs2$dat_normalized, type = ""prob"")) %>%"
+"0","  # event_level = ""second"" sets the second level as success"
+"0","  yardstick::gain_curve(.pred_academic, .pred_general, .pred_vocation, "
+"0","                        truth = prog, event_level = ""second"") %>%"
+"0","  autoplot() +"
+"0","  labs(title = ""Gain Curve"")"

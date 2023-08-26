@@ -1,0 +1,4 @@
+"0","(mean_person <- "
+"0","  cs1$dat %>%"
+"0","  select(-caseno) %>%"
+"0","  summarize(.by = gender, across(where(is.numeric), mean)))"

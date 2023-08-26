@@ -1,0 +1,13 @@
+"0","download.file("
+"0","  ""https://stats.idre.ucla.edu/stat/data/hsbdemo.dta"","
+"0","  ""./input/hsbdemo.dta"","
+"0","  mode = ""wb"""
+"0",")"
+"2","trying URL 'https://stats.idre.ucla.edu/stat/data/hsbdemo.dta'
+"
+"2","Content type 'text/html; charset=iso-8859-1'"
+"2"," length 12649 bytes (12 KB)
+"
+"2","downloaded 12 KB
+
+"
