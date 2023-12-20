@@ -1,6 +1,31 @@
 {
     "sources": [
         {
+            "DOI": "10.1177/2515245920960351",
+            "URL": "https://doi.org/10.1177/2515245920960351",
+            "abstract": "This Tutorial serves as both an approachable theoretical introduction to mixed-effects modeling and a practical introduction to how to implement mixed-effects models in R. The intended audience is researchers who have some basic statistical knowledge, but little or no experience implementing mixed-effects models in R using their own data. In an attempt to increase the accessibility of this Tutorial, I deliberately avoid using mathematical terminology beyond what a student would learn in a standard graduate-level statistics course, but I reference articles and textbooks that provide more detail for interested readers. This Tutorial includes snippets of R code throughout; the data and R script used to build the models described in the text are available via OSF at https://osf.io/v6qag/, so readers can follow along if they wish. The goal of this practical introduction is to provide researchers with the tools they need to begin implementing mixed-effects models in their own research.",
+            "author": [
+                {
+                    "family": "Brown",
+                    "given": "Violet A."
+                }
+            ],
+            "container-title": "Advances in Methods and Practices in Psychological Science",
+            "id": "Brown2021",
+            "issue": "1",
+            "issued": {
+                "date-parts": [
+                    [
+                        2021
+                    ]
+                ]
+            },
+            "page": "2515245920960351",
+            "title": "An introduction to linear mixed-effects modeling in r",
+            "type": "article-journal",
+            "volume": "4"
+        },
+        {
             "URL": "https://www.amazon.com/Categorical-Analysis-Wiley-Probability-Statistics-ebook-dp-B00CAYUFM2/dp/B00CAYUFM2/ref=mt_kindle?_encoding=UTF8&me=&qid=",
             "author": [
                 {
