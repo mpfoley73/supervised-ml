@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 5 Non-linear Models | Supervised Machine Learning</title>
+  <title>Chapter 4 Non-linear Models | Supervised Machine Learning</title>
   <meta name="description" content="These are my personal notes related to supervised machine learning techniques." />
-  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 5 Non-linear Models | Supervised Machine Learning" />
+  <meta property="og:title" content="Chapter 4 Non-linear Models | Supervised Machine Learning" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="These are my personal notes related to supervised machine learning techniques." />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 5 Non-linear Models | Supervised Machine Learning" />
+  <meta name="twitter:title" content="Chapter 4 Non-linear Models | Supervised Machine Learning" />
   
   <meta name="twitter:description" content="These are my personal notes related to supervised machine learning techniques." />
   
@@ -23,15 +23,15 @@
 <meta name="author" content="Michael Foley" />
 
 
-<meta name="date" content="2023-07-30" />
+<meta name="date" content="2024-01-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="decision-trees.html"/>
-<link rel="next" href="support-vector-machines.html"/>
+<link rel="prev" href="mixed-effects-models.html"/>
+<link rel="next" href="regularization.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -192,82 +192,86 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html"><i class="fa fa-check"></i><b>2</b> Generalized Linear Models (GLM)</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#binomiallogistic"><i class="fa fa-check"></i><b>2.1</b> Binomial Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs1"><i class="fa fa-check"></i>Case Study 1</a>
+<li class="chapter" data-level="2.1" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#binomiallogistic"><i class="fa fa-check"></i><b>2.1</b> Binomial Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#the-model"><i class="fa fa-check"></i>The Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs1"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model"><i class="fa fa-check"></i>Fit the Model</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpretation-1"><i class="fa fa-check"></i>Interpretation</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions"><i class="fa fa-check"></i>Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#model-fit"><i class="fa fa-check"></i>Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#multinomiallogistic"><i class="fa fa-check"></i><b>2.2</b> Multinomial Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs2"><i class="fa fa-check"></i>Case Study 2</a>
+<li class="chapter" data-level="2.2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#multinomiallogistic"><i class="fa fa-check"></i><b>2.2</b> Multinomial Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#the-model-1"><i class="fa fa-check"></i>The Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs2"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model-1"><i class="fa fa-check"></i>Fit the Model</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpretation-2"><i class="fa fa-check"></i>Interpretation</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions-1"><i class="fa fa-check"></i>Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#model-fit-1"><i class="fa fa-check"></i>Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit-1"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting-1"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#ordinallogistic"><i class="fa fa-check"></i><b>2.3</b> Ordinal Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs3"><i class="fa fa-check"></i>Case Study 3</a>
+<li class="chapter" data-level="2.3" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#ordinallogistic"><i class="fa fa-check"></i><b>2.3</b> Ordinal Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model"><i class="fa fa-check"></i>Fit the Model</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#verify-assumptions"><i class="fa fa-check"></i>Verify Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assess-the-model-fit"><i class="fa fa-check"></i>Assess the Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs3"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model-2"><i class="fa fa-check"></i>Fit the Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions-2"><i class="fa fa-check"></i>Assumptions</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit-2"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpret-results"><i class="fa fa-check"></i>Interpret Results</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting-2"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.4" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#poissonregression"><i class="fa fa-check"></i><b>2.4</b> Poisson Regression</a></li>
+<li class="chapter" data-level="2.4" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#poissonregression"><i class="fa fa-check"></i><b>2.4</b> Poisson Regression</a>
+<ul>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs4"><i class="fa fa-check"></i>Case Study 4</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="regularization.html"><a href="regularization.html"><i class="fa fa-check"></i><b>3</b> Regularization</a>
+</ul></li>
+<li class="chapter" data-level="3" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html"><i class="fa fa-check"></i><b>3</b> Mixed Effects Models</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="regularization.html"><a href="regularization.html#ridge"><i class="fa fa-check"></i><b>3.1</b> Ridge</a></li>
-<li class="chapter" data-level="3.2" data-path="regularization.html"><a href="regularization.html#lasso"><i class="fa fa-check"></i><b>3.2</b> Lasso</a></li>
-<li class="chapter" data-level="3.3" data-path="regularization.html"><a href="regularization.html#elastic-net"><i class="fa fa-check"></i><b>3.3</b> Elastic Net</a></li>
+<li class="chapter" data-level="3.1" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#lme"><i class="fa fa-check"></i><b>3.1</b> Linear Mixed Effects</a>
+<ul>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#lme1"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#fit-the-model-3"><i class="fa fa-check"></i>Fit the Model</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#interpretation-3"><i class="fa fa-check"></i>Interpretation</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#model-assumptions-1"><i class="fa fa-check"></i>Model Assumptions</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#evaluate-the-fit-3"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#reporting-3"><i class="fa fa-check"></i>Reporting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="non-linear-models.html"><a href="non-linear-models.html"><i class="fa fa-check"></i><b>4</b> Non-linear Models</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="non-linear-models.html"><a href="non-linear-models.html#splines"><i class="fa fa-check"></i><b>4.1</b> Splines</a></li>
+<li class="chapter" data-level="4.2" data-path="non-linear-models.html"><a href="non-linear-models.html#mars"><i class="fa fa-check"></i><b>4.2</b> MARS</a></li>
+<li class="chapter" data-level="4.3" data-path="non-linear-models.html"><a href="non-linear-models.html#gam"><i class="fa fa-check"></i><b>4.3</b> GAM</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="regularization.html"><a href="regularization.html"><i class="fa fa-check"></i><b>5</b> Regularization</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="regularization.html"><a href="regularization.html#ridge"><i class="fa fa-check"></i><b>5.1</b> Ridge</a></li>
+<li class="chapter" data-level="5.2" data-path="regularization.html"><a href="regularization.html#lasso"><i class="fa fa-check"></i><b>5.2</b> Lasso</a></li>
+<li class="chapter" data-level="5.3" data-path="regularization.html"><a href="regularization.html#elastic-net"><i class="fa fa-check"></i><b>5.3</b> Elastic Net</a></li>
 <li class="chapter" data-level="" data-path="regularization.html"><a href="regularization.html#model-summary"><i class="fa fa-check"></i>Model Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="decision-trees.html"><a href="decision-trees.html"><i class="fa fa-check"></i><b>4</b> Decision Trees</a>
+<li class="chapter" data-level="6" data-path="decision-trees.html"><a href="decision-trees.html"><i class="fa fa-check"></i><b>6</b> Decision Trees</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-tree"><i class="fa fa-check"></i><b>4.1</b> Classification Tree</a>
+<li class="chapter" data-level="6.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-tree"><i class="fa fa-check"></i><b>6.1</b> Classification Tree</a>
 <ul>
-<li class="chapter" data-level="4.1.1" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance"><i class="fa fa-check"></i><b>4.1.1</b> Measuring Performance</a></li>
-<li class="chapter" data-level="4.1.2" data-path="decision-trees.html"><a href="decision-trees.html#training-with-caret"><i class="fa fa-check"></i><b>4.1.2</b> Training with Caret</a></li>
+<li class="chapter" data-level="" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance"><i class="fa fa-check"></i>Measuring Performance</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-tree"><i class="fa fa-check"></i><b>4.2</b> Regression Tree</a>
+<li class="chapter" data-level="6.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-tree"><i class="fa fa-check"></i><b>6.2</b> Regression Tree</a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="decision-trees.html"><a href="decision-trees.html#training-with-caret-1"><i class="fa fa-check"></i><b>4.2.1</b> Training with Caret</a></li>
+<li class="chapter" data-level="" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance-1"><i class="fa fa-check"></i>Measuring Performance</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="decision-trees.html"><a href="decision-trees.html#bagged-trees"><i class="fa fa-check"></i><b>4.3</b> Bagged Trees</a>
+<li class="chapter" data-level="6.3" data-path="decision-trees.html"><a href="decision-trees.html#bagged-trees"><i class="fa fa-check"></i><b>6.3</b> Bagged Trees</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="decision-trees.html"><a href="decision-trees.html#bagged-classification-tree"><i class="fa fa-check"></i><b>4.3.1</b> Bagged Classification Tree</a></li>
-<li class="chapter" data-level="4.3.2" data-path="decision-trees.html"><a href="decision-trees.html#bagging-regression-tree"><i class="fa fa-check"></i><b>4.3.2</b> Bagging Regression Tree</a></li>
+<li class="chapter" data-level="6.3.1" data-path="decision-trees.html"><a href="decision-trees.html#bagged-classification-tree"><i class="fa fa-check"></i><b>6.3.1</b> Bagged Classification Tree</a></li>
+<li class="chapter" data-level="6.3.2" data-path="decision-trees.html"><a href="decision-trees.html#bagging-regression-tree"><i class="fa fa-check"></i><b>6.3.2</b> Bagging Regression Tree</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="decision-trees.html"><a href="decision-trees.html#random-forests"><i class="fa fa-check"></i><b>4.4</b> Random Forests</a></li>
-<li class="chapter" data-level="4.5" data-path="decision-trees.html"><a href="decision-trees.html#gradient-boosting"><i class="fa fa-check"></i><b>4.5</b> Gradient Boosting</a></li>
-<li class="chapter" data-level="4.6" data-path="decision-trees.html"><a href="decision-trees.html#summary"><i class="fa fa-check"></i><b>4.6</b> Summary</a>
+<li class="chapter" data-level="6.4" data-path="decision-trees.html"><a href="decision-trees.html#random-forests"><i class="fa fa-check"></i><b>6.4</b> Random Forests</a></li>
+<li class="chapter" data-level="6.5" data-path="decision-trees.html"><a href="decision-trees.html#gradient-boosting"><i class="fa fa-check"></i><b>6.5</b> Gradient Boosting</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="support-vector-machines.html"><a href="support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Support Vector Machines</a>
 <ul>
-<li class="chapter" data-level="4.6.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-trees"><i class="fa fa-check"></i><b>4.6.1</b> Classification Trees</a></li>
-<li class="chapter" data-level="4.6.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-trees"><i class="fa fa-check"></i><b>4.6.2</b> Regression Trees</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="non-linear-models.html"><a href="non-linear-models.html"><i class="fa fa-check"></i><b>5</b> Non-linear Models</a>
-<ul>
-<li class="chapter" data-level="5.1" data-path="non-linear-models.html"><a href="non-linear-models.html#splines"><i class="fa fa-check"></i><b>5.1</b> Splines</a></li>
-<li class="chapter" data-level="5.2" data-path="non-linear-models.html"><a href="non-linear-models.html#mars"><i class="fa fa-check"></i><b>5.2</b> MARS</a></li>
-<li class="chapter" data-level="5.3" data-path="non-linear-models.html"><a href="non-linear-models.html#gam"><i class="fa fa-check"></i><b>5.3</b> GAM</a></li>
-</ul></li>
-<li class="chapter" data-level="6" data-path="support-vector-machines.html"><a href="support-vector-machines.html"><i class="fa fa-check"></i><b>6</b> Support Vector Machines</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="support-vector-machines.html"><a href="support-vector-machines.html#maximal-margin-classifier"><i class="fa fa-check"></i><b>6.1</b> Maximal Margin Classifier</a></li>
-<li class="chapter" data-level="6.2" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>6.2</b> Support Vector Classifier</a></li>
-<li class="chapter" data-level="6.3" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>6.3</b> Support Vector Machines</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="EMMs.html"><a href="EMMs.html"><i class="fa fa-check"></i><b>7</b> Topics: EMMs</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="EMMs.html"><a href="EMMs.html#references"><i class="fa fa-check"></i><b>7.1</b> References</a></li>
+<li class="chapter" data-level="7.1" data-path="support-vector-machines.html"><a href="support-vector-machines.html#maximal-margin-classifier"><i class="fa fa-check"></i><b>7.1</b> Maximal Margin Classifier</a></li>
+<li class="chapter" data-level="7.2" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>7.2</b> Support Vector Classifier</a></li>
+<li class="chapter" data-level="7.3" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>7.3</b> Support Vector Machines</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="BayesRegression.html"><a href="BayesRegression.html"><i class="fa fa-check"></i><b>8</b> Bayesian Regression</a>
 <ul>
@@ -277,6 +281,10 @@ div.csl-indent {
 <li class="chapter" data-level="8.2.1" data-path="BayesRegression.html"><a href="BayesRegression.html#model-comparison"><i class="fa fa-check"></i><b>8.2.1</b> Model Comparison</a></li>
 <li class="chapter" data-level="8.2.2" data-path="BayesRegression.html"><a href="BayesRegression.html#visualization"><i class="fa fa-check"></i><b>8.2.2</b> Visualization</a></li>
 </ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="EMMs.html"><a href="EMMs.html"><i class="fa fa-check"></i><b>9</b> Estimated Marginal Means</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="EMMs.html"><a href="EMMs.html#references"><i class="fa fa-check"></i><b>9.1</b> References</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references-1.html"><a href="references-1.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -299,11 +307,11 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="non-linear-models" class="section level1 hasAnchor" number="5">
-<h1><span class="header-section-number">Chapter 5</span> Non-linear Models<a href="non-linear-models.html#non-linear-models" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="non-linear-models" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">Chapter 4</span> Non-linear Models<a href="non-linear-models.html#non-linear-models" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Linear methods can model nonlinear relationships by including polynomial terms, interaction effects, and variable transformations. However, it is often difficult to identify how to formulate the model. Nonlinear models may be preferable because you do not need to know the the exact form of the nonlinearity prior to model training.</p>
-<div id="splines" class="section level2 hasAnchor" number="5.1">
-<h2><span class="header-section-number">5.1</span> Splines<a href="non-linear-models.html#splines" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="splines" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Splines<a href="non-linear-models.html#splines" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>A regression spline fits a piecewise polynomial to the range of <em>X</em> partitioned by <em>knots</em> (<em>K</em> knots produce <em>K + 1</em> piecewise polynomials) <strong>James et al</strong> <span class="citation">(<a href="#ref-James2013">James et al. 2013</a>)</span>. The polynomials can be of any degree <em>d</em>, but are usually in the range [0, 3], most commonly 3 (a cubic spline). To avoid discontinuities in the fit, a degree-<em>d</em> spline is constrained to have continuity in derivatives up to degree <em>d</em>−1 at each knot.</p>
 <p>A cubic spline fit to a data set with <em>K</em> knots, performs least squares regression with an intercept and 3 + <em>K</em> predictors, of the form</p>
 <p><span class="math display">\[y_i = \beta_0 + \beta_1X + \beta_2X^2 + \beta_3X^3 + \beta_4h(X, \xi_1) + \beta_5h(X, \xi_2) + \dots + \beta_{K+3}h(X, \xi_K)\]</span></p>
@@ -314,53 +322,53 @@ div.csl-indent {
 <p><span class="math display">\[L = \sum{(y_i - g(x_i))^2 + \lambda \int g&#39;&#39;(t)^2dt}.\]</span></p>
 <p>The function <span class="math inline">\(g(x)\)</span> that minimizes the loss function is a <em>natural cubic spline</em> with knots at each <span class="math inline">\(x_1, \dots, x_n\)</span>. This is called a <strong>smoothing spline</strong>. The larger g is, the greater the penalty on variation in the spline. In a smoothing spline, you do not optimize the number or location of the knots – there is a knot at each training observation. Instead, you optimize <span class="math inline">\(\lambda\)</span>. One way to optimze <span class="math inline">\(\lambda\)</span> is cross-validation to minimize RSS. Leave-one-out cross-validation (LOOCV) can be computed efficiently for smoothing splines.</p>
 </div>
-<div id="mars" class="section level2 hasAnchor" number="5.2">
-<h2><span class="header-section-number">5.2</span> MARS<a href="non-linear-models.html#mars" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="mars" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> MARS<a href="non-linear-models.html#mars" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Multivariate adaptive regression splines (MARS) is a non-parametric algorithm that creates a piecewise linear model to capture nonlinearities and interactions effects. The resulting model is a weighted sum of <em>basis</em> functions <span class="math inline">\(B_i(X)\)</span>:</p>
 <p><span class="math display">\[\hat{y} = \sum_{i=1}^{k}{w_iB_i(x)}\]</span></p>
 <p>The basis functions are either a constant (for the intercept), a <em>hinge</em> function of the form <span class="math inline">\(\max(0, x - x_0)\)</span> or <span class="math inline">\(\max(0, x_0 - x)\)</span> (a more concise representation is <span class="math inline">\([\pm(x - x_0)]_+\)</span>), or products of two or more hinge functions (for interactions). MARS automatically selects which predictors to use and what predictor values to serve as the <em>knots</em> of the hinge functions.</p>
 <p>MARS builds a model in two phases: the forward pass and the backward pass, similar to growing and pruning of tree models. MARS starts with a model consisting of just the intercept term equaling the mean of the response values. It then asseses every predictor to find a basis function pair consisting of opposing sides of a mirrored hinge function which produces the maximum improvement in the model error. MARS repeats the process until either it reaches a predefined limit of terms or the error improvement reaches a predefined limit. MARS generalizes the model by removing terms according to the generalized cross validation (GCV) criterion. GCV is a form of regularization: it trades off goodness-of-fit against model complexity.</p>
 <p>The <code>earth::earth()</code> function (<a href="https://www.rdocumentation.org/packages/earth/versions/5.1.2/topics/earth">documentation</a>) performs the MARS algorithm (<em>the term “MARS” is trademarked, so open-source implementations use “Earth” instead</em>). The caret implementation tunes two parameters: <code>nprune</code> and <code>degree</code>. <code>nprune</code> is the maximum number of terms in the pruned model. <code>degree</code> is the maximum degree of interaction (default is 1 (no interactions)). However, there are other hyperparameters in the model that may improve performance, including <code>minspan</code> which regulates the number of knots in the predictors.</p>
 <p>Here is an example using the Ames housing data set (following <a href="http://uc-r.github.io/mars">this</a> tutorial.</p>
-<div class="sourceCode" id="cb375"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb375-1"><a href="non-linear-models.html#cb375-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb375-2"><a href="non-linear-models.html#cb375-2" tabindex="-1"></a><span class="fu">library</span>(earth)</span>
-<span id="cb375-3"><a href="non-linear-models.html#cb375-3" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
-<span id="cb375-4"><a href="non-linear-models.html#cb375-4" tabindex="-1"></a></span>
-<span id="cb375-5"><a href="non-linear-models.html#cb375-5" tabindex="-1"></a><span class="co"># set up</span></span>
-<span id="cb375-6"><a href="non-linear-models.html#cb375-6" tabindex="-1"></a>ames <span class="ot">&lt;-</span> AmesHousing<span class="sc">::</span><span class="fu">make_ames</span>()</span>
-<span id="cb375-7"><a href="non-linear-models.html#cb375-7" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
-<span id="cb375-8"><a href="non-linear-models.html#cb375-8" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(ames<span class="sc">$</span>Sale_Price, <span class="at">p =</span> <span class="fl">0.80</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb375-9"><a href="non-linear-models.html#cb375-9" tabindex="-1"></a>ames_train <span class="ot">&lt;-</span> ames[idx, ] <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span>
-<span id="cb375-10"><a href="non-linear-models.html#cb375-10" tabindex="-1"></a>ames_test  <span class="ot">&lt;-</span> ames[<span class="sc">-</span>idx, ]</span>
-<span id="cb375-11"><a href="non-linear-models.html#cb375-11" tabindex="-1"></a></span>
-<span id="cb375-12"><a href="non-linear-models.html#cb375-12" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb375-13"><a href="non-linear-models.html#cb375-13" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">subset</span>(ames_train, <span class="at">select =</span> <span class="sc">-</span>Sale_Price),</span>
-<span id="cb375-14"><a href="non-linear-models.html#cb375-14" tabindex="-1"></a>  <span class="at">y =</span> ames_train<span class="sc">$</span>Sale_Price,</span>
-<span id="cb375-15"><a href="non-linear-models.html#cb375-15" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;earth&quot;</span>,</span>
-<span id="cb375-16"><a href="non-linear-models.html#cb375-16" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
-<span id="cb375-17"><a href="non-linear-models.html#cb375-17" tabindex="-1"></a>  <span class="at">minspan =</span> <span class="sc">-</span><span class="dv">15</span>,</span>
-<span id="cb375-18"><a href="non-linear-models.html#cb375-18" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>),</span>
-<span id="cb375-19"><a href="non-linear-models.html#cb375-19" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb375-20"><a href="non-linear-models.html#cb375-20" tabindex="-1"></a>    <span class="at">degree =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, </span>
-<span id="cb375-21"><a href="non-linear-models.html#cb375-21" tabindex="-1"></a>    <span class="at">nprune =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">100</span>, <span class="at">length.out =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">floor</span>()</span>
-<span id="cb375-22"><a href="non-linear-models.html#cb375-22" tabindex="-1"></a>  )</span>
-<span id="cb375-23"><a href="non-linear-models.html#cb375-23" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="non-linear-models.html#cb208-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb208-2"><a href="non-linear-models.html#cb208-2" tabindex="-1"></a><span class="fu">library</span>(earth)</span>
+<span id="cb208-3"><a href="non-linear-models.html#cb208-3" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb208-4"><a href="non-linear-models.html#cb208-4" tabindex="-1"></a></span>
+<span id="cb208-5"><a href="non-linear-models.html#cb208-5" tabindex="-1"></a><span class="co"># set up</span></span>
+<span id="cb208-6"><a href="non-linear-models.html#cb208-6" tabindex="-1"></a>ames <span class="ot">&lt;-</span> AmesHousing<span class="sc">::</span><span class="fu">make_ames</span>()</span>
+<span id="cb208-7"><a href="non-linear-models.html#cb208-7" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
+<span id="cb208-8"><a href="non-linear-models.html#cb208-8" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(ames<span class="sc">$</span>Sale_Price, <span class="at">p =</span> <span class="fl">0.80</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb208-9"><a href="non-linear-models.html#cb208-9" tabindex="-1"></a>ames_train <span class="ot">&lt;-</span> ames[idx, ] <span class="sc">%&gt;%</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb208-10"><a href="non-linear-models.html#cb208-10" tabindex="-1"></a>ames_test  <span class="ot">&lt;-</span> ames[<span class="sc">-</span>idx, ]</span>
+<span id="cb208-11"><a href="non-linear-models.html#cb208-11" tabindex="-1"></a></span>
+<span id="cb208-12"><a href="non-linear-models.html#cb208-12" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb208-13"><a href="non-linear-models.html#cb208-13" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">subset</span>(ames_train, <span class="at">select =</span> <span class="sc">-</span>Sale_Price),</span>
+<span id="cb208-14"><a href="non-linear-models.html#cb208-14" tabindex="-1"></a>  <span class="at">y =</span> ames_train<span class="sc">$</span>Sale_Price,</span>
+<span id="cb208-15"><a href="non-linear-models.html#cb208-15" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;earth&quot;</span>,</span>
+<span id="cb208-16"><a href="non-linear-models.html#cb208-16" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
+<span id="cb208-17"><a href="non-linear-models.html#cb208-17" tabindex="-1"></a>  <span class="at">minspan =</span> <span class="sc">-</span><span class="dv">15</span>,</span>
+<span id="cb208-18"><a href="non-linear-models.html#cb208-18" tabindex="-1"></a>  <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>),</span>
+<span id="cb208-19"><a href="non-linear-models.html#cb208-19" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb208-20"><a href="non-linear-models.html#cb208-20" tabindex="-1"></a>    <span class="at">degree =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, </span>
+<span id="cb208-21"><a href="non-linear-models.html#cb208-21" tabindex="-1"></a>    <span class="at">nprune =</span> <span class="fu">seq</span>(<span class="dv">2</span>, <span class="dv">100</span>, <span class="at">length.out =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> <span class="fu">floor</span>()</span>
+<span id="cb208-22"><a href="non-linear-models.html#cb208-22" tabindex="-1"></a>  )</span>
+<span id="cb208-23"><a href="non-linear-models.html#cb208-23" tabindex="-1"></a>)</span></code></pre></div>
 <p>The model plot shows the best tuning parameter combination.</p>
-<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="non-linear-models.html#cb376-1" tabindex="-1"></a><span class="fu">plot</span>(m, <span class="at">main =</span> <span class="st">&quot;MARS Parameter Tuning&quot;</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-254-1.png" width="672" /></p>
-<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb377-1"><a href="non-linear-models.html#cb377-1" tabindex="-1"></a>m<span class="sc">$</span>bestTune</span></code></pre></div>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="non-linear-models.html#cb209-1" tabindex="-1"></a><span class="fu">plot</span>(m, <span class="at">main =</span> <span class="st">&quot;MARS Parameter Tuning&quot;</span>)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-150-1.png" width="672" /></p>
+<div class="sourceCode" id="cb210"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb210-1"><a href="non-linear-models.html#cb210-1" tabindex="-1"></a>m<span class="sc">$</span>bestTune</span></code></pre></div>
 <pre><code>##    nprune degree
 ## 25     45      3</code></pre>
 <p>How does this model perform against the holdout data?</p>
-<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb379-1"><a href="non-linear-models.html#cb379-1" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">postResample</span>(</span>
-<span id="cb379-2"><a href="non-linear-models.html#cb379-2" tabindex="-1"></a>  <span class="at">pred =</span> <span class="fu">log</span>(<span class="fu">predict</span>(m, <span class="at">newdata =</span> ames_test)),</span>
-<span id="cb379-3"><a href="non-linear-models.html#cb379-3" tabindex="-1"></a>  <span class="at">obs =</span> <span class="fu">log</span>(ames_test<span class="sc">$</span>Sale_Price)</span>
-<span id="cb379-4"><a href="non-linear-models.html#cb379-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="non-linear-models.html#cb212-1" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">postResample</span>(</span>
+<span id="cb212-2"><a href="non-linear-models.html#cb212-2" tabindex="-1"></a>  <span class="at">pred =</span> <span class="fu">log</span>(<span class="fu">predict</span>(m, <span class="at">newdata =</span> ames_test)),</span>
+<span id="cb212-3"><a href="non-linear-models.html#cb212-3" tabindex="-1"></a>  <span class="at">obs =</span> <span class="fu">log</span>(ames_test<span class="sc">$</span>Sale_Price)</span>
+<span id="cb212-4"><a href="non-linear-models.html#cb212-4" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>##       RMSE   Rsquared        MAE 
 ## 0.16515620 0.85470300 0.09319503</code></pre>
 </div>
-<div id="gam" class="section level2 hasAnchor" number="5.3">
-<h2><span class="header-section-number">5.3</span> GAM<a href="non-linear-models.html#gam" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="gam" class="section level2 hasAnchor" number="4.3">
+<h2><span class="header-section-number">4.3</span> GAM<a href="non-linear-models.html#gam" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Generalized additive models (GAM) allow for non-linear relationships between each feature and the response by replacing each linear component <span class="math inline">\(\beta_j x_{ij}\)</span> with a nonlinear function <span class="math inline">\(f_j(x_{ij})\)</span>. The GAM model is of the form</p>
 <p><span class="math display">\[y_i = \beta_0 + \sum{f_j(x_{ij})} + \epsilon_i.\]</span></p>
 <p>It is called an additive model because we calculate a separate <span class="math inline">\(f_j\)</span> for each <span class="math inline">\(X_j\)</span>, and then add together all of their contributions.</p>
@@ -379,8 +387,8 @@ James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2013. <em>A
           </div>
         </div>
       </div>
-<a href="decision-trees.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="support-vector-machines.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="mixed-effects-models.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="regularization.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -1,7 +1,0 @@
-"0","set.seed(123)"
-"0","# train_index <- createDataPartition(y = dat$default, p = 0.8, list = FALSE)"
-"0","# dat_train <- dat[train_index, ]"
-"0","# dat_test <- dat[-train_index, ]"
-"0","dat_split <- initial_split(dat, prop = .8, strata = default)"
-"0","dat_train <- training(dat_split)"
-"0","dat_test <- testing(dat_split)"

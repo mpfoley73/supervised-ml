@@ -20,6 +20,7 @@ A Bayesian model estimates each coefficient parameter and model error with a pri
 
 ```{r message=FALSE}
 library(rstanarm)
+conflicted::conflicts_prefer(rstanarm::exponential)
 
 sink(type = "message")
 stan_mdl <- stan_glm(kid_score ~ mom_iq, data = kidiq)

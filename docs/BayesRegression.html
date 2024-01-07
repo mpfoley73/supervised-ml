@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Chapter 8 Bayesian Regression | Supervised Machine Learning</title>
   <meta name="description" content="These are my personal notes related to supervised machine learning techniques." />
-  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
   <meta property="og:title" content="Chapter 8 Bayesian Regression | Supervised Machine Learning" />
   <meta property="og:type" content="book" />
@@ -23,15 +23,15 @@
 <meta name="author" content="Michael Foley" />
 
 
-<meta name="date" content="2023-07-30" />
+<meta name="date" content="2024-01-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="EMMs.html"/>
-<link rel="next" href="references-1.html"/>
+<link rel="prev" href="support-vector-machines.html"/>
+<link rel="next" href="EMMs.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -192,82 +192,86 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html"><i class="fa fa-check"></i><b>2</b> Generalized Linear Models (GLM)</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#binomiallogistic"><i class="fa fa-check"></i><b>2.1</b> Binomial Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs1"><i class="fa fa-check"></i>Case Study 1</a>
+<li class="chapter" data-level="2.1" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#binomiallogistic"><i class="fa fa-check"></i><b>2.1</b> Binomial Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#the-model"><i class="fa fa-check"></i>The Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs1"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model"><i class="fa fa-check"></i>Fit the Model</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpretation-1"><i class="fa fa-check"></i>Interpretation</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions"><i class="fa fa-check"></i>Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#model-fit"><i class="fa fa-check"></i>Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#multinomiallogistic"><i class="fa fa-check"></i><b>2.2</b> Multinomial Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs2"><i class="fa fa-check"></i>Case Study 2</a>
+<li class="chapter" data-level="2.2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#multinomiallogistic"><i class="fa fa-check"></i><b>2.2</b> Multinomial Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#the-model-1"><i class="fa fa-check"></i>The Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs2"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model-1"><i class="fa fa-check"></i>Fit the Model</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpretation-2"><i class="fa fa-check"></i>Interpretation</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions-1"><i class="fa fa-check"></i>Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#model-fit-1"><i class="fa fa-check"></i>Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit-1"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting-1"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#ordinallogistic"><i class="fa fa-check"></i><b>2.3</b> Ordinal Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs3"><i class="fa fa-check"></i>Case Study 3</a>
+<li class="chapter" data-level="2.3" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#ordinallogistic"><i class="fa fa-check"></i><b>2.3</b> Ordinal Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model"><i class="fa fa-check"></i>Fit the Model</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#verify-assumptions"><i class="fa fa-check"></i>Verify Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assess-the-model-fit"><i class="fa fa-check"></i>Assess the Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs3"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model-2"><i class="fa fa-check"></i>Fit the Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions-2"><i class="fa fa-check"></i>Assumptions</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit-2"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpret-results"><i class="fa fa-check"></i>Interpret Results</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting-2"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.4" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#poissonregression"><i class="fa fa-check"></i><b>2.4</b> Poisson Regression</a></li>
+<li class="chapter" data-level="2.4" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#poissonregression"><i class="fa fa-check"></i><b>2.4</b> Poisson Regression</a>
+<ul>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs4"><i class="fa fa-check"></i>Case Study 4</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="regularization.html"><a href="regularization.html"><i class="fa fa-check"></i><b>3</b> Regularization</a>
+</ul></li>
+<li class="chapter" data-level="3" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html"><i class="fa fa-check"></i><b>3</b> Mixed Effects Models</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="regularization.html"><a href="regularization.html#ridge"><i class="fa fa-check"></i><b>3.1</b> Ridge</a></li>
-<li class="chapter" data-level="3.2" data-path="regularization.html"><a href="regularization.html#lasso"><i class="fa fa-check"></i><b>3.2</b> Lasso</a></li>
-<li class="chapter" data-level="3.3" data-path="regularization.html"><a href="regularization.html#elastic-net"><i class="fa fa-check"></i><b>3.3</b> Elastic Net</a></li>
+<li class="chapter" data-level="3.1" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#lme"><i class="fa fa-check"></i><b>3.1</b> Linear Mixed Effects</a>
+<ul>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#lme1"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#fit-the-model-3"><i class="fa fa-check"></i>Fit the Model</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#interpretation-3"><i class="fa fa-check"></i>Interpretation</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#model-assumptions-1"><i class="fa fa-check"></i>Model Assumptions</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#evaluate-the-fit-3"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#reporting-3"><i class="fa fa-check"></i>Reporting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="non-linear-models.html"><a href="non-linear-models.html"><i class="fa fa-check"></i><b>4</b> Non-linear Models</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="non-linear-models.html"><a href="non-linear-models.html#splines"><i class="fa fa-check"></i><b>4.1</b> Splines</a></li>
+<li class="chapter" data-level="4.2" data-path="non-linear-models.html"><a href="non-linear-models.html#mars"><i class="fa fa-check"></i><b>4.2</b> MARS</a></li>
+<li class="chapter" data-level="4.3" data-path="non-linear-models.html"><a href="non-linear-models.html#gam"><i class="fa fa-check"></i><b>4.3</b> GAM</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="regularization.html"><a href="regularization.html"><i class="fa fa-check"></i><b>5</b> Regularization</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="regularization.html"><a href="regularization.html#ridge"><i class="fa fa-check"></i><b>5.1</b> Ridge</a></li>
+<li class="chapter" data-level="5.2" data-path="regularization.html"><a href="regularization.html#lasso"><i class="fa fa-check"></i><b>5.2</b> Lasso</a></li>
+<li class="chapter" data-level="5.3" data-path="regularization.html"><a href="regularization.html#elastic-net"><i class="fa fa-check"></i><b>5.3</b> Elastic Net</a></li>
 <li class="chapter" data-level="" data-path="regularization.html"><a href="regularization.html#model-summary"><i class="fa fa-check"></i>Model Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="decision-trees.html"><a href="decision-trees.html"><i class="fa fa-check"></i><b>4</b> Decision Trees</a>
+<li class="chapter" data-level="6" data-path="decision-trees.html"><a href="decision-trees.html"><i class="fa fa-check"></i><b>6</b> Decision Trees</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-tree"><i class="fa fa-check"></i><b>4.1</b> Classification Tree</a>
+<li class="chapter" data-level="6.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-tree"><i class="fa fa-check"></i><b>6.1</b> Classification Tree</a>
 <ul>
-<li class="chapter" data-level="4.1.1" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance"><i class="fa fa-check"></i><b>4.1.1</b> Measuring Performance</a></li>
-<li class="chapter" data-level="4.1.2" data-path="decision-trees.html"><a href="decision-trees.html#training-with-caret"><i class="fa fa-check"></i><b>4.1.2</b> Training with Caret</a></li>
+<li class="chapter" data-level="" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance"><i class="fa fa-check"></i>Measuring Performance</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-tree"><i class="fa fa-check"></i><b>4.2</b> Regression Tree</a>
+<li class="chapter" data-level="6.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-tree"><i class="fa fa-check"></i><b>6.2</b> Regression Tree</a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="decision-trees.html"><a href="decision-trees.html#training-with-caret-1"><i class="fa fa-check"></i><b>4.2.1</b> Training with Caret</a></li>
+<li class="chapter" data-level="" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance-1"><i class="fa fa-check"></i>Measuring Performance</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="decision-trees.html"><a href="decision-trees.html#bagged-trees"><i class="fa fa-check"></i><b>4.3</b> Bagged Trees</a>
+<li class="chapter" data-level="6.3" data-path="decision-trees.html"><a href="decision-trees.html#bagged-trees"><i class="fa fa-check"></i><b>6.3</b> Bagged Trees</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="decision-trees.html"><a href="decision-trees.html#bagged-classification-tree"><i class="fa fa-check"></i><b>4.3.1</b> Bagged Classification Tree</a></li>
-<li class="chapter" data-level="4.3.2" data-path="decision-trees.html"><a href="decision-trees.html#bagging-regression-tree"><i class="fa fa-check"></i><b>4.3.2</b> Bagging Regression Tree</a></li>
+<li class="chapter" data-level="6.3.1" data-path="decision-trees.html"><a href="decision-trees.html#bagged-classification-tree"><i class="fa fa-check"></i><b>6.3.1</b> Bagged Classification Tree</a></li>
+<li class="chapter" data-level="6.3.2" data-path="decision-trees.html"><a href="decision-trees.html#bagging-regression-tree"><i class="fa fa-check"></i><b>6.3.2</b> Bagging Regression Tree</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="decision-trees.html"><a href="decision-trees.html#random-forests"><i class="fa fa-check"></i><b>4.4</b> Random Forests</a></li>
-<li class="chapter" data-level="4.5" data-path="decision-trees.html"><a href="decision-trees.html#gradient-boosting"><i class="fa fa-check"></i><b>4.5</b> Gradient Boosting</a></li>
-<li class="chapter" data-level="4.6" data-path="decision-trees.html"><a href="decision-trees.html#summary"><i class="fa fa-check"></i><b>4.6</b> Summary</a>
+<li class="chapter" data-level="6.4" data-path="decision-trees.html"><a href="decision-trees.html#random-forests"><i class="fa fa-check"></i><b>6.4</b> Random Forests</a></li>
+<li class="chapter" data-level="6.5" data-path="decision-trees.html"><a href="decision-trees.html#gradient-boosting"><i class="fa fa-check"></i><b>6.5</b> Gradient Boosting</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="support-vector-machines.html"><a href="support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Support Vector Machines</a>
 <ul>
-<li class="chapter" data-level="4.6.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-trees"><i class="fa fa-check"></i><b>4.6.1</b> Classification Trees</a></li>
-<li class="chapter" data-level="4.6.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-trees"><i class="fa fa-check"></i><b>4.6.2</b> Regression Trees</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="non-linear-models.html"><a href="non-linear-models.html"><i class="fa fa-check"></i><b>5</b> Non-linear Models</a>
-<ul>
-<li class="chapter" data-level="5.1" data-path="non-linear-models.html"><a href="non-linear-models.html#splines"><i class="fa fa-check"></i><b>5.1</b> Splines</a></li>
-<li class="chapter" data-level="5.2" data-path="non-linear-models.html"><a href="non-linear-models.html#mars"><i class="fa fa-check"></i><b>5.2</b> MARS</a></li>
-<li class="chapter" data-level="5.3" data-path="non-linear-models.html"><a href="non-linear-models.html#gam"><i class="fa fa-check"></i><b>5.3</b> GAM</a></li>
-</ul></li>
-<li class="chapter" data-level="6" data-path="support-vector-machines.html"><a href="support-vector-machines.html"><i class="fa fa-check"></i><b>6</b> Support Vector Machines</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="support-vector-machines.html"><a href="support-vector-machines.html#maximal-margin-classifier"><i class="fa fa-check"></i><b>6.1</b> Maximal Margin Classifier</a></li>
-<li class="chapter" data-level="6.2" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>6.2</b> Support Vector Classifier</a></li>
-<li class="chapter" data-level="6.3" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>6.3</b> Support Vector Machines</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="EMMs.html"><a href="EMMs.html"><i class="fa fa-check"></i><b>7</b> Topics: EMMs</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="EMMs.html"><a href="EMMs.html#references"><i class="fa fa-check"></i><b>7.1</b> References</a></li>
+<li class="chapter" data-level="7.1" data-path="support-vector-machines.html"><a href="support-vector-machines.html#maximal-margin-classifier"><i class="fa fa-check"></i><b>7.1</b> Maximal Margin Classifier</a></li>
+<li class="chapter" data-level="7.2" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>7.2</b> Support Vector Classifier</a></li>
+<li class="chapter" data-level="7.3" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>7.3</b> Support Vector Machines</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="BayesRegression.html"><a href="BayesRegression.html"><i class="fa fa-check"></i><b>8</b> Bayesian Regression</a>
 <ul>
@@ -277,6 +281,10 @@ div.csl-indent {
 <li class="chapter" data-level="8.2.1" data-path="BayesRegression.html"><a href="BayesRegression.html#model-comparison"><i class="fa fa-check"></i><b>8.2.1</b> Model Comparison</a></li>
 <li class="chapter" data-level="8.2.2" data-path="BayesRegression.html"><a href="BayesRegression.html#visualization"><i class="fa fa-check"></i><b>8.2.2</b> Visualization</a></li>
 </ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="EMMs.html"><a href="EMMs.html"><i class="fa fa-check"></i><b>9</b> Estimated Marginal Means</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="EMMs.html"><a href="EMMs.html#references"><i class="fa fa-check"></i><b>9.1</b> References</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references-1.html"><a href="references-1.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -308,15 +316,16 @@ div.csl-indent {
 <p>The frequentist p-value is the probability of observing a test statistic of equal or greater magnitude if the null hypothesis is true. The 95% confidence interval has a 95% probability of capturing the population value (repeated sampling would produce similar CIs, 95% of which would capture the population value). The 95% <em>credible interval</em> captures the confidence the value falls within the range. There is an important difference here. In the Bayesian framework, you can state the probability the parameter value falls with a specified range, but there is no equivalent in frequentist regression.</p>
 <p>Bayesian regression uses maximum likelihood to fit the model because the integral in the denominator (the marginal distribution) cannot (or is difficult) to calculate analytically. Instead, the algorithm samples from the posterior distribution in groups (chains). Each chain begins at a random location. Each sample (iteration) moves toward the area where the combination of likelihood and prior indicates a high probability of the true parameter value residing. The more iterations per chain, the larger the total sample size, and more robust the outcome. The chains need to converge to have a stable estimate. The iterations prior to convergence are sometimes referred to as the “warm up” and are not included in the posterior distribution estimate. By default, the <strong>rstanarm</strong> package estimates 4 chains, each with 2,000 iterations, and the first 1,000 set aside as warm-up. The final posterior combines the chains, so is composed of 4,000 iterations.</p>
 <p>A Bayesian model estimates each coefficient parameter and model error with a prior*likelihood/marginal dist = posterior framework.</p>
-<div class="sourceCode" id="cb426"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb426-1"><a href="BayesRegression.html#cb426-1" tabindex="-1"></a><span class="fu">library</span>(rstanarm)</span>
-<span id="cb426-2"><a href="BayesRegression.html#cb426-2" tabindex="-1"></a></span>
-<span id="cb426-3"><a href="BayesRegression.html#cb426-3" tabindex="-1"></a><span class="fu">sink</span>(<span class="at">type =</span> <span class="st">&quot;message&quot;</span>)</span>
-<span id="cb426-4"><a href="BayesRegression.html#cb426-4" tabindex="-1"></a>stan_mdl <span class="ot">&lt;-</span> <span class="fu">stan_glm</span>(kid_score <span class="sc">~</span> mom_iq, <span class="at">data =</span> kidiq)</span></code></pre></div>
+<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb368-1"><a href="BayesRegression.html#cb368-1" tabindex="-1"></a><span class="fu">library</span>(rstanarm)</span>
+<span id="cb368-2"><a href="BayesRegression.html#cb368-2" tabindex="-1"></a>conflicted<span class="sc">::</span><span class="fu">conflicts_prefer</span>(rstanarm<span class="sc">::</span>exponential)</span>
+<span id="cb368-3"><a href="BayesRegression.html#cb368-3" tabindex="-1"></a></span>
+<span id="cb368-4"><a href="BayesRegression.html#cb368-4" tabindex="-1"></a><span class="fu">sink</span>(<span class="at">type =</span> <span class="st">&quot;message&quot;</span>)</span>
+<span id="cb368-5"><a href="BayesRegression.html#cb368-5" tabindex="-1"></a>stan_mdl <span class="ot">&lt;-</span> <span class="fu">stan_glm</span>(kid_score <span class="sc">~</span> mom_iq, <span class="at">data =</span> kidiq)</span></code></pre></div>
 <pre><code>## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 1).
 ## Chain 1: 
-## Chain 1: Gradient evaluation took 0.000109 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 1.09 seconds.
+## Chain 1: Gradient evaluation took 4.1e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.41 seconds.
 ## Chain 1: Adjust your expectations accordingly!
 ## Chain 1: 
 ## Chain 1: 
@@ -333,15 +342,15 @@ div.csl-indent {
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.036 seconds (Warm-up)
-## Chain 1:                0.058 seconds (Sampling)
-## Chain 1:                0.094 seconds (Total)
+## Chain 1:  Elapsed Time: 0.034 seconds (Warm-up)
+## Chain 1:                0.051 seconds (Sampling)
+## Chain 1:                0.085 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 2).
 ## Chain 2: 
-## Chain 2: Gradient evaluation took 1.4e-05 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.14 seconds.
+## Chain 2: Gradient evaluation took 1e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
 ## Chain 2: Adjust your expectations accordingly!
 ## Chain 2: 
 ## Chain 2: 
@@ -358,15 +367,15 @@ div.csl-indent {
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.037 seconds (Warm-up)
-## Chain 2:                0.061 seconds (Sampling)
-## Chain 2:                0.098 seconds (Total)
+## Chain 2:  Elapsed Time: 0.033 seconds (Warm-up)
+## Chain 2:                0.052 seconds (Sampling)
+## Chain 2:                0.085 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 3).
 ## Chain 3: 
-## Chain 3: Gradient evaluation took 1.2e-05 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+## Chain 3: Gradient evaluation took 1e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
 ## Chain 3: Adjust your expectations accordingly!
 ## Chain 3: 
 ## Chain 3: 
@@ -383,15 +392,15 @@ div.csl-indent {
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.035 seconds (Warm-up)
-## Chain 3:                0.07 seconds (Sampling)
-## Chain 3:                0.105 seconds (Total)
+## Chain 3:  Elapsed Time: 0.034 seconds (Warm-up)
+## Chain 3:                0.051 seconds (Sampling)
+## Chain 3:                0.085 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 4).
 ## Chain 4: 
-## Chain 4: Gradient evaluation took 6e-06 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
+## Chain 4: Gradient evaluation took 1.2e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
 ## Chain 4: Adjust your expectations accordingly!
 ## Chain 4: 
 ## Chain 4: 
@@ -408,13 +417,13 @@ div.csl-indent {
 ## Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
-## Chain 4:  Elapsed Time: 0.051 seconds (Warm-up)
-## Chain 4:                0.058 seconds (Sampling)
-## Chain 4:                0.109 seconds (Total)
+## Chain 4:  Elapsed Time: 0.033 seconds (Warm-up)
+## Chain 4:                0.051 seconds (Sampling)
+## Chain 4:                0.084 seconds (Total)
 ## Chain 4:</code></pre>
-<div class="sourceCode" id="cb428"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb428-1"><a href="BayesRegression.html#cb428-1" tabindex="-1"></a><span class="fu">sink</span>(<span class="at">type =</span> <span class="st">&quot;message&quot;</span>)</span>
-<span id="cb428-2"><a href="BayesRegression.html#cb428-2" tabindex="-1"></a></span>
-<span id="cb428-3"><a href="BayesRegression.html#cb428-3" tabindex="-1"></a><span class="fu">summary</span>(stan_mdl)</span></code></pre></div>
+<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb370-1"><a href="BayesRegression.html#cb370-1" tabindex="-1"></a><span class="fu">sink</span>(<span class="at">type =</span> <span class="st">&quot;message&quot;</span>)</span>
+<span id="cb370-2"><a href="BayesRegression.html#cb370-2" tabindex="-1"></a></span>
+<span id="cb370-3"><a href="BayesRegression.html#cb370-3" tabindex="-1"></a><span class="fu">summary</span>(stan_mdl)</span></code></pre></div>
 <pre><code>## 
 ## Model Info:
 ##  function:     stan_glm
@@ -447,19 +456,19 @@ div.csl-indent {
 ## log-posterior 0.0  1.0  1864 
 ## 
 ## For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).</code></pre>
-<div class="sourceCode" id="cb430"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb430-1"><a href="BayesRegression.html#cb430-1" tabindex="-1"></a>broom.mixed<span class="sc">::</span><span class="fu">tidy</span>(stan_mdl)</span></code></pre></div>
+<div class="sourceCode" id="cb372"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb372-1"><a href="BayesRegression.html#cb372-1" tabindex="-1"></a>broom.mixed<span class="sc">::</span><span class="fu">tidy</span>(stan_mdl)</span></code></pre></div>
 <pre><code>## # A tibble: 2 × 3
 ##   term        estimate std.error
 ##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
 ## 1 (Intercept)   25.8      5.94  
 ## 2 mom_iq         0.610    0.0593</code></pre>
-<div class="sourceCode" id="cb432"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb432-1"><a href="BayesRegression.html#cb432-1" tabindex="-1"></a><span class="fu">posterior_interval</span>(stan_mdl)</span></code></pre></div>
+<div class="sourceCode" id="cb374"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb374-1"><a href="BayesRegression.html#cb374-1" tabindex="-1"></a><span class="fu">posterior_interval</span>(stan_mdl)</span></code></pre></div>
 <pre><code>##                     5%       95%
 ## (Intercept) 16.1471464 35.391103
 ## mom_iq       0.5149525  0.706094
 ## sigma       17.3167852 19.328867</code></pre>
 <p>By default, <strong>rstanarm</strong> priors are normal distributions with mean 0 and variance equal to a scaler multiple of the data variance.</p>
-<div class="sourceCode" id="cb434"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb434-1"><a href="BayesRegression.html#cb434-1" tabindex="-1"></a><span class="fu">prior_summary</span>(stan_mdl)</span></code></pre></div>
+<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb376-1"><a href="BayesRegression.html#cb376-1" tabindex="-1"></a><span class="fu">prior_summary</span>(stan_mdl)</span></code></pre></div>
 <pre><code>## Priors for model &#39;stan_mdl&#39; 
 ## ------
 ## Intercept (after predictors centered)
@@ -481,22 +490,22 @@ div.csl-indent {
 ##     ~ exponential(rate = 0.049)
 ## ------
 ## See help(&#39;prior_summary.stanreg&#39;) for more details</code></pre>
-<div class="sourceCode" id="cb436"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb436-1"><a href="BayesRegression.html#cb436-1" tabindex="-1"></a><span class="co"># Calculate the adjusted scale for the intercept</span></span>
-<span id="cb436-2"><a href="BayesRegression.html#cb436-2" tabindex="-1"></a><span class="fl">2.5</span> <span class="sc">*</span> <span class="fu">sd</span>(kidiq<span class="sc">$</span>kid_score)</span></code></pre></div>
+<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb378-1"><a href="BayesRegression.html#cb378-1" tabindex="-1"></a><span class="co"># Calculate the adjusted scale for the intercept</span></span>
+<span id="cb378-2"><a href="BayesRegression.html#cb378-2" tabindex="-1"></a><span class="fl">2.5</span> <span class="sc">*</span> <span class="fu">sd</span>(kidiq<span class="sc">$</span>kid_score)</span></code></pre></div>
 <pre><code>## [1] 51.02672</code></pre>
-<div class="sourceCode" id="cb438"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb438-1"><a href="BayesRegression.html#cb438-1" tabindex="-1"></a><span class="co"># Calculate the adjusted scale for `mom_iq`</span></span>
-<span id="cb438-2"><a href="BayesRegression.html#cb438-2" tabindex="-1"></a>(<span class="fl">2.5</span> <span class="sc">/</span> <span class="fu">sd</span>(kidiq<span class="sc">$</span>mom_iq)) <span class="sc">*</span> <span class="fu">sd</span>(kidiq<span class="sc">$</span>kid_score)</span></code></pre></div>
+<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb380-1"><a href="BayesRegression.html#cb380-1" tabindex="-1"></a><span class="co"># Calculate the adjusted scale for `mom_iq`</span></span>
+<span id="cb380-2"><a href="BayesRegression.html#cb380-2" tabindex="-1"></a>(<span class="fl">2.5</span> <span class="sc">/</span> <span class="fu">sd</span>(kidiq<span class="sc">$</span>mom_iq)) <span class="sc">*</span> <span class="fu">sd</span>(kidiq<span class="sc">$</span>kid_score)</span></code></pre></div>
 <pre><code>## [1] 3.401781</code></pre>
 <p>You can override the priors to set your own:</p>
-<div class="sourceCode" id="cb440"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb440-1"><a href="BayesRegression.html#cb440-1" tabindex="-1"></a>stan_mdl <span class="ot">&lt;-</span> <span class="fu">stan_glm</span>(kid_score <span class="sc">~</span> mom_iq, <span class="at">data =</span> kidiq,</span>
-<span id="cb440-2"><a href="BayesRegression.html#cb440-2" tabindex="-1"></a>                     <span class="at">prior_intercept =</span> <span class="fu">normal</span>(<span class="at">location =</span> <span class="dv">0</span>, <span class="at">scale =</span> <span class="dv">10</span>, <span class="at">autoscale =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb440-3"><a href="BayesRegression.html#cb440-3" tabindex="-1"></a>                     <span class="at">prior =</span> <span class="fu">normal</span>(<span class="at">location =</span> <span class="dv">0</span>, <span class="at">scale =</span> <span class="fl">2.5</span>, <span class="at">autoscale =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb440-4"><a href="BayesRegression.html#cb440-4" tabindex="-1"></a>                     <span class="at">prior_aux =</span> <span class="fu">exponential</span>(<span class="at">rate =</span> <span class="dv">1</span>, <span class="at">autoscale =</span> <span class="cn">FALSE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb382-1"><a href="BayesRegression.html#cb382-1" tabindex="-1"></a>stan_mdl <span class="ot">&lt;-</span> <span class="fu">stan_glm</span>(kid_score <span class="sc">~</span> mom_iq, <span class="at">data =</span> kidiq,</span>
+<span id="cb382-2"><a href="BayesRegression.html#cb382-2" tabindex="-1"></a>                     <span class="at">prior_intercept =</span> <span class="fu">normal</span>(<span class="at">location =</span> <span class="dv">0</span>, <span class="at">scale =</span> <span class="dv">10</span>, <span class="at">autoscale =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb382-3"><a href="BayesRegression.html#cb382-3" tabindex="-1"></a>                     <span class="at">prior =</span> <span class="fu">normal</span>(<span class="at">location =</span> <span class="dv">0</span>, <span class="at">scale =</span> <span class="fl">2.5</span>, <span class="at">autoscale =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb382-4"><a href="BayesRegression.html#cb382-4" tabindex="-1"></a>                     <span class="at">prior_aux =</span> <span class="fu">exponential</span>(<span class="at">rate =</span> <span class="dv">1</span>, <span class="at">autoscale =</span> <span class="cn">FALSE</span>))</span></code></pre></div>
 <pre><code>## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 1).
 ## Chain 1: 
-## Chain 1: Gradient evaluation took 1.4e-05 seconds
-## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.14 seconds.
+## Chain 1: Gradient evaluation took 1.5e-05 seconds
+## Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.15 seconds.
 ## Chain 1: Adjust your expectations accordingly!
 ## Chain 1: 
 ## Chain 1: 
@@ -513,15 +522,15 @@ div.csl-indent {
 ## Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 1: 
-## Chain 1:  Elapsed Time: 0.037 seconds (Warm-up)
-## Chain 1:                0.051 seconds (Sampling)
-## Chain 1:                0.088 seconds (Total)
+## Chain 1:  Elapsed Time: 0.032 seconds (Warm-up)
+## Chain 1:                0.047 seconds (Sampling)
+## Chain 1:                0.079 seconds (Total)
 ## Chain 1: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 2).
 ## Chain 2: 
-## Chain 2: Gradient evaluation took 6e-06 seconds
-## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
+## Chain 2: Gradient evaluation took 1e-05 seconds
+## Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
 ## Chain 2: Adjust your expectations accordingly!
 ## Chain 2: 
 ## Chain 2: 
@@ -538,15 +547,15 @@ div.csl-indent {
 ## Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 2: 
-## Chain 2:  Elapsed Time: 0.034 seconds (Warm-up)
-## Chain 2:                0.048 seconds (Sampling)
-## Chain 2:                0.082 seconds (Total)
+## Chain 2:  Elapsed Time: 0.031 seconds (Warm-up)
+## Chain 2:                0.047 seconds (Sampling)
+## Chain 2:                0.078 seconds (Total)
 ## Chain 2: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 3).
 ## Chain 3: 
-## Chain 3: Gradient evaluation took 7e-06 seconds
-## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.07 seconds.
+## Chain 3: Gradient evaluation took 1e-05 seconds
+## Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
 ## Chain 3: Adjust your expectations accordingly!
 ## Chain 3: 
 ## Chain 3: 
@@ -563,15 +572,15 @@ div.csl-indent {
 ## Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 ## Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 3: 
-## Chain 3:  Elapsed Time: 0.032 seconds (Warm-up)
-## Chain 3:                0.047 seconds (Sampling)
-## Chain 3:                0.079 seconds (Total)
+## Chain 3:  Elapsed Time: 0.033 seconds (Warm-up)
+## Chain 3:                0.045 seconds (Sampling)
+## Chain 3:                0.078 seconds (Total)
 ## Chain 3: 
 ## 
 ## SAMPLING FOR MODEL &#39;continuous&#39; NOW (CHAIN 4).
 ## Chain 4: 
-## Chain 4: Gradient evaluation took 6e-06 seconds
-## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.06 seconds.
+## Chain 4: Gradient evaluation took 1.2e-05 seconds
+## Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
 ## Chain 4: Adjust your expectations accordingly!
 ## Chain 4: 
 ## Chain 4: 
@@ -589,50 +598,50 @@ div.csl-indent {
 ## Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 ## Chain 4: 
 ## Chain 4:  Elapsed Time: 0.031 seconds (Warm-up)
-## Chain 4:                0.047 seconds (Sampling)
-## Chain 4:                0.078 seconds (Total)
+## Chain 4:                0.046 seconds (Sampling)
+## Chain 4:                0.077 seconds (Total)
 ## Chain 4:</code></pre>
 <p>Bayesian estimation samples from the posterior distribution, so there is no point estimate and test statistic.</p>
 </div>
 <div id="model-evaluation" class="section level2 hasAnchor" number="8.2">
 <h2><span class="header-section-number">8.2</span> Model Evaluation<a href="BayesRegression.html#model-evaluation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The R-squared statistic is not available from the summary object, but you can still calculate it manually from the model data, or use the <code>bayes_R2</code> function.</p>
-<div class="sourceCode" id="cb442"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb442-1"><a href="BayesRegression.html#cb442-1" tabindex="-1"></a>sse <span class="ot">&lt;-</span> <span class="fu">var</span>(stan_mdl<span class="sc">$</span>residuals)</span>
-<span id="cb442-2"><a href="BayesRegression.html#cb442-2" tabindex="-1"></a>ssr <span class="ot">&lt;-</span> <span class="fu">var</span>(stan_mdl<span class="sc">$</span>fitted.values)</span>
-<span id="cb442-3"><a href="BayesRegression.html#cb442-3" tabindex="-1"></a>sst <span class="ot">&lt;-</span> ssr <span class="sc">+</span> sse</span>
-<span id="cb442-4"><a href="BayesRegression.html#cb442-4" tabindex="-1"></a>r2 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> sse<span class="sc">/</span>sst</span>
-<span id="cb442-5"><a href="BayesRegression.html#cb442-5" tabindex="-1"></a><span class="co"># bayes_R2 returns a vector of length equal to the posterior sample size.</span></span>
-<span id="cb442-6"><a href="BayesRegression.html#cb442-6" tabindex="-1"></a><span class="fu">bayes_R2</span>(stan_mdl) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="BayesRegression.html#cb384-1" tabindex="-1"></a>sse <span class="ot">&lt;-</span> <span class="fu">var</span>(stan_mdl<span class="sc">$</span>residuals)</span>
+<span id="cb384-2"><a href="BayesRegression.html#cb384-2" tabindex="-1"></a>ssr <span class="ot">&lt;-</span> <span class="fu">var</span>(stan_mdl<span class="sc">$</span>fitted.values)</span>
+<span id="cb384-3"><a href="BayesRegression.html#cb384-3" tabindex="-1"></a>sst <span class="ot">&lt;-</span> ssr <span class="sc">+</span> sse</span>
+<span id="cb384-4"><a href="BayesRegression.html#cb384-4" tabindex="-1"></a>r2 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> sse<span class="sc">/</span>sst</span>
+<span id="cb384-5"><a href="BayesRegression.html#cb384-5" tabindex="-1"></a><span class="co"># bayes_R2 returns a vector of length equal to the posterior sample size.</span></span>
+<span id="cb384-6"><a href="BayesRegression.html#cb384-6" tabindex="-1"></a><span class="fu">bayes_R2</span>(stan_mdl) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## 0.07899 0.18431 0.20692 0.20718 0.22924 0.31917</code></pre>
-<div class="sourceCode" id="cb444"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb444-1"><a href="BayesRegression.html#cb444-1" tabindex="-1"></a><span class="fu">bayes_R2</span>(stan_mdl) <span class="sc">%&gt;%</span> <span class="fu">quantile</span>(<span class="fu">c</span>(.<span class="dv">025</span>, .<span class="dv">975</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="BayesRegression.html#cb386-1" tabindex="-1"></a><span class="fu">bayes_R2</span>(stan_mdl) <span class="sc">%&gt;%</span> <span class="fu">quantile</span>(<span class="fu">c</span>(.<span class="dv">025</span>, .<span class="dv">975</span>))</span></code></pre></div>
 <pre><code>##      2.5%     97.5% 
 ## 0.1451410 0.2705964</code></pre>
 <p>Bayesian regression has other model fit statistics.</p>
-<div class="sourceCode" id="cb446"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb446-1"><a href="BayesRegression.html#cb446-1" tabindex="-1"></a><span class="co"># Calculate posterior predictive scores</span></span>
-<span id="cb446-2"><a href="BayesRegression.html#cb446-2" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> <span class="fu">posterior_linpred</span>(stan_mdl)</span>
-<span id="cb446-3"><a href="BayesRegression.html#cb446-3" tabindex="-1"></a><span class="co"># Print a summary of the 1st replication</span></span>
-<span id="cb446-4"><a href="BayesRegression.html#cb446-4" tabindex="-1"></a><span class="fu">summary</span>(predictions[<span class="dv">1</span>,])</span></code></pre></div>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="BayesRegression.html#cb388-1" tabindex="-1"></a><span class="co"># Calculate posterior predictive scores</span></span>
+<span id="cb388-2"><a href="BayesRegression.html#cb388-2" tabindex="-1"></a>predictions <span class="ot">&lt;-</span> <span class="fu">posterior_linpred</span>(stan_mdl)</span>
+<span id="cb388-3"><a href="BayesRegression.html#cb388-3" tabindex="-1"></a><span class="co"># Print a summary of the 1st replication</span></span>
+<span id="cb388-4"><a href="BayesRegression.html#cb388-4" tabindex="-1"></a><span class="fu">summary</span>(predictions[<span class="dv">1</span>,])</span></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##   67.10   79.44   85.93   87.39   94.58  114.63</code></pre>
 <p>Or produce a posterior predictive model check.</p>
-<div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="BayesRegression.html#cb448-1" tabindex="-1"></a><span class="co"># peaks of observed data and model are similar places, but there is a second </span></span>
-<span id="cb448-2"><a href="BayesRegression.html#cb448-2" tabindex="-1"></a><span class="co"># mode of popularity scores around 10 that is not captured by the model.</span></span>
-<span id="cb448-3"><a href="BayesRegression.html#cb448-3" tabindex="-1"></a><span class="fu">pp_check</span>(stan_mdl, <span class="st">&quot;dens_overlay&quot;</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-285-1.png" width="672" /></p>
-<div class="sourceCode" id="cb449"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb449-1"><a href="BayesRegression.html#cb449-1" tabindex="-1"></a><span class="fu">pp_check</span>(stan_mdl, <span class="st">&quot;stat&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="BayesRegression.html#cb390-1" tabindex="-1"></a><span class="co"># peaks of observed data and model are similar places, but there is a second </span></span>
+<span id="cb390-2"><a href="BayesRegression.html#cb390-2" tabindex="-1"></a><span class="co"># mode of popularity scores around 10 that is not captured by the model.</span></span>
+<span id="cb390-3"><a href="BayesRegression.html#cb390-3" tabindex="-1"></a><span class="fu">pp_check</span>(stan_mdl, <span class="st">&quot;dens_overlay&quot;</span>)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-246-1.png" width="672" /></p>
+<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="BayesRegression.html#cb391-1" tabindex="-1"></a><span class="fu">pp_check</span>(stan_mdl, <span class="st">&quot;stat&quot;</span>)</span></code></pre></div>
 <pre><code>## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-285-2.png" width="672" /></p>
-<div class="sourceCode" id="cb451"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb451-1"><a href="BayesRegression.html#cb451-1" tabindex="-1"></a><span class="co"># mean and sd of the observed data in middle of expected distribution - these </span></span>
-<span id="cb451-2"><a href="BayesRegression.html#cb451-2" tabindex="-1"></a><span class="co"># two characteristics are recovered well.</span></span>
-<span id="cb451-3"><a href="BayesRegression.html#cb451-3" tabindex="-1"></a><span class="fu">pp_check</span>(stan_mdl, <span class="st">&quot;stat_2d&quot;</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-285-3.png" width="672" /></p>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-246-2.png" width="672" /></p>
+<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="BayesRegression.html#cb393-1" tabindex="-1"></a><span class="co"># mean and sd of the observed data in middle of expected distribution - these </span></span>
+<span id="cb393-2"><a href="BayesRegression.html#cb393-2" tabindex="-1"></a><span class="co"># two characteristics are recovered well.</span></span>
+<span id="cb393-3"><a href="BayesRegression.html#cb393-3" tabindex="-1"></a><span class="fu">pp_check</span>(stan_mdl, <span class="st">&quot;stat_2d&quot;</span>)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-246-3.png" width="672" /></p>
 <div id="model-comparison" class="section level3 hasAnchor" number="8.2.1">
 <h3><span class="header-section-number">8.2.1</span> Model Comparison<a href="BayesRegression.html#model-comparison" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Use the <strong>loo</strong> (leave on out) package to compare models. <strong>loo</strong> approximates cross-validation. In the initial summary, 4000 is the number of iterations in the posterior, and 434 is the number of observations in the data set.</p>
 <p><code>ekpd_loo</code> is the LOO estimate; <code>p_loo</code> is the effective number of parameters in the model; and <code>looic</code> is the LOO estimate converted to the deviance scale, -2 * LOO.</p>
-<div class="sourceCode" id="cb452"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb452-1"><a href="BayesRegression.html#cb452-1" tabindex="-1"></a>stan_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(stan_mdl)</span>
-<span id="cb452-2"><a href="BayesRegression.html#cb452-2" tabindex="-1"></a>stan_loo</span></code></pre></div>
+<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="BayesRegression.html#cb394-1" tabindex="-1"></a>stan_loo <span class="ot">&lt;-</span> <span class="fu">loo</span>(stan_mdl)</span>
+<span id="cb394-2"><a href="BayesRegression.html#cb394-2" tabindex="-1"></a>stan_loo</span></code></pre></div>
 <pre><code>## 
 ## Computed from 4000 by 434 log-likelihood matrix
 ## 
@@ -646,11 +655,11 @@ div.csl-indent {
 ## All Pareto k estimates are good (k &lt; 0.5).
 ## See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
 <p>The statistics are not useful in isolation - they should be used in comparison to competing models.</p>
-<div class="sourceCode" id="cb454"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb454-1"><a href="BayesRegression.html#cb454-1" tabindex="-1"></a>stan_mdl_2 <span class="ot">&lt;-</span> <span class="fu">stan_glm</span>(kid_score <span class="sc">~</span> mom_iq <span class="sc">*</span> mom_hs, <span class="at">data =</span> kidiq)</span></code></pre></div>
+<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="BayesRegression.html#cb396-1" tabindex="-1"></a>stan_mdl_2 <span class="ot">&lt;-</span> <span class="fu">stan_glm</span>(kid_score <span class="sc">~</span> mom_iq <span class="sc">*</span> mom_hs, <span class="at">data =</span> kidiq)</span></code></pre></div>
 <p>Which model has more predictive power? As a rule of thumb, if the absolute value of the difference is greater than the standard error, then the result is significant. In this case, the new model is significantly better.</p>
-<div class="sourceCode" id="cb455"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb455-1"><a href="BayesRegression.html#cb455-1" tabindex="-1"></a>stan_loo_2 <span class="ot">&lt;-</span> <span class="fu">loo</span>(stan_mdl_2) </span>
-<span id="cb455-2"><a href="BayesRegression.html#cb455-2" tabindex="-1"></a></span>
-<span id="cb455-3"><a href="BayesRegression.html#cb455-3" tabindex="-1"></a><span class="fu">loo_compare</span>(stan_loo, stan_loo_2)</span></code></pre></div>
+<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="BayesRegression.html#cb397-1" tabindex="-1"></a>stan_loo_2 <span class="ot">&lt;-</span> <span class="fu">loo</span>(stan_mdl_2) </span>
+<span id="cb397-2"><a href="BayesRegression.html#cb397-2" tabindex="-1"></a></span>
+<span id="cb397-3"><a href="BayesRegression.html#cb397-3" tabindex="-1"></a><span class="fu">loo_compare</span>(stan_loo, stan_loo_2)</span></code></pre></div>
 <pre><code>##            elpd_diff se_diff
 ## stan_mdl_2  0.0       0.0   
 ## stan_mdl   -6.4       4.3</code></pre>
@@ -658,33 +667,33 @@ div.csl-indent {
 <div id="visualization" class="section level3 hasAnchor" number="8.2.2">
 <h3><span class="header-section-number">8.2.2</span> Visualization<a href="BayesRegression.html#visualization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Use <code>tidy()</code> to pull out the intercept and slope. Use the posterior distributions to create a predicted regression line from each draw in the posterior samples. These lines will show the uncertainty around the overall line.</p>
-<div class="sourceCode" id="cb457"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb457-1"><a href="BayesRegression.html#cb457-1" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
-<span id="cb457-2"><a href="BayesRegression.html#cb457-2" tabindex="-1"></a></span>
-<span id="cb457-3"><a href="BayesRegression.html#cb457-3" tabindex="-1"></a>stan_tdy_2 <span class="ot">&lt;-</span> <span class="fu">tidy</span>(stan_mdl_2)</span>
-<span id="cb457-4"><a href="BayesRegression.html#cb457-4" tabindex="-1"></a></span>
-<span id="cb457-5"><a href="BayesRegression.html#cb457-5" tabindex="-1"></a>draws <span class="ot">&lt;-</span> tidybayes<span class="sc">::</span><span class="fu">spread_draws</span>(stan_mdl_2, <span class="st">`</span><span class="at">(Intercept)</span><span class="st">`</span>, mom_iq)</span>
-<span id="cb457-6"><a href="BayesRegression.html#cb457-6" tabindex="-1"></a></span>
-<span id="cb457-7"><a href="BayesRegression.html#cb457-7" tabindex="-1"></a>kidiq <span class="sc">%&gt;%</span></span>
-<span id="cb457-8"><a href="BayesRegression.html#cb457-8" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> mom_iq, <span class="at">y =</span> kid_score)) <span class="sc">+</span></span>
-<span id="cb457-9"><a href="BayesRegression.html#cb457-9" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb457-10"><a href="BayesRegression.html#cb457-10" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> draws, <span class="fu">aes</span>(<span class="at">intercept =</span> <span class="st">`</span><span class="at">(Intercept)</span><span class="st">`</span>, <span class="at">slope =</span> mom_iq), </span>
-<span id="cb457-11"><a href="BayesRegression.html#cb457-11" tabindex="-1"></a>              <span class="at">size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">&quot;skyblue&quot;</span>) <span class="sc">+</span></span>
-<span id="cb457-12"><a href="BayesRegression.html#cb457-12" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> stan_tdy_2<span class="sc">$</span>estimate[<span class="dv">1</span>], <span class="at">slope =</span> stan_tdy_2<span class="sc">$</span>estimate[<span class="dv">2</span>]) </span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-289-1.png" width="672" /></p>
+<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="BayesRegression.html#cb399-1" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb399-2"><a href="BayesRegression.html#cb399-2" tabindex="-1"></a></span>
+<span id="cb399-3"><a href="BayesRegression.html#cb399-3" tabindex="-1"></a>stan_tdy_2 <span class="ot">&lt;-</span> <span class="fu">tidy</span>(stan_mdl_2)</span>
+<span id="cb399-4"><a href="BayesRegression.html#cb399-4" tabindex="-1"></a></span>
+<span id="cb399-5"><a href="BayesRegression.html#cb399-5" tabindex="-1"></a>draws <span class="ot">&lt;-</span> tidybayes<span class="sc">::</span><span class="fu">spread_draws</span>(stan_mdl_2, <span class="st">`</span><span class="at">(Intercept)</span><span class="st">`</span>, mom_iq)</span>
+<span id="cb399-6"><a href="BayesRegression.html#cb399-6" tabindex="-1"></a></span>
+<span id="cb399-7"><a href="BayesRegression.html#cb399-7" tabindex="-1"></a>kidiq <span class="sc">%&gt;%</span></span>
+<span id="cb399-8"><a href="BayesRegression.html#cb399-8" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> mom_iq, <span class="at">y =</span> kid_score)) <span class="sc">+</span></span>
+<span id="cb399-9"><a href="BayesRegression.html#cb399-9" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb399-10"><a href="BayesRegression.html#cb399-10" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">data =</span> draws, <span class="fu">aes</span>(<span class="at">intercept =</span> <span class="st">`</span><span class="at">(Intercept)</span><span class="st">`</span>, <span class="at">slope =</span> mom_iq), </span>
+<span id="cb399-11"><a href="BayesRegression.html#cb399-11" tabindex="-1"></a>              <span class="at">size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>, <span class="at">color =</span> <span class="st">&quot;skyblue&quot;</span>) <span class="sc">+</span></span>
+<span id="cb399-12"><a href="BayesRegression.html#cb399-12" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> stan_tdy_2<span class="sc">$</span>estimate[<span class="dv">1</span>], <span class="at">slope =</span> stan_tdy_2<span class="sc">$</span>estimate[<span class="dv">2</span>]) </span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-250-1.png" width="672" /></p>
 <p>Use the model to get posterior predictions with <code>posterior_predict()</code>.</p>
-<div class="sourceCode" id="cb458"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb458-1"><a href="BayesRegression.html#cb458-1" tabindex="-1"></a>posteriors <span class="ot">&lt;-</span> <span class="fu">posterior_predict</span>(stan_mdl_2)</span>
-<span id="cb458-2"><a href="BayesRegression.html#cb458-2" tabindex="-1"></a></span>
-<span id="cb458-3"><a href="BayesRegression.html#cb458-3" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">mom_iq =</span> <span class="dv">100</span>, <span class="at">mom_hs =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb458-4"><a href="BayesRegression.html#cb458-4" tabindex="-1"></a>posteriors_2 <span class="ot">&lt;-</span> <span class="fu">posterior_predict</span>(stan_mdl_2, <span class="at">newdata =</span> new_data) <span class="sc">%&gt;%</span></span>
-<span id="cb458-5"><a href="BayesRegression.html#cb458-5" tabindex="-1"></a>  <span class="fu">as.data.frame</span>()</span>
-<span id="cb458-6"><a href="BayesRegression.html#cb458-6" tabindex="-1"></a></span>
-<span id="cb458-7"><a href="BayesRegression.html#cb458-7" tabindex="-1"></a><span class="fu">colnames</span>(posteriors_2) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;No HS&quot;</span>, <span class="st">&quot;Completed HS&quot;</span>)</span>
-<span id="cb458-8"><a href="BayesRegression.html#cb458-8" tabindex="-1"></a>posteriors_2 <span class="sc">%&gt;%</span></span>
-<span id="cb458-9"><a href="BayesRegression.html#cb458-9" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">&quot;HS&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;predict&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb458-10"><a href="BayesRegression.html#cb458-10" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> predict)) <span class="sc">+</span></span>
-<span id="cb458-11"><a href="BayesRegression.html#cb458-11" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
-<span id="cb458-12"><a href="BayesRegression.html#cb458-12" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>HS, <span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-290-1.png" width="672" /></p>
+<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="BayesRegression.html#cb400-1" tabindex="-1"></a>posteriors <span class="ot">&lt;-</span> <span class="fu">posterior_predict</span>(stan_mdl_2)</span>
+<span id="cb400-2"><a href="BayesRegression.html#cb400-2" tabindex="-1"></a></span>
+<span id="cb400-3"><a href="BayesRegression.html#cb400-3" tabindex="-1"></a>new_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">mom_iq =</span> <span class="dv">100</span>, <span class="at">mom_hs =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb400-4"><a href="BayesRegression.html#cb400-4" tabindex="-1"></a>posteriors_2 <span class="ot">&lt;-</span> <span class="fu">posterior_predict</span>(stan_mdl_2, <span class="at">newdata =</span> new_data) <span class="sc">%&gt;%</span></span>
+<span id="cb400-5"><a href="BayesRegression.html#cb400-5" tabindex="-1"></a>  <span class="fu">as.data.frame</span>()</span>
+<span id="cb400-6"><a href="BayesRegression.html#cb400-6" tabindex="-1"></a></span>
+<span id="cb400-7"><a href="BayesRegression.html#cb400-7" tabindex="-1"></a><span class="fu">colnames</span>(posteriors_2) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;No HS&quot;</span>, <span class="st">&quot;Completed HS&quot;</span>)</span>
+<span id="cb400-8"><a href="BayesRegression.html#cb400-8" tabindex="-1"></a>posteriors_2 <span class="sc">%&gt;%</span></span>
+<span id="cb400-9"><a href="BayesRegression.html#cb400-9" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">&quot;HS&quot;</span>, <span class="at">values_to =</span> <span class="st">&quot;predict&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb400-10"><a href="BayesRegression.html#cb400-10" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> predict)) <span class="sc">+</span></span>
+<span id="cb400-11"><a href="BayesRegression.html#cb400-11" tabindex="-1"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb400-12"><a href="BayesRegression.html#cb400-12" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>HS, <span class="at">ncol =</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-251-1.png" width="672" /></p>
 
 </div>
 </div>
@@ -694,8 +703,8 @@ div.csl-indent {
           </div>
         </div>
       </div>
-<a href="EMMs.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="references-1.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="support-vector-machines.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="EMMs.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 6 Support Vector Machines | Supervised Machine Learning</title>
+  <title>Chapter 7 Support Vector Machines | Supervised Machine Learning</title>
   <meta name="description" content="These are my personal notes related to supervised machine learning techniques." />
-  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 6 Support Vector Machines | Supervised Machine Learning" />
+  <meta property="og:title" content="Chapter 7 Support Vector Machines | Supervised Machine Learning" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="These are my personal notes related to supervised machine learning techniques." />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 6 Support Vector Machines | Supervised Machine Learning" />
+  <meta name="twitter:title" content="Chapter 7 Support Vector Machines | Supervised Machine Learning" />
   
   <meta name="twitter:description" content="These are my personal notes related to supervised machine learning techniques." />
   
@@ -23,15 +23,15 @@
 <meta name="author" content="Michael Foley" />
 
 
-<meta name="date" content="2023-07-30" />
+<meta name="date" content="2024-01-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="non-linear-models.html"/>
-<link rel="next" href="EMMs.html"/>
+<link rel="prev" href="decision-trees.html"/>
+<link rel="next" href="BayesRegression.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -52,8 +52,6 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
-<link href="libs/tabwid-1.1.3/tabwid.css" rel="stylesheet" />
-<script src="libs/tabwid-1.1.3/tabwid.js"></script>
 
 
 <style type="text/css">
@@ -192,82 +190,86 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html"><i class="fa fa-check"></i><b>2</b> Generalized Linear Models (GLM)</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#binomiallogistic"><i class="fa fa-check"></i><b>2.1</b> Binomial Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs1"><i class="fa fa-check"></i>Case Study 1</a>
+<li class="chapter" data-level="2.1" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#binomiallogistic"><i class="fa fa-check"></i><b>2.1</b> Binomial Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#the-model"><i class="fa fa-check"></i>The Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs1"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model"><i class="fa fa-check"></i>Fit the Model</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpretation-1"><i class="fa fa-check"></i>Interpretation</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions"><i class="fa fa-check"></i>Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#model-fit"><i class="fa fa-check"></i>Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#multinomiallogistic"><i class="fa fa-check"></i><b>2.2</b> Multinomial Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs2"><i class="fa fa-check"></i>Case Study 2</a>
+<li class="chapter" data-level="2.2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#multinomiallogistic"><i class="fa fa-check"></i><b>2.2</b> Multinomial Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#the-model-1"><i class="fa fa-check"></i>The Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs2"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model-1"><i class="fa fa-check"></i>Fit the Model</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpretation-2"><i class="fa fa-check"></i>Interpretation</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions-1"><i class="fa fa-check"></i>Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#model-fit-1"><i class="fa fa-check"></i>Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit-1"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting-1"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#ordinallogistic"><i class="fa fa-check"></i><b>2.3</b> Ordinal Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs3"><i class="fa fa-check"></i>Case Study 3</a>
+<li class="chapter" data-level="2.3" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#ordinallogistic"><i class="fa fa-check"></i><b>2.3</b> Ordinal Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model"><i class="fa fa-check"></i>Fit the Model</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#verify-assumptions"><i class="fa fa-check"></i>Verify Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assess-the-model-fit"><i class="fa fa-check"></i>Assess the Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs3"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model-2"><i class="fa fa-check"></i>Fit the Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions-2"><i class="fa fa-check"></i>Assumptions</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit-2"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpret-results"><i class="fa fa-check"></i>Interpret Results</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting-2"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.4" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#poissonregression"><i class="fa fa-check"></i><b>2.4</b> Poisson Regression</a></li>
+<li class="chapter" data-level="2.4" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#poissonregression"><i class="fa fa-check"></i><b>2.4</b> Poisson Regression</a>
+<ul>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs4"><i class="fa fa-check"></i>Case Study 4</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="regularization.html"><a href="regularization.html"><i class="fa fa-check"></i><b>3</b> Regularization</a>
+</ul></li>
+<li class="chapter" data-level="3" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html"><i class="fa fa-check"></i><b>3</b> Mixed Effects Models</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="regularization.html"><a href="regularization.html#ridge"><i class="fa fa-check"></i><b>3.1</b> Ridge</a></li>
-<li class="chapter" data-level="3.2" data-path="regularization.html"><a href="regularization.html#lasso"><i class="fa fa-check"></i><b>3.2</b> Lasso</a></li>
-<li class="chapter" data-level="3.3" data-path="regularization.html"><a href="regularization.html#elastic-net"><i class="fa fa-check"></i><b>3.3</b> Elastic Net</a></li>
+<li class="chapter" data-level="3.1" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#lme"><i class="fa fa-check"></i><b>3.1</b> Linear Mixed Effects</a>
+<ul>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#lme1"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#fit-the-model-3"><i class="fa fa-check"></i>Fit the Model</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#interpretation-3"><i class="fa fa-check"></i>Interpretation</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#model-assumptions-1"><i class="fa fa-check"></i>Model Assumptions</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#evaluate-the-fit-3"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#reporting-3"><i class="fa fa-check"></i>Reporting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="non-linear-models.html"><a href="non-linear-models.html"><i class="fa fa-check"></i><b>4</b> Non-linear Models</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="non-linear-models.html"><a href="non-linear-models.html#splines"><i class="fa fa-check"></i><b>4.1</b> Splines</a></li>
+<li class="chapter" data-level="4.2" data-path="non-linear-models.html"><a href="non-linear-models.html#mars"><i class="fa fa-check"></i><b>4.2</b> MARS</a></li>
+<li class="chapter" data-level="4.3" data-path="non-linear-models.html"><a href="non-linear-models.html#gam"><i class="fa fa-check"></i><b>4.3</b> GAM</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="regularization.html"><a href="regularization.html"><i class="fa fa-check"></i><b>5</b> Regularization</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="regularization.html"><a href="regularization.html#ridge"><i class="fa fa-check"></i><b>5.1</b> Ridge</a></li>
+<li class="chapter" data-level="5.2" data-path="regularization.html"><a href="regularization.html#lasso"><i class="fa fa-check"></i><b>5.2</b> Lasso</a></li>
+<li class="chapter" data-level="5.3" data-path="regularization.html"><a href="regularization.html#elastic-net"><i class="fa fa-check"></i><b>5.3</b> Elastic Net</a></li>
 <li class="chapter" data-level="" data-path="regularization.html"><a href="regularization.html#model-summary"><i class="fa fa-check"></i>Model Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="decision-trees.html"><a href="decision-trees.html"><i class="fa fa-check"></i><b>4</b> Decision Trees</a>
+<li class="chapter" data-level="6" data-path="decision-trees.html"><a href="decision-trees.html"><i class="fa fa-check"></i><b>6</b> Decision Trees</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-tree"><i class="fa fa-check"></i><b>4.1</b> Classification Tree</a>
+<li class="chapter" data-level="6.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-tree"><i class="fa fa-check"></i><b>6.1</b> Classification Tree</a>
 <ul>
-<li class="chapter" data-level="4.1.1" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance"><i class="fa fa-check"></i><b>4.1.1</b> Measuring Performance</a></li>
-<li class="chapter" data-level="4.1.2" data-path="decision-trees.html"><a href="decision-trees.html#training-with-caret"><i class="fa fa-check"></i><b>4.1.2</b> Training with Caret</a></li>
+<li class="chapter" data-level="" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance"><i class="fa fa-check"></i>Measuring Performance</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-tree"><i class="fa fa-check"></i><b>4.2</b> Regression Tree</a>
+<li class="chapter" data-level="6.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-tree"><i class="fa fa-check"></i><b>6.2</b> Regression Tree</a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="decision-trees.html"><a href="decision-trees.html#training-with-caret-1"><i class="fa fa-check"></i><b>4.2.1</b> Training with Caret</a></li>
+<li class="chapter" data-level="" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance-1"><i class="fa fa-check"></i>Measuring Performance</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="decision-trees.html"><a href="decision-trees.html#bagged-trees"><i class="fa fa-check"></i><b>4.3</b> Bagged Trees</a>
+<li class="chapter" data-level="6.3" data-path="decision-trees.html"><a href="decision-trees.html#bagged-trees"><i class="fa fa-check"></i><b>6.3</b> Bagged Trees</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="decision-trees.html"><a href="decision-trees.html#bagged-classification-tree"><i class="fa fa-check"></i><b>4.3.1</b> Bagged Classification Tree</a></li>
-<li class="chapter" data-level="4.3.2" data-path="decision-trees.html"><a href="decision-trees.html#bagging-regression-tree"><i class="fa fa-check"></i><b>4.3.2</b> Bagging Regression Tree</a></li>
+<li class="chapter" data-level="6.3.1" data-path="decision-trees.html"><a href="decision-trees.html#bagged-classification-tree"><i class="fa fa-check"></i><b>6.3.1</b> Bagged Classification Tree</a></li>
+<li class="chapter" data-level="6.3.2" data-path="decision-trees.html"><a href="decision-trees.html#bagging-regression-tree"><i class="fa fa-check"></i><b>6.3.2</b> Bagging Regression Tree</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="decision-trees.html"><a href="decision-trees.html#random-forests"><i class="fa fa-check"></i><b>4.4</b> Random Forests</a></li>
-<li class="chapter" data-level="4.5" data-path="decision-trees.html"><a href="decision-trees.html#gradient-boosting"><i class="fa fa-check"></i><b>4.5</b> Gradient Boosting</a></li>
-<li class="chapter" data-level="4.6" data-path="decision-trees.html"><a href="decision-trees.html#summary"><i class="fa fa-check"></i><b>4.6</b> Summary</a>
+<li class="chapter" data-level="6.4" data-path="decision-trees.html"><a href="decision-trees.html#random-forests"><i class="fa fa-check"></i><b>6.4</b> Random Forests</a></li>
+<li class="chapter" data-level="6.5" data-path="decision-trees.html"><a href="decision-trees.html#gradient-boosting"><i class="fa fa-check"></i><b>6.5</b> Gradient Boosting</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="support-vector-machines.html"><a href="support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Support Vector Machines</a>
 <ul>
-<li class="chapter" data-level="4.6.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-trees"><i class="fa fa-check"></i><b>4.6.1</b> Classification Trees</a></li>
-<li class="chapter" data-level="4.6.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-trees"><i class="fa fa-check"></i><b>4.6.2</b> Regression Trees</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="non-linear-models.html"><a href="non-linear-models.html"><i class="fa fa-check"></i><b>5</b> Non-linear Models</a>
-<ul>
-<li class="chapter" data-level="5.1" data-path="non-linear-models.html"><a href="non-linear-models.html#splines"><i class="fa fa-check"></i><b>5.1</b> Splines</a></li>
-<li class="chapter" data-level="5.2" data-path="non-linear-models.html"><a href="non-linear-models.html#mars"><i class="fa fa-check"></i><b>5.2</b> MARS</a></li>
-<li class="chapter" data-level="5.3" data-path="non-linear-models.html"><a href="non-linear-models.html#gam"><i class="fa fa-check"></i><b>5.3</b> GAM</a></li>
-</ul></li>
-<li class="chapter" data-level="6" data-path="support-vector-machines.html"><a href="support-vector-machines.html"><i class="fa fa-check"></i><b>6</b> Support Vector Machines</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="support-vector-machines.html"><a href="support-vector-machines.html#maximal-margin-classifier"><i class="fa fa-check"></i><b>6.1</b> Maximal Margin Classifier</a></li>
-<li class="chapter" data-level="6.2" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>6.2</b> Support Vector Classifier</a></li>
-<li class="chapter" data-level="6.3" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>6.3</b> Support Vector Machines</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="EMMs.html"><a href="EMMs.html"><i class="fa fa-check"></i><b>7</b> Topics: EMMs</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="EMMs.html"><a href="EMMs.html#references"><i class="fa fa-check"></i><b>7.1</b> References</a></li>
+<li class="chapter" data-level="7.1" data-path="support-vector-machines.html"><a href="support-vector-machines.html#maximal-margin-classifier"><i class="fa fa-check"></i><b>7.1</b> Maximal Margin Classifier</a></li>
+<li class="chapter" data-level="7.2" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>7.2</b> Support Vector Classifier</a></li>
+<li class="chapter" data-level="7.3" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>7.3</b> Support Vector Machines</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="BayesRegression.html"><a href="BayesRegression.html"><i class="fa fa-check"></i><b>8</b> Bayesian Regression</a>
 <ul>
@@ -277,6 +279,10 @@ div.csl-indent {
 <li class="chapter" data-level="8.2.1" data-path="BayesRegression.html"><a href="BayesRegression.html#model-comparison"><i class="fa fa-check"></i><b>8.2.1</b> Model Comparison</a></li>
 <li class="chapter" data-level="8.2.2" data-path="BayesRegression.html"><a href="BayesRegression.html#visualization"><i class="fa fa-check"></i><b>8.2.2</b> Visualization</a></li>
 </ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="EMMs.html"><a href="EMMs.html"><i class="fa fa-check"></i><b>9</b> Estimated Marginal Means</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="EMMs.html"><a href="EMMs.html#references"><i class="fa fa-check"></i><b>9.1</b> References</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references-1.html"><a href="references-1.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -299,25 +305,25 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="support-vector-machines" class="section level1 hasAnchor" number="6">
-<h1><span class="header-section-number">Chapter 6</span> Support Vector Machines<a href="support-vector-machines.html#support-vector-machines" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="support-vector-machines" class="section level1 hasAnchor" number="7">
+<h1><span class="header-section-number">Chapter 7</span> Support Vector Machines<a href="support-vector-machines.html#support-vector-machines" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>These notes rely on <span class="citation">(<a href="#ref-James2013">James et al. 2013</a>)</span>, <span class="citation">(<a href="#ref-Hastie2017">Hastie, Tibshirani, and Friedman 2017</a>)</span>, <span class="citation">(<a href="#ref-Kuhn2016">Kuhn and Johnson 2016</a>)</span>, <a href="https://online.stat.psu.edu/stat508/">PSU STAT 508</a>, and the <a href="https://cran.r-project.org/web/packages/e1071/vignettes/svmdoc.pdf">e1071 SVM vignette</a>.</p>
 <p>Support Vector Machines (SVM) is a classification model that maps observations as points in space so that the categories are divided by as wide a gap as possible. New observations can then be mapped into the space for prediction. The SVM algorithm finds the optimal separating hyperplane using a nonlinear mapping. The hyperplane is defined by the observations that lie within a margin optimized by a cost hyperparameter. These observations are called the <em>support vectors</em>.</p>
 <p>SVM is an extension of the <em>support vector classifier</em> which in turn is a generalization of the simple and intuitive <em>maximal margin classifier</em>. The maximal margin classifier is defined for cases where the data can be separated by a linear boundary (uncommon). The support vector classifier generalizes the maximal margin classifier by introducing a margin which permits some observations to land on wrong side of the hyperplane. The support vector machine generalizes still more by introducing non-linear hyperplanes. The best way to understand SVM is to start with the maximal margin classifier and work up.</p>
 <p>I’ll learn by example, using the <code>ISLR::Default</code> data set to predict which customers will default on their credit card debt from its 3 predictor variables. I’m using this <a href="https://dataaspirant.com/support-vector-machine-classifier-implementation-r-caret-package/#:~:text=For%20machine%20learning%2C%20caret%20package%20is%20a%20nice,build%20a%20hyperplane%20separating%20data%20for%20different%20classes.">Dataaspirant</a> tutorial for guidance. The three predictors are <code>student</code> (Yes|No), current credit card <code>balance</code>, and annual <code>income</code>.</p>
-<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb381-1"><a href="support-vector-machines.html#cb381-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb381-2"><a href="support-vector-machines.html#cb381-2" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb381-3"><a href="support-vector-machines.html#cb381-3" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
-<span id="cb381-4"><a href="support-vector-machines.html#cb381-4" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
-<span id="cb381-5"><a href="support-vector-machines.html#cb381-5" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
-<span id="cb381-6"><a href="support-vector-machines.html#cb381-6" tabindex="-1"></a></span>
-<span id="cb381-7"><a href="support-vector-machines.html#cb381-7" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
-<span id="cb381-8"><a href="support-vector-machines.html#cb381-8" tabindex="-1"></a><span class="fu">library</span>(recipes)</span>
-<span id="cb381-9"><a href="support-vector-machines.html#cb381-9" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
-<span id="cb381-10"><a href="support-vector-machines.html#cb381-10" tabindex="-1"></a></span>
-<span id="cb381-11"><a href="support-vector-machines.html#cb381-11" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb381-12"><a href="support-vector-machines.html#cb381-12" tabindex="-1"></a>dat <span class="ot">&lt;-</span> ISLR<span class="sc">::</span>Default <span class="sc">%&gt;%</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">1000</span>)</span>
-<span id="cb381-13"><a href="support-vector-machines.html#cb381-13" tabindex="-1"></a><span class="fu">glimpse</span>(dat)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="support-vector-machines.html#cb1-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="support-vector-machines.html#cb1-2" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-3"><a href="support-vector-machines.html#cb1-3" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb1-4"><a href="support-vector-machines.html#cb1-4" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-5"><a href="support-vector-machines.html#cb1-5" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb1-6"><a href="support-vector-machines.html#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="support-vector-machines.html#cb1-7" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-8"><a href="support-vector-machines.html#cb1-8" tabindex="-1"></a><span class="fu">library</span>(recipes)</span>
+<span id="cb1-9"><a href="support-vector-machines.html#cb1-9" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
+<span id="cb1-10"><a href="support-vector-machines.html#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="support-vector-machines.html#cb1-11" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-12"><a href="support-vector-machines.html#cb1-12" tabindex="-1"></a>dat <span class="ot">&lt;-</span> ISLR<span class="sc">::</span>Default <span class="sc">%&gt;%</span> <span class="fu">slice_sample</span>(<span class="at">n =</span> <span class="dv">1000</span>)</span>
+<span id="cb1-13"><a href="support-vector-machines.html#cb1-13" tabindex="-1"></a><span class="fu">glimpse</span>(dat)</span></code></pre></div>
 <pre><code>## Rows: 1,000
 ## Columns: 4
 ## $ default &lt;fct&gt; No, No, No, No, No, No, No, No, No, No, No, No, No, No, No, No…
@@ -325,76 +331,76 @@ div.csl-indent {
 ## $ balance &lt;dbl&gt; 559.4686, 905.6415, 1806.5517, 1615.2250, 1229.4415, 1723.2161…
 ## $ income  &lt;dbl&gt; 61187.81, 47271.35, 17648.20, 55219.52, 12158.04, 23279.00, 40…</code></pre>
 <p>I’ll build and compare models the customary way, splitting <code>dat</code> (<em>n</em> = 1,000) into <code>dat_train</code> (80%, <em>n</em> = 800) to fit models, and <code>dat_test</code> (20%, <em>n</em> = 200) to evaluate.</p>
-<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="support-vector-machines.html#cb383-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb383-2"><a href="support-vector-machines.html#cb383-2" tabindex="-1"></a></span>
-<span id="cb383-3"><a href="support-vector-machines.html#cb383-3" tabindex="-1"></a><span class="co"># initial_split() partitions by `strata`, then samples `prop` percent. This </span></span>
-<span id="cb383-4"><a href="support-vector-machines.html#cb383-4" tabindex="-1"></a><span class="co"># ensures the outcome is proportionally represented in data sets.</span></span>
-<span id="cb383-5"><a href="support-vector-machines.html#cb383-5" tabindex="-1"></a>dat_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(dat, <span class="at">prop =</span> .<span class="dv">8</span>, <span class="at">strata =</span> default)</span>
-<span id="cb383-6"><a href="support-vector-machines.html#cb383-6" tabindex="-1"></a>dat_train <span class="ot">&lt;-</span> <span class="fu">training</span>(dat_split)</span>
-<span id="cb383-7"><a href="support-vector-machines.html#cb383-7" tabindex="-1"></a>dat_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(dat_split)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="support-vector-machines.html#cb3-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb3-2"><a href="support-vector-machines.html#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="support-vector-machines.html#cb3-3" tabindex="-1"></a><span class="co"># initial_split() partitions by `strata`, then samples `prop` percent. This </span></span>
+<span id="cb3-4"><a href="support-vector-machines.html#cb3-4" tabindex="-1"></a><span class="co"># ensures the outcome is proportionally represented in data sets.</span></span>
+<span id="cb3-5"><a href="support-vector-machines.html#cb3-5" tabindex="-1"></a>dat_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(dat, <span class="at">prop =</span> .<span class="dv">8</span>, <span class="at">strata =</span> default)</span>
+<span id="cb3-6"><a href="support-vector-machines.html#cb3-6" tabindex="-1"></a>dat_train <span class="ot">&lt;-</span> <span class="fu">training</span>(dat_split)</span>
+<span id="cb3-7"><a href="support-vector-machines.html#cb3-7" tabindex="-1"></a>dat_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(dat_split)</span></code></pre></div>
 <p>Only 3.0% of applicants default, so this is a difficult prediction problem.</p>
-<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="support-vector-machines.html#cb384-1" tabindex="-1"></a><span class="fu">tabyl</span>(dat<span class="sc">$</span>default)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="support-vector-machines.html#cb4-1" tabindex="-1"></a><span class="fu">tabyl</span>(dat<span class="sc">$</span>default)</span></code></pre></div>
 <pre><code>##  dat$default   n percent
 ##           No 970    0.97
 ##          Yes  30    0.03</code></pre>
-<div id="maximal-margin-classifier" class="section level2 hasAnchor" number="6.1">
-<h2><span class="header-section-number">6.1</span> Maximal Margin Classifier<a href="support-vector-machines.html#maximal-margin-classifier" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="maximal-margin-classifier" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Maximal Margin Classifier<a href="support-vector-machines.html#maximal-margin-classifier" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The maximal margin classifier is the optimal hyperplane defined in the (rare) case where two classes are <em>linearly separable</em>. Given an <span class="math inline">\(X_{n \times p}\)</span> predictor matrix with a binary response variable <span class="math inline">\(y \in \{-1, 1\}\)</span> it <em>might</em> be possible to define a <em>p</em>-dimensional hyperplane <span class="math inline">\(h(x) = \beta_0 + \beta_1x_1 + \beta_2x_2 \dots + \beta_px_p = X_i^{&#39;} \beta + \beta_0 = 0\)</span> such that all of the <span class="math inline">\(y_i = -1\)</span> observations fall on the negative side of the hyperplane and the <span class="math inline">\(y_i = +1\)</span> observations fall on the positive side:</p>
 <p><span class="math display">\[y_i \left(x_i^{&#39;} \beta + \beta_0 \right) &gt; 0\]</span></p>
 <p>This <em>separating hyperplane</em> is a simple classifier, and the magnitude of <span class="math inline">\(\left(x_i^{&#39;} \beta + \beta_0 \right)\)</span> is an indicator of confidence in the predicted classification.</p>
 <p>If you constrain <span class="math inline">\(\beta\)</span> to be a unit vector, <span class="math inline">\(||\beta|| = \sum\beta^2 = 1\)</span>, then the products of the hyperplane and response variables, <span class="math inline">\(\left(x_i^{&#39;} \beta + \beta_0 \right)\)</span>, are the positive perpendicular distances from the hyperplane. If a separating hyperplane exists, there are an infinite number of possible hyperplanes. Evaluate a hyperplane by its <em>margin</em>, <span class="math inline">\(M\)</span>, the perpendicular distance to the closest observation.</p>
 <p><span class="math display">\[M = \min \left\{y_i (x_i^{&#39;} \beta + \beta_0) \right\}.\]</span></p>
 <p>The <em>maximal margin classifier</em> is the hyperplane that maximizes <span class="math inline">\(M.\)</span> The figure below (adapted from figure 9.3 from <span class="citation">(<a href="#ref-James2013">James et al. 2013</a>)</span>) shows a maximal marginal classifier. The three vectors shown in the figure anchor the hyperplane and are called the <em>support vectors</em>. Interestingly, it is only these three observations that factor into the determination of the maximal marginal classifier.</p>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-259-1.png" width="480" /></p>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-4-1.png" width="480" /></p>
 <p>So, to put it all together, if a separating hyperplane exists, one could calculate it by maximizing <span class="math inline">\(M\)</span> subject to <span class="math inline">\(||\beta|| = 1\)</span> and <span class="math inline">\(y_i (x_i^{&#39;} \beta + \beta_0) \ge M\)</span> for all <span class="math inline">\(i\)</span>. However, a separating hyperplane rarely exists. In fact, even if a separating hyperplane does exist, its maximal margin classifier is probably undesirably narrow. A maximal margin classifier is sensitive to outliers so it tends to overfit data.</p>
 </div>
-<div id="support-vector-classifier" class="section level2 hasAnchor" number="6.2">
-<h2><span class="header-section-number">6.2</span> Support Vector Classifier<a href="support-vector-machines.html#support-vector-classifier" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="support-vector-classifier" class="section level2 hasAnchor" number="7.2">
+<h2><span class="header-section-number">7.2</span> Support Vector Classifier<a href="support-vector-machines.html#support-vector-classifier" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The maximal margin classifier can be generalized to non-separable cases using a so-called <em>soft margin</em>. The generalization is called the <em>support vector classifier</em>. The soft margin allows some misclassification in the interest of greater robustness to individual observations.</p>
 <p>The support vector classifier maximizes <span class="math inline">\(M\)</span> subject to <span class="math inline">\(||\beta|| = 1\)</span> and <span class="math inline">\(y_i (x_i^{&#39;} \beta + \beta_0) \ge M(1 - \xi_i)\)</span> and <span class="math inline">\(\sum \xi_i \le \Xi\)</span> for all <span class="math inline">\(i\)</span>. The <span class="math inline">\(\xi_i\)</span> are <em>slack variables</em> whose sum is bounded by some constant tuning parameter <span class="math inline">\(\Xi\)</span>. The slack variable values indicate where the observation lies: <span class="math inline">\(\xi_i = 0\)</span> observations lie on the correct side of the margin; <span class="math inline">\(\xi_i &gt; 0\)</span> observation lie on the wrong side of the margin; <span class="math inline">\(\xi_i &gt; 1\)</span> observations lie on the wrong side of the hyperplane. <span class="math inline">\(\Xi\)</span> sets the tolerance for margin violation. If <span class="math inline">\(\Xi = 0\)</span>, then all observations must reside on the correct side of the margin, as in the maximal margin classifier. <span class="math inline">\(\Xi\)</span> controls the bias-variance trade-off: as <span class="math inline">\(\Xi\)</span> increases, the margin widens and allows more violations, increasing bias and decreasing variance. Similar to the maximal margin classifier, only the observations that are on the margin or that violate the margin factor into the determination of the support vector classifier. These observations are the support vectors.</p>
 <p>The figure below (adaptation of figure 9.7 from <span class="citation">(<a href="#ref-James2013">James et al. 2013</a>)</span>) shows two support vector classifiers. The one on the left uses a large <span class="math inline">\(\Xi\)</span> and as a result includes many support vectors. The one on the right uses a smaller <span class="math inline">\(\Xi.\)</span></p>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-260-1.png" width="672" /></p>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <p>As <span class="math inline">\(\Xi\)</span> increases, the number of violating observations increase, and thus the number of support vectors increases. This property makes the algorithm robust to the extreme observations far away from the hyperplane. The only shortcoming with the algorithm is that it presumes a linear decision boundary.</p>
 <p>Let’s build a support vector classifier model to predict credit <code>default</code> in the <code>ISLM:Default</code> data set. I’ll build the model in <strong>caret</strong> with the <code>svmLinear</code> method using 10-fold cross-validation (CV-10) to optimize the hyperparameters. There is only one hyperparameter for this model, the cost parameter:</p>
-<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="support-vector-machines.html#cb386-1" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">modelLookup</span>(<span class="st">&quot;svmLinear&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="support-vector-machines.html#cb6-1" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">modelLookup</span>(<span class="st">&quot;svmLinear&quot;</span>)</span></code></pre></div>
 <pre><code>##       model parameter label forReg forClass probModel
 ## 1 svmLinear         C  Cost   TRUE     TRUE      TRUE</code></pre>
 <p>I’m not sure if <span class="math inline">\(C = Xi\)</span>, but it seems to function the same way. The documentation notes in <code>e1071::svm()</code> say <em>C</em> is the “<em>cost of constraints violation (default: 1)—it is the ‘C’-constant of the regularization term in the Lagrange formulation.</em>” CV-10 will fit 10 models for each candidate value of <em>C</em> and keep the model with the best performance on resamples according to our evaluation metric. I can evaluate with “Accuracy”, “Kappa”, or “ROC”. I’ll use ROC, so I need to also set <code>summaryFunction = twoClassSummary</code> and <code>classProbs = TRUE</code>.</p>
 <p><code>svmLinear</code> expects the response variable to be a factor with labels that can double as R variable names. This data set is fine because <code>default</code> is a factor with labels “No” and “Yes”. The predictor variables should be of comparable scale, but that is <em>not</em> the case here: <code>student</code> is binary, <code>balance</code> has a range of $0 - $2654, and <code>income</code> has a range of $772 - $73,554. I’ll one-hot encode <code>student</code> and standardize <code>balance</code> and <code>income</code> inside a <code>recipe</code> object.</p>
-<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="support-vector-machines.html#cb388-1" tabindex="-1"></a>mdl_ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(</span>
-<span id="cb388-2"><a href="support-vector-machines.html#cb388-2" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>,</span>
-<span id="cb388-3"><a href="support-vector-machines.html#cb388-3" tabindex="-1"></a>  <span class="at">summaryFunction =</span> twoClassSummary, <span class="at">classProbs =</span> <span class="cn">TRUE</span></span>
-<span id="cb388-4"><a href="support-vector-machines.html#cb388-4" tabindex="-1"></a>)</span>
-<span id="cb388-5"><a href="support-vector-machines.html#cb388-5" tabindex="-1"></a></span>
-<span id="cb388-6"><a href="support-vector-machines.html#cb388-6" tabindex="-1"></a>rcpe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(default <span class="sc">~</span> ., <span class="at">data =</span> dat_train) <span class="sc">%&gt;%</span></span>
-<span id="cb388-7"><a href="support-vector-machines.html#cb388-7" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb388-8"><a href="support-vector-machines.html#cb388-8" tabindex="-1"></a>  <span class="fu">step_center</span>(balance, income) <span class="sc">%&gt;%</span></span>
-<span id="cb388-9"><a href="support-vector-machines.html#cb388-9" tabindex="-1"></a>  <span class="fu">step_scale</span>(balance, income)</span>
-<span id="cb388-10"><a href="support-vector-machines.html#cb388-10" tabindex="-1"></a></span>
-<span id="cb388-11"><a href="support-vector-machines.html#cb388-11" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb388-12"><a href="support-vector-machines.html#cb388-12" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb388-13"><a href="support-vector-machines.html#cb388-13" tabindex="-1"></a><span class="fu">capture.output</span>(</span>
-<span id="cb388-14"><a href="support-vector-machines.html#cb388-14" tabindex="-1"></a>  mdl_svm_linear <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb388-15"><a href="support-vector-machines.html#cb388-15" tabindex="-1"></a>    rcpe,</span>
-<span id="cb388-16"><a href="support-vector-machines.html#cb388-16" tabindex="-1"></a>    <span class="at">data =</span> dat_train,</span>
-<span id="cb388-17"><a href="support-vector-machines.html#cb388-17" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;svmLinear&quot;</span>,</span>
-<span id="cb388-18"><a href="support-vector-machines.html#cb388-18" tabindex="-1"></a>    <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
-<span id="cb388-19"><a href="support-vector-machines.html#cb388-19" tabindex="-1"></a>    <span class="at">trControl =</span> mdl_ctrl,</span>
-<span id="cb388-20"><a href="support-vector-machines.html#cb388-20" tabindex="-1"></a>    <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">C =</span> <span class="fu">c</span>(<span class="fl">1e-1</span>, <span class="fl">1e0</span>, <span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>, <span class="fl">1e4</span>))</span>
-<span id="cb388-21"><a href="support-vector-machines.html#cb388-21" tabindex="-1"></a>  )</span>
-<span id="cb388-22"><a href="support-vector-machines.html#cb388-22" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="support-vector-machines.html#cb8-1" tabindex="-1"></a>mdl_ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(</span>
+<span id="cb8-2"><a href="support-vector-machines.html#cb8-2" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>,</span>
+<span id="cb8-3"><a href="support-vector-machines.html#cb8-3" tabindex="-1"></a>  <span class="at">summaryFunction =</span> twoClassSummary, <span class="at">classProbs =</span> <span class="cn">TRUE</span></span>
+<span id="cb8-4"><a href="support-vector-machines.html#cb8-4" tabindex="-1"></a>)</span>
+<span id="cb8-5"><a href="support-vector-machines.html#cb8-5" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="support-vector-machines.html#cb8-6" tabindex="-1"></a>rcpe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(default <span class="sc">~</span> ., <span class="at">data =</span> dat_train) <span class="sc">%&gt;%</span></span>
+<span id="cb8-7"><a href="support-vector-machines.html#cb8-7" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal</span>(), <span class="sc">-</span><span class="fu">all_outcomes</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb8-8"><a href="support-vector-machines.html#cb8-8" tabindex="-1"></a>  <span class="fu">step_center</span>(balance, income) <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="support-vector-machines.html#cb8-9" tabindex="-1"></a>  <span class="fu">step_scale</span>(balance, income)</span>
+<span id="cb8-10"><a href="support-vector-machines.html#cb8-10" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="support-vector-machines.html#cb8-11" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb8-12"><a href="support-vector-machines.html#cb8-12" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb8-13"><a href="support-vector-machines.html#cb8-13" tabindex="-1"></a><span class="fu">capture.output</span>(</span>
+<span id="cb8-14"><a href="support-vector-machines.html#cb8-14" tabindex="-1"></a>  mdl_svm_linear <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb8-15"><a href="support-vector-machines.html#cb8-15" tabindex="-1"></a>    rcpe,</span>
+<span id="cb8-16"><a href="support-vector-machines.html#cb8-16" tabindex="-1"></a>    <span class="at">data =</span> dat_train,</span>
+<span id="cb8-17"><a href="support-vector-machines.html#cb8-17" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;svmLinear&quot;</span>,</span>
+<span id="cb8-18"><a href="support-vector-machines.html#cb8-18" tabindex="-1"></a>    <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
+<span id="cb8-19"><a href="support-vector-machines.html#cb8-19" tabindex="-1"></a>    <span class="at">trControl =</span> mdl_ctrl,</span>
+<span id="cb8-20"><a href="support-vector-machines.html#cb8-20" tabindex="-1"></a>    <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(<span class="at">C =</span> <span class="fu">c</span>(<span class="fl">1e-1</span>, <span class="fl">1e0</span>, <span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>, <span class="fl">1e4</span>))</span>
+<span id="cb8-21"><a href="support-vector-machines.html#cb8-21" tabindex="-1"></a>  )</span>
+<span id="cb8-22"><a href="support-vector-machines.html#cb8-22" tabindex="-1"></a>)</span></code></pre></div>
 <pre><code>## Loading required namespace: kernlab</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;kernlab&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:tictoc&#39;:
-## 
-##     size</code></pre>
 <pre><code>## The following object is masked from &#39;package:ordinal&#39;:
 ## 
 ##     convergence</code></pre>
 <pre><code>## The following object is masked from &#39;package:VGAM&#39;:
 ## 
 ##     nvar</code></pre>
+<pre><code>## The following object is masked from &#39;package:tictoc&#39;:
+## 
+##     size</code></pre>
 <pre><code>## The following object is masked from &#39;package:scales&#39;:
 ## 
 ##     alpha</code></pre>
@@ -404,10 +410,10 @@ div.csl-indent {
 <pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
 ## 
 ##     alpha</code></pre>
-<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="support-vector-machines.html#cb397-1" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="support-vector-machines.html#cb17-1" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
 <p>I experimented with the <code>tuneGrid</code> and found that smaller values for <em>C</em> (C &lt;= 10) produced poorer performance on resamples and on the holdout set. Unfortunately, the time to fit the models increased with <em>C</em> so that <code>expand.grid(C = c(1e-1, 1e0, 1e1, 1e2, 1e3, 1e4)</code> ran ~6 minutes.</p>
 <p>The cross-validation maximized ROC with <em>C</em> = 10,000. The first three values (.1, 1, and 10) resulted in models that predicted no default every time.</p>
-<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="support-vector-machines.html#cb398-1" tabindex="-1"></a>mdl_svm_linear</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="support-vector-machines.html#cb18-1" tabindex="-1"></a>mdl_svm_linear</span></code></pre></div>
 <pre><code>## Support Vector Machines with Linear Kernel 
 ## 
 ## 800 samples
@@ -430,15 +436,15 @@ div.csl-indent {
 ## ROC was used to select the optimal model using the largest value.
 ## The final value used for the model was C = 0.1.</code></pre>
 <p>As <em>C</em> increases, the model variance decreases at the expense of more bias. The plot of the optimization results makes you wonder if <em>C</em> = 100 is basically just as good as <em>C</em> = 10,000 at a fraction of the fitting time.</p>
-<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb400-1"><a href="support-vector-machines.html#cb400-1" tabindex="-1"></a><span class="fu">ggplot</span>(mdl_svm_linear)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-263-1.png" width="672" /></p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="support-vector-machines.html#cb20-1" tabindex="-1"></a><span class="fu">ggplot</span>(mdl_svm_linear)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p>Predictions on the holdout set yield 96.8% accuracy. It found 15 of the 66 defaulters (sensitivity = 0.227), and misclassified 13 of the 1933 non-defaulters (specificity = 0.993).</p>
-<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="support-vector-machines.html#cb401-1" tabindex="-1"></a>preds_svm_linear <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
-<span id="cb401-2"><a href="support-vector-machines.html#cb401-2" tabindex="-1"></a>  dat_test,</span>
-<span id="cb401-3"><a href="support-vector-machines.html#cb401-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_linear, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
-<span id="cb401-4"><a href="support-vector-machines.html#cb401-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_linear, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>)</span>
-<span id="cb401-5"><a href="support-vector-machines.html#cb401-5" tabindex="-1"></a>)</span>
-<span id="cb401-6"><a href="support-vector-machines.html#cb401-6" tabindex="-1"></a><span class="fu">confusionMatrix</span>(preds_svm_linear<span class="sc">$</span>Predicted, <span class="at">reference =</span> preds_svm_linear<span class="sc">$</span>default, <span class="at">positive =</span> <span class="st">&quot;Yes&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="support-vector-machines.html#cb21-1" tabindex="-1"></a>preds_svm_linear <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb21-2"><a href="support-vector-machines.html#cb21-2" tabindex="-1"></a>  dat_test,</span>
+<span id="cb21-3"><a href="support-vector-machines.html#cb21-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_linear, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
+<span id="cb21-4"><a href="support-vector-machines.html#cb21-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_linear, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>)</span>
+<span id="cb21-5"><a href="support-vector-machines.html#cb21-5" tabindex="-1"></a>)</span>
+<span id="cb21-6"><a href="support-vector-machines.html#cb21-6" tabindex="-1"></a><span class="fu">confusionMatrix</span>(preds_svm_linear<span class="sc">$</span>Predicted, <span class="at">reference =</span> preds_svm_linear<span class="sc">$</span>default, <span class="at">positive =</span> <span class="st">&quot;Yes&quot;</span>)</span></code></pre></div>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##           Reference
@@ -467,54 +473,54 @@ div.csl-indent {
 ##        &#39;Positive&#39; Class : Yes             
 ## </code></pre>
 <p><code>Metrics::auc()</code> will calculate the confusion matrix values from the model using the holdout data set. The AUC on the holdout set is 0.9541.</p>
-<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="support-vector-machines.html#cb403-1" tabindex="-1"></a>mdl_svm_linear_auc <span class="ot">&lt;-</span> Metrics<span class="sc">::</span><span class="fu">auc</span>(<span class="at">actual =</span> preds_svm_linear<span class="sc">$</span>default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>, preds_svm_linear<span class="sc">$</span>Yes)</span>
-<span id="cb403-2"><a href="support-vector-machines.html#cb403-2" tabindex="-1"></a>yardstick<span class="sc">::</span><span class="fu">roc_curve</span>(preds_svm_linear, default, Yes) <span class="sc">%&gt;%</span></span>
-<span id="cb403-3"><a href="support-vector-machines.html#cb403-3" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
-<span id="cb403-4"><a href="support-vector-machines.html#cb403-4" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb403-5"><a href="support-vector-machines.html#cb403-5" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;SVM Linear Model ROC Curve, Test Data&quot;</span>,</span>
-<span id="cb403-6"><a href="support-vector-machines.html#cb403-6" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">&quot;AUC = &quot;</span>, <span class="fu">round</span>(mdl_svm_linear_auc, <span class="dv">4</span>))</span>
-<span id="cb403-7"><a href="support-vector-machines.html#cb403-7" tabindex="-1"></a>  )</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-265-1.png" width="672" /></p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="support-vector-machines.html#cb23-1" tabindex="-1"></a>mdl_svm_linear_auc <span class="ot">&lt;-</span> Metrics<span class="sc">::</span><span class="fu">auc</span>(<span class="at">actual =</span> preds_svm_linear<span class="sc">$</span>default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>, preds_svm_linear<span class="sc">$</span>Yes)</span>
+<span id="cb23-2"><a href="support-vector-machines.html#cb23-2" tabindex="-1"></a>yardstick<span class="sc">::</span><span class="fu">roc_curve</span>(preds_svm_linear, default, Yes) <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="support-vector-machines.html#cb23-3" tabindex="-1"></a>  <span class="fu">autoplot</span>() <span class="sc">+</span></span>
+<span id="cb23-4"><a href="support-vector-machines.html#cb23-4" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb23-5"><a href="support-vector-machines.html#cb23-5" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;SVM Linear Model ROC Curve, Test Data&quot;</span>,</span>
+<span id="cb23-6"><a href="support-vector-machines.html#cb23-6" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">&quot;AUC = &quot;</span>, <span class="fu">round</span>(mdl_svm_linear_auc, <span class="dv">4</span>))</span>
+<span id="cb23-7"><a href="support-vector-machines.html#cb23-7" tabindex="-1"></a>  )</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
 <p>There are just a few predictors in this model, so there is a chance I can visualize the model.</p>
-<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb404-1"><a href="support-vector-machines.html#cb404-1" tabindex="-1"></a>fits_svm_linear <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
-<span id="cb404-2"><a href="support-vector-machines.html#cb404-2" tabindex="-1"></a>  dat_train,</span>
-<span id="cb404-3"><a href="support-vector-machines.html#cb404-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_linear, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
-<span id="cb404-4"><a href="support-vector-machines.html#cb404-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_linear, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>),</span>
-<span id="cb404-5"><a href="support-vector-machines.html#cb404-5" tabindex="-1"></a>)</span>
-<span id="cb404-6"><a href="support-vector-machines.html#cb404-6" tabindex="-1"></a></span>
-<span id="cb404-7"><a href="support-vector-machines.html#cb404-7" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb404-8"><a href="support-vector-machines.html#cb404-8" tabindex="-1"></a>  fits_svm_linear <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">outcome =</span> default),</span>
-<span id="cb404-9"><a href="support-vector-machines.html#cb404-9" tabindex="-1"></a>  fits_svm_linear <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Fitted&quot;</span>, <span class="at">outcome =</span> Predicted)</span>
-<span id="cb404-10"><a href="support-vector-machines.html#cb404-10" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb404-11"><a href="support-vector-machines.html#cb404-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income, <span class="at">color =</span> outcome)) <span class="sc">+</span></span>
-<span id="cb404-12"><a href="support-vector-machines.html#cb404-12" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> student), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb404-13"><a href="support-vector-machines.html#cb404-13" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb404-14"><a href="support-vector-machines.html#cb404-14" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) <span class="sc">+</span></span>
-<span id="cb404-15"><a href="support-vector-machines.html#cb404-15" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb404-16"><a href="support-vector-machines.html#cb404-16" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb404-17"><a href="support-vector-machines.html#cb404-17" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">list</span>(<span class="at">No =</span> <span class="st">&quot;#B6E2D3&quot;</span>, <span class="at">Yes =</span> <span class="st">&quot;#EF7C8E&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb404-18"><a href="support-vector-machines.html#cb404-18" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Training Set&quot;</span>) <span class="sc">+</span></span>
-<span id="cb404-19"><a href="support-vector-machines.html#cb404-19" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(set))</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-266-1.png" width="672" /></p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="support-vector-machines.html#cb24-1" tabindex="-1"></a>fits_svm_linear <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb24-2"><a href="support-vector-machines.html#cb24-2" tabindex="-1"></a>  dat_train,</span>
+<span id="cb24-3"><a href="support-vector-machines.html#cb24-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_linear, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
+<span id="cb24-4"><a href="support-vector-machines.html#cb24-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_linear, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>),</span>
+<span id="cb24-5"><a href="support-vector-machines.html#cb24-5" tabindex="-1"></a>)</span>
+<span id="cb24-6"><a href="support-vector-machines.html#cb24-6" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="support-vector-machines.html#cb24-7" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb24-8"><a href="support-vector-machines.html#cb24-8" tabindex="-1"></a>  fits_svm_linear <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">outcome =</span> default),</span>
+<span id="cb24-9"><a href="support-vector-machines.html#cb24-9" tabindex="-1"></a>  fits_svm_linear <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Fitted&quot;</span>, <span class="at">outcome =</span> Predicted)</span>
+<span id="cb24-10"><a href="support-vector-machines.html#cb24-10" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb24-11"><a href="support-vector-machines.html#cb24-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income, <span class="at">color =</span> outcome)) <span class="sc">+</span></span>
+<span id="cb24-12"><a href="support-vector-machines.html#cb24-12" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> student), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb24-13"><a href="support-vector-machines.html#cb24-13" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb24-14"><a href="support-vector-machines.html#cb24-14" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) <span class="sc">+</span></span>
+<span id="cb24-15"><a href="support-vector-machines.html#cb24-15" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb24-16"><a href="support-vector-machines.html#cb24-16" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb24-17"><a href="support-vector-machines.html#cb24-17" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">list</span>(<span class="at">No =</span> <span class="st">&quot;#B6E2D3&quot;</span>, <span class="at">Yes =</span> <span class="st">&quot;#EF7C8E&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb24-18"><a href="support-vector-machines.html#cb24-18" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Training Set&quot;</span>) <span class="sc">+</span></span>
+<span id="cb24-19"><a href="support-vector-machines.html#cb24-19" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(set))</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <p>Looks like the hyperplane slopes slightly right, so high credit card balances are a little less likely to fall into default if income is high. Distinguishing students is difficult, but they are generally at the low end of the income scale, and they seem to exert a positive association with default. Let’s look at the same figure with the training set.</p>
-<div class="sourceCode" id="cb405"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb405-1"><a href="support-vector-machines.html#cb405-1" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb405-2"><a href="support-vector-machines.html#cb405-2" tabindex="-1"></a>  preds_svm_linear <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">outcome =</span> default),</span>
-<span id="cb405-3"><a href="support-vector-machines.html#cb405-3" tabindex="-1"></a>  preds_svm_linear <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Fitted&quot;</span>, <span class="at">outcome =</span> Predicted)</span>
-<span id="cb405-4"><a href="support-vector-machines.html#cb405-4" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb405-5"><a href="support-vector-machines.html#cb405-5" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income, <span class="at">color =</span> outcome)) <span class="sc">+</span></span>
-<span id="cb405-6"><a href="support-vector-machines.html#cb405-6" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> student), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb405-7"><a href="support-vector-machines.html#cb405-7" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb405-8"><a href="support-vector-machines.html#cb405-8" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) <span class="sc">+</span></span>
-<span id="cb405-9"><a href="support-vector-machines.html#cb405-9" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb405-10"><a href="support-vector-machines.html#cb405-10" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb405-11"><a href="support-vector-machines.html#cb405-11" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">list</span>(<span class="at">No =</span> <span class="st">&quot;#B6E2D3&quot;</span>, <span class="at">Yes =</span> <span class="st">&quot;#EF7C8E&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb405-12"><a href="support-vector-machines.html#cb405-12" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Test Set&quot;</span>) <span class="sc">+</span></span>
-<span id="cb405-13"><a href="support-vector-machines.html#cb405-13" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(set))</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-267-1.png" width="672" /></p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="support-vector-machines.html#cb25-1" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb25-2"><a href="support-vector-machines.html#cb25-2" tabindex="-1"></a>  preds_svm_linear <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">outcome =</span> default),</span>
+<span id="cb25-3"><a href="support-vector-machines.html#cb25-3" tabindex="-1"></a>  preds_svm_linear <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Fitted&quot;</span>, <span class="at">outcome =</span> Predicted)</span>
+<span id="cb25-4"><a href="support-vector-machines.html#cb25-4" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb25-5"><a href="support-vector-machines.html#cb25-5" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income, <span class="at">color =</span> outcome)) <span class="sc">+</span></span>
+<span id="cb25-6"><a href="support-vector-machines.html#cb25-6" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> student), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb25-7"><a href="support-vector-machines.html#cb25-7" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb25-8"><a href="support-vector-machines.html#cb25-8" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) <span class="sc">+</span></span>
+<span id="cb25-9"><a href="support-vector-machines.html#cb25-9" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb25-10"><a href="support-vector-machines.html#cb25-10" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb25-11"><a href="support-vector-machines.html#cb25-11" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">list</span>(<span class="at">No =</span> <span class="st">&quot;#B6E2D3&quot;</span>, <span class="at">Yes =</span> <span class="st">&quot;#EF7C8E&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb25-12"><a href="support-vector-machines.html#cb25-12" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Test Set&quot;</span>) <span class="sc">+</span></span>
+<span id="cb25-13"><a href="support-vector-machines.html#cb25-13" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(set))</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <p>Visually, the model performed consistently between the training and test sets.</p>
 </div>
-<div id="support-vector-machines-1" class="section level2 hasAnchor" number="6.3">
-<h2><span class="header-section-number">6.3</span> Support Vector Machines<a href="support-vector-machines.html#support-vector-machines-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="support-vector-machines-1" class="section level2 hasAnchor" number="7.3">
+<h2><span class="header-section-number">7.3</span> Support Vector Machines<a href="support-vector-machines.html#support-vector-machines-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Enlarging the feature space of the support vector classifier accommodates nonlinear relationships. Support vector machines do this in a specific way, using <em>kernels</em>. Before diving into kernels, you need to understand (somewhat) the solution to the support vector classifier optimization problem.</p>
 <p>The linear support vector classifier can be represented as</p>
 <p><span class="math display">\[f(x) = \beta_0 + \sum_i^n \alpha_i \langle x, x_i \rangle.\]</span></p>
@@ -538,35 +544,35 @@ where <span class="math inline">\(S\)</span> is the set of support vector indice
 <p><span class="math display">\[\min_\beta \left \{ \sum_{i=1}^n \max [0, 1-y_i f(x_i)] + \lambda \sum_{j=1}^p \beta_j^2 \right \}\]</span></p>
 <p>Increasing <span class="math inline">\(\lambda\)</span>, shrinks <span class="math inline">\(\beta\)</span> and more violations to the margin are tolerated, resulting in a lower-variance/higher-bias model. The loss function above is known as a <em>hinge loss</em>.</p>
 <p>Let’s build a support vector machine model to predict credit <code>default</code> in the <code>ISLM:Default</code> data set again. I’ll try a polynomial kernel with the <code>svmPoly</code> method and a radial kernal with <code>svmRadial</code>. <code>svmPoly</code> has three hyperparameters. <em>What is the Scale parameter?</em></p>
-<div class="sourceCode" id="cb406"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb406-1"><a href="support-vector-machines.html#cb406-1" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">modelLookup</span>(<span class="st">&quot;svmPoly&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="support-vector-machines.html#cb26-1" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">modelLookup</span>(<span class="st">&quot;svmPoly&quot;</span>)</span></code></pre></div>
 <pre><code>##     model parameter             label forReg forClass probModel
 ## 1 svmPoly    degree Polynomial Degree   TRUE     TRUE      TRUE
 ## 2 svmPoly     scale             Scale   TRUE     TRUE      TRUE
 ## 3 svmPoly         C              Cost   TRUE     TRUE      TRUE</code></pre>
 <p><code>svmRadial</code> has two hyperparameters:</p>
-<div class="sourceCode" id="cb408"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb408-1"><a href="support-vector-machines.html#cb408-1" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">modelLookup</span>(<span class="st">&quot;svmRadial&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="support-vector-machines.html#cb28-1" tabindex="-1"></a>caret<span class="sc">::</span><span class="fu">modelLookup</span>(<span class="st">&quot;svmRadial&quot;</span>)</span></code></pre></div>
 <pre><code>##       model parameter label forReg forClass probModel
 ## 1 svmRadial     sigma Sigma   TRUE     TRUE      TRUE
 ## 2 svmRadial         C  Cost   TRUE     TRUE      TRUE</code></pre>
 <p>I’ll use the same <code>trControl</code> object as with the support vector classifier, and I’ll use the same one-hot encoded binaries and scaled and centered data. I fixed <code>scale</code> at its default value and tried polynomials of degree 1-3. I used the same candidate <code>cost</code> values.</p>
-<div class="sourceCode" id="cb410"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb410-1"><a href="support-vector-machines.html#cb410-1" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb410-2"><a href="support-vector-machines.html#cb410-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb410-3"><a href="support-vector-machines.html#cb410-3" tabindex="-1"></a><span class="fu">capture.output</span>(</span>
-<span id="cb410-4"><a href="support-vector-machines.html#cb410-4" tabindex="-1"></a>  mdl_svm_poly <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb410-5"><a href="support-vector-machines.html#cb410-5" tabindex="-1"></a>    rcpe,</span>
-<span id="cb410-6"><a href="support-vector-machines.html#cb410-6" tabindex="-1"></a>    <span class="at">data =</span> dat_train,</span>
-<span id="cb410-7"><a href="support-vector-machines.html#cb410-7" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;svmPoly&quot;</span>,</span>
-<span id="cb410-8"><a href="support-vector-machines.html#cb410-8" tabindex="-1"></a>    <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
-<span id="cb410-9"><a href="support-vector-machines.html#cb410-9" tabindex="-1"></a>    <span class="at">trControl =</span> mdl_ctrl,</span>
-<span id="cb410-10"><a href="support-vector-machines.html#cb410-10" tabindex="-1"></a>    <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb410-11"><a href="support-vector-machines.html#cb410-11" tabindex="-1"></a>      <span class="at">C =</span> <span class="fu">c</span>(<span class="fl">1e-1</span>, <span class="fl">1e0</span>, <span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>, <span class="fl">1e4</span>),</span>
-<span id="cb410-12"><a href="support-vector-machines.html#cb410-12" tabindex="-1"></a>      <span class="at">degree =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
-<span id="cb410-13"><a href="support-vector-machines.html#cb410-13" tabindex="-1"></a>      <span class="at">scale =</span> <span class="fl">0.001</span>)</span>
-<span id="cb410-14"><a href="support-vector-machines.html#cb410-14" tabindex="-1"></a>  )</span>
-<span id="cb410-15"><a href="support-vector-machines.html#cb410-15" tabindex="-1"></a>)</span>
-<span id="cb410-16"><a href="support-vector-machines.html#cb410-16" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="support-vector-machines.html#cb30-1" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb30-2"><a href="support-vector-machines.html#cb30-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb30-3"><a href="support-vector-machines.html#cb30-3" tabindex="-1"></a><span class="fu">capture.output</span>(</span>
+<span id="cb30-4"><a href="support-vector-machines.html#cb30-4" tabindex="-1"></a>  mdl_svm_poly <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb30-5"><a href="support-vector-machines.html#cb30-5" tabindex="-1"></a>    rcpe,</span>
+<span id="cb30-6"><a href="support-vector-machines.html#cb30-6" tabindex="-1"></a>    <span class="at">data =</span> dat_train,</span>
+<span id="cb30-7"><a href="support-vector-machines.html#cb30-7" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;svmPoly&quot;</span>,</span>
+<span id="cb30-8"><a href="support-vector-machines.html#cb30-8" tabindex="-1"></a>    <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
+<span id="cb30-9"><a href="support-vector-machines.html#cb30-9" tabindex="-1"></a>    <span class="at">trControl =</span> mdl_ctrl,</span>
+<span id="cb30-10"><a href="support-vector-machines.html#cb30-10" tabindex="-1"></a>    <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb30-11"><a href="support-vector-machines.html#cb30-11" tabindex="-1"></a>      <span class="at">C =</span> <span class="fu">c</span>(<span class="fl">1e-1</span>, <span class="fl">1e0</span>, <span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>, <span class="fl">1e4</span>),</span>
+<span id="cb30-12"><a href="support-vector-machines.html#cb30-12" tabindex="-1"></a>      <span class="at">degree =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb30-13"><a href="support-vector-machines.html#cb30-13" tabindex="-1"></a>      <span class="at">scale =</span> <span class="fl">0.001</span>)</span>
+<span id="cb30-14"><a href="support-vector-machines.html#cb30-14" tabindex="-1"></a>  )</span>
+<span id="cb30-15"><a href="support-vector-machines.html#cb30-15" tabindex="-1"></a>)</span>
+<span id="cb30-16"><a href="support-vector-machines.html#cb30-16" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
 <p>The model ran ~3 minutes. The cross-validation maximized ROC with <em>degree</em> = 2 and <em>C</em> = 0.1.</p>
-<div class="sourceCode" id="cb411"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb411-1"><a href="support-vector-machines.html#cb411-1" tabindex="-1"></a>mdl_svm_poly</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="support-vector-machines.html#cb31-1" tabindex="-1"></a>mdl_svm_poly</span></code></pre></div>
 <pre><code>## Support Vector Machines with Polynomial Kernel 
 ## 
 ## 800 samples
@@ -603,24 +609,24 @@ where <span class="math inline">\(S\)</span> is the set of support vector indice
 ## The final values used for the model were degree = 2, scale = 0.001 and C
 ##  = 10000.</code></pre>
 <p>Here is <code>svmRadial</code>. At this point, I do not know how the sigma tuning parameter works, so I expanded around the default value used from <code>tuneLength = 1</code>.</p>
-<div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb413-1"><a href="support-vector-machines.html#cb413-1" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb413-2"><a href="support-vector-machines.html#cb413-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb413-3"><a href="support-vector-machines.html#cb413-3" tabindex="-1"></a><span class="fu">capture.output</span>(</span>
-<span id="cb413-4"><a href="support-vector-machines.html#cb413-4" tabindex="-1"></a>  mdl_svm_radial <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb413-5"><a href="support-vector-machines.html#cb413-5" tabindex="-1"></a>    rcpe,</span>
-<span id="cb413-6"><a href="support-vector-machines.html#cb413-6" tabindex="-1"></a>    <span class="at">data =</span> dat_train,</span>
-<span id="cb413-7"><a href="support-vector-machines.html#cb413-7" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;svmRadial&quot;</span>,</span>
-<span id="cb413-8"><a href="support-vector-machines.html#cb413-8" tabindex="-1"></a>    <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
-<span id="cb413-9"><a href="support-vector-machines.html#cb413-9" tabindex="-1"></a>    <span class="at">trControl =</span> mdl_ctrl,</span>
-<span id="cb413-10"><a href="support-vector-machines.html#cb413-10" tabindex="-1"></a>    <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb413-11"><a href="support-vector-machines.html#cb413-11" tabindex="-1"></a>      <span class="at">C =</span> <span class="fu">c</span>(<span class="fl">1e-1</span>, <span class="fl">1e0</span>, <span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>),</span>
-<span id="cb413-12"><a href="support-vector-machines.html#cb413-12" tabindex="-1"></a>      <span class="at">sigma =</span> <span class="fu">c</span>(.<span class="dv">01</span>, .<span class="dv">1</span>, <span class="fl">1.0</span>)</span>
-<span id="cb413-13"><a href="support-vector-machines.html#cb413-13" tabindex="-1"></a>    )</span>
-<span id="cb413-14"><a href="support-vector-machines.html#cb413-14" tabindex="-1"></a>  )</span>
-<span id="cb413-15"><a href="support-vector-machines.html#cb413-15" tabindex="-1"></a>)</span>
-<span id="cb413-16"><a href="support-vector-machines.html#cb413-16" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="support-vector-machines.html#cb33-1" tabindex="-1"></a><span class="fu">tic</span>()</span>
+<span id="cb33-2"><a href="support-vector-machines.html#cb33-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb33-3"><a href="support-vector-machines.html#cb33-3" tabindex="-1"></a><span class="fu">capture.output</span>(</span>
+<span id="cb33-4"><a href="support-vector-machines.html#cb33-4" tabindex="-1"></a>  mdl_svm_radial <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb33-5"><a href="support-vector-machines.html#cb33-5" tabindex="-1"></a>    rcpe,</span>
+<span id="cb33-6"><a href="support-vector-machines.html#cb33-6" tabindex="-1"></a>    <span class="at">data =</span> dat_train,</span>
+<span id="cb33-7"><a href="support-vector-machines.html#cb33-7" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">&quot;svmRadial&quot;</span>,</span>
+<span id="cb33-8"><a href="support-vector-machines.html#cb33-8" tabindex="-1"></a>    <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
+<span id="cb33-9"><a href="support-vector-machines.html#cb33-9" tabindex="-1"></a>    <span class="at">trControl =</span> mdl_ctrl,</span>
+<span id="cb33-10"><a href="support-vector-machines.html#cb33-10" tabindex="-1"></a>    <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb33-11"><a href="support-vector-machines.html#cb33-11" tabindex="-1"></a>      <span class="at">C =</span> <span class="fu">c</span>(<span class="fl">1e-1</span>, <span class="fl">1e0</span>, <span class="fl">1e1</span>, <span class="fl">1e2</span>, <span class="fl">1e3</span>),</span>
+<span id="cb33-12"><a href="support-vector-machines.html#cb33-12" tabindex="-1"></a>      <span class="at">sigma =</span> <span class="fu">c</span>(.<span class="dv">01</span>, .<span class="dv">1</span>, <span class="fl">1.0</span>)</span>
+<span id="cb33-13"><a href="support-vector-machines.html#cb33-13" tabindex="-1"></a>    )</span>
+<span id="cb33-14"><a href="support-vector-machines.html#cb33-14" tabindex="-1"></a>  )</span>
+<span id="cb33-15"><a href="support-vector-machines.html#cb33-15" tabindex="-1"></a>)</span>
+<span id="cb33-16"><a href="support-vector-machines.html#cb33-16" tabindex="-1"></a><span class="fu">toc</span>()</span></code></pre></div>
 <p>This model ran in ~11 minutes and optimized at <em>C</em> = 0.1 and <em>sigma</em> = 0.01.</p>
-<div class="sourceCode" id="cb414"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb414-1"><a href="support-vector-machines.html#cb414-1" tabindex="-1"></a>mdl_svm_radial</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="support-vector-machines.html#cb34-1" tabindex="-1"></a>mdl_svm_radial</span></code></pre></div>
 <pre><code>## Support Vector Machines with Radial Basis Function Kernel 
 ## 
 ## 800 samples
@@ -652,73 +658,73 @@ where <span class="math inline">\(S\)</span> is the set of support vector indice
 ## ROC was used to select the optimal model using the largest value.
 ## The final values used for the model were sigma = 0.01 and C = 100.</code></pre>
 <p>Here are the optimization plots I used to help tune the models.</p>
-<div class="sourceCode" id="cb416"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb416-1"><a href="support-vector-machines.html#cb416-1" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mdl_svm_poly) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;SVMPoly Tuning&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb416-2"><a href="support-vector-machines.html#cb416-2" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span>
-<span id="cb416-3"><a href="support-vector-machines.html#cb416-3" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mdl_svm_radial) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;SVMRadial Tuning&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb416-4"><a href="support-vector-machines.html#cb416-4" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span>
-<span id="cb416-5"><a href="support-vector-machines.html#cb416-5" tabindex="-1"></a>gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(p1, p2, <span class="at">nrow =</span> <span class="dv">1</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-272-1.png" width="672" /></p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="support-vector-machines.html#cb36-1" tabindex="-1"></a>p1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mdl_svm_poly) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;SVMPoly Tuning&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb36-2"><a href="support-vector-machines.html#cb36-2" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span>
+<span id="cb36-3"><a href="support-vector-machines.html#cb36-3" tabindex="-1"></a>p2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mdl_svm_radial) <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;SVMRadial Tuning&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb36-4"><a href="support-vector-machines.html#cb36-4" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>)</span>
+<span id="cb36-5"><a href="support-vector-machines.html#cb36-5" tabindex="-1"></a>gridExtra<span class="sc">::</span><span class="fu">grid.arrange</span>(p1, p2, <span class="at">nrow =</span> <span class="dv">1</span>)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
 <p>The polynomial model predictions on the holdout set yielded 96.85% accuracy. It found 20 of the 66 defaulters (sensitivity = 0.303), and misclassified 17 of the 1933 non-defaulters (specificity = 0.991). So the polynomial model found a few more defaulters at the expense of a few more mistakes.</p>
 <p>The radial model predictions on the holdout set yielded 97% accuracy. It found 17 defaulters (sensitivity = 0.258), and misclassified 11 non-defaulters (specificity = 0.994). So the radial was somewhere between the linear and polynomial models.</p>
-<div class="sourceCode" id="cb417"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb417-1"><a href="support-vector-machines.html#cb417-1" tabindex="-1"></a>preds_svm_poly <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
-<span id="cb417-2"><a href="support-vector-machines.html#cb417-2" tabindex="-1"></a>  dat_test,</span>
-<span id="cb417-3"><a href="support-vector-machines.html#cb417-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_poly, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
-<span id="cb417-4"><a href="support-vector-machines.html#cb417-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_poly, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>)</span>
-<span id="cb417-5"><a href="support-vector-machines.html#cb417-5" tabindex="-1"></a>)</span>
-<span id="cb417-6"><a href="support-vector-machines.html#cb417-6" tabindex="-1"></a><span class="fu">confusionMatrix</span>(preds_svm_poly<span class="sc">$</span>Predicted, <span class="at">reference =</span> preds_svm_poly<span class="sc">$</span>default, <span class="at">positive =</span> <span class="st">&quot;Yes&quot;</span>)</span>
-<span id="cb417-7"><a href="support-vector-machines.html#cb417-7" tabindex="-1"></a></span>
-<span id="cb417-8"><a href="support-vector-machines.html#cb417-8" tabindex="-1"></a>preds_svm_radial <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
-<span id="cb417-9"><a href="support-vector-machines.html#cb417-9" tabindex="-1"></a>  dat_test,</span>
-<span id="cb417-10"><a href="support-vector-machines.html#cb417-10" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_radial, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
-<span id="cb417-11"><a href="support-vector-machines.html#cb417-11" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_radial, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>)</span>
-<span id="cb417-12"><a href="support-vector-machines.html#cb417-12" tabindex="-1"></a>)</span>
-<span id="cb417-13"><a href="support-vector-machines.html#cb417-13" tabindex="-1"></a><span class="fu">confusionMatrix</span>(preds_svm_radial<span class="sc">$</span>Predicted, <span class="at">reference =</span> preds_svm_radial<span class="sc">$</span>default, <span class="at">positive =</span> <span class="st">&quot;Yes&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="support-vector-machines.html#cb37-1" tabindex="-1"></a>preds_svm_poly <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb37-2"><a href="support-vector-machines.html#cb37-2" tabindex="-1"></a>  dat_test,</span>
+<span id="cb37-3"><a href="support-vector-machines.html#cb37-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_poly, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
+<span id="cb37-4"><a href="support-vector-machines.html#cb37-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_poly, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>)</span>
+<span id="cb37-5"><a href="support-vector-machines.html#cb37-5" tabindex="-1"></a>)</span>
+<span id="cb37-6"><a href="support-vector-machines.html#cb37-6" tabindex="-1"></a><span class="fu">confusionMatrix</span>(preds_svm_poly<span class="sc">$</span>Predicted, <span class="at">reference =</span> preds_svm_poly<span class="sc">$</span>default, <span class="at">positive =</span> <span class="st">&quot;Yes&quot;</span>)</span>
+<span id="cb37-7"><a href="support-vector-machines.html#cb37-7" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="support-vector-machines.html#cb37-8" tabindex="-1"></a>preds_svm_radial <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb37-9"><a href="support-vector-machines.html#cb37-9" tabindex="-1"></a>  dat_test,</span>
+<span id="cb37-10"><a href="support-vector-machines.html#cb37-10" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_radial, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
+<span id="cb37-11"><a href="support-vector-machines.html#cb37-11" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_radial, <span class="at">newdata =</span> dat_test, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>)</span>
+<span id="cb37-12"><a href="support-vector-machines.html#cb37-12" tabindex="-1"></a>)</span>
+<span id="cb37-13"><a href="support-vector-machines.html#cb37-13" tabindex="-1"></a><span class="fu">confusionMatrix</span>(preds_svm_radial<span class="sc">$</span>Predicted, <span class="at">reference =</span> preds_svm_radial<span class="sc">$</span>default, <span class="at">positive =</span> <span class="st">&quot;Yes&quot;</span>)</span></code></pre></div>
 <p>The AUCs on the holdout set is where 0.9536 for the polynmomial and 0.8836 for the radial.</p>
-<div class="sourceCode" id="cb418"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb418-1"><a href="support-vector-machines.html#cb418-1" tabindex="-1"></a>Metrics<span class="sc">::</span><span class="fu">auc</span>(<span class="at">actual =</span> preds_svm_poly<span class="sc">$</span>default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>, preds_svm_poly<span class="sc">$</span>Yes)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="support-vector-machines.html#cb38-1" tabindex="-1"></a>Metrics<span class="sc">::</span><span class="fu">auc</span>(<span class="at">actual =</span> preds_svm_poly<span class="sc">$</span>default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>, preds_svm_poly<span class="sc">$</span>Yes)</span></code></pre></div>
 <pre><code>## [1] 0.906901</code></pre>
-<div class="sourceCode" id="cb420"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb420-1"><a href="support-vector-machines.html#cb420-1" tabindex="-1"></a>Metrics<span class="sc">::</span><span class="fu">auc</span>(<span class="at">actual =</span> preds_svm_radial<span class="sc">$</span>default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>, preds_svm_radial<span class="sc">$</span>Yes)</span></code></pre></div>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="support-vector-machines.html#cb40-1" tabindex="-1"></a>Metrics<span class="sc">::</span><span class="fu">auc</span>(<span class="at">actual =</span> preds_svm_radial<span class="sc">$</span>default <span class="sc">==</span> <span class="st">&quot;Yes&quot;</span>, preds_svm_radial<span class="sc">$</span>Yes)</span></code></pre></div>
 <pre><code>## [1] 0.8873698</code></pre>
 <p>Let’s see what the two models look like on the training data.</p>
-<div class="sourceCode" id="cb422"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb422-1"><a href="support-vector-machines.html#cb422-1" tabindex="-1"></a>fits_svm_poly <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
-<span id="cb422-2"><a href="support-vector-machines.html#cb422-2" tabindex="-1"></a>  dat_train,</span>
-<span id="cb422-3"><a href="support-vector-machines.html#cb422-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_poly, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
-<span id="cb422-4"><a href="support-vector-machines.html#cb422-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_poly, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>),</span>
-<span id="cb422-5"><a href="support-vector-machines.html#cb422-5" tabindex="-1"></a>)</span>
-<span id="cb422-6"><a href="support-vector-machines.html#cb422-6" tabindex="-1"></a></span>
-<span id="cb422-7"><a href="support-vector-machines.html#cb422-7" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb422-8"><a href="support-vector-machines.html#cb422-8" tabindex="-1"></a>  fits_svm_poly <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">outcome =</span> default),</span>
-<span id="cb422-9"><a href="support-vector-machines.html#cb422-9" tabindex="-1"></a>  fits_svm_poly <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Fitted&quot;</span>, <span class="at">outcome =</span> Predicted)</span>
-<span id="cb422-10"><a href="support-vector-machines.html#cb422-10" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb422-11"><a href="support-vector-machines.html#cb422-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income, <span class="at">color =</span> outcome)) <span class="sc">+</span></span>
-<span id="cb422-12"><a href="support-vector-machines.html#cb422-12" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> student), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb422-13"><a href="support-vector-machines.html#cb422-13" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb422-14"><a href="support-vector-machines.html#cb422-14" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) <span class="sc">+</span></span>
-<span id="cb422-15"><a href="support-vector-machines.html#cb422-15" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb422-16"><a href="support-vector-machines.html#cb422-16" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb422-17"><a href="support-vector-machines.html#cb422-17" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">list</span>(<span class="at">No =</span> <span class="st">&quot;#B6E2D3&quot;</span>, <span class="at">Yes =</span> <span class="st">&quot;#EF7C8E&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb422-18"><a href="support-vector-machines.html#cb422-18" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Training Set, Polynomial Kernel&quot;</span>) <span class="sc">+</span></span>
-<span id="cb422-19"><a href="support-vector-machines.html#cb422-19" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(set))</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-275-1.png" width="672" /></p>
-<div class="sourceCode" id="cb423"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb423-1"><a href="support-vector-machines.html#cb423-1" tabindex="-1"></a>fits_svm_radial <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
-<span id="cb423-2"><a href="support-vector-machines.html#cb423-2" tabindex="-1"></a>  dat_train,</span>
-<span id="cb423-3"><a href="support-vector-machines.html#cb423-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_radial, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
-<span id="cb423-4"><a href="support-vector-machines.html#cb423-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_radial, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>),</span>
-<span id="cb423-5"><a href="support-vector-machines.html#cb423-5" tabindex="-1"></a>)</span>
-<span id="cb423-6"><a href="support-vector-machines.html#cb423-6" tabindex="-1"></a></span>
-<span id="cb423-7"><a href="support-vector-machines.html#cb423-7" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb423-8"><a href="support-vector-machines.html#cb423-8" tabindex="-1"></a>  fits_svm_radial <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">outcome =</span> default),</span>
-<span id="cb423-9"><a href="support-vector-machines.html#cb423-9" tabindex="-1"></a>  fits_svm_radial <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Fitted&quot;</span>, <span class="at">outcome =</span> Predicted)</span>
-<span id="cb423-10"><a href="support-vector-machines.html#cb423-10" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb423-11"><a href="support-vector-machines.html#cb423-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income, <span class="at">color =</span> outcome)) <span class="sc">+</span></span>
-<span id="cb423-12"><a href="support-vector-machines.html#cb423-12" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> student), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
-<span id="cb423-13"><a href="support-vector-machines.html#cb423-13" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb423-14"><a href="support-vector-machines.html#cb423-14" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) <span class="sc">+</span></span>
-<span id="cb423-15"><a href="support-vector-machines.html#cb423-15" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb423-16"><a href="support-vector-machines.html#cb423-16" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
-<span id="cb423-17"><a href="support-vector-machines.html#cb423-17" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">list</span>(<span class="at">No =</span> <span class="st">&quot;#B6E2D3&quot;</span>, <span class="at">Yes =</span> <span class="st">&quot;#EF7C8E&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb423-18"><a href="support-vector-machines.html#cb423-18" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Training Set, Radial Kernel&quot;</span>) <span class="sc">+</span></span>
-<span id="cb423-19"><a href="support-vector-machines.html#cb423-19" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(set))</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-276-1.png" width="672" /></p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="support-vector-machines.html#cb42-1" tabindex="-1"></a>fits_svm_poly <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb42-2"><a href="support-vector-machines.html#cb42-2" tabindex="-1"></a>  dat_train,</span>
+<span id="cb42-3"><a href="support-vector-machines.html#cb42-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_poly, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
+<span id="cb42-4"><a href="support-vector-machines.html#cb42-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_poly, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>),</span>
+<span id="cb42-5"><a href="support-vector-machines.html#cb42-5" tabindex="-1"></a>)</span>
+<span id="cb42-6"><a href="support-vector-machines.html#cb42-6" tabindex="-1"></a></span>
+<span id="cb42-7"><a href="support-vector-machines.html#cb42-7" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb42-8"><a href="support-vector-machines.html#cb42-8" tabindex="-1"></a>  fits_svm_poly <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">outcome =</span> default),</span>
+<span id="cb42-9"><a href="support-vector-machines.html#cb42-9" tabindex="-1"></a>  fits_svm_poly <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Fitted&quot;</span>, <span class="at">outcome =</span> Predicted)</span>
+<span id="cb42-10"><a href="support-vector-machines.html#cb42-10" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-11"><a href="support-vector-machines.html#cb42-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income, <span class="at">color =</span> outcome)) <span class="sc">+</span></span>
+<span id="cb42-12"><a href="support-vector-machines.html#cb42-12" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> student), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb42-13"><a href="support-vector-machines.html#cb42-13" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb42-14"><a href="support-vector-machines.html#cb42-14" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) <span class="sc">+</span></span>
+<span id="cb42-15"><a href="support-vector-machines.html#cb42-15" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb42-16"><a href="support-vector-machines.html#cb42-16" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb42-17"><a href="support-vector-machines.html#cb42-17" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">list</span>(<span class="at">No =</span> <span class="st">&quot;#B6E2D3&quot;</span>, <span class="at">Yes =</span> <span class="st">&quot;#EF7C8E&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb42-18"><a href="support-vector-machines.html#cb42-18" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Training Set, Polynomial Kernel&quot;</span>) <span class="sc">+</span></span>
+<span id="cb42-19"><a href="support-vector-machines.html#cb42-19" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(set))</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="support-vector-machines.html#cb43-1" tabindex="-1"></a>fits_svm_radial <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(</span>
+<span id="cb43-2"><a href="support-vector-machines.html#cb43-2" tabindex="-1"></a>  dat_train,</span>
+<span id="cb43-3"><a href="support-vector-machines.html#cb43-3" tabindex="-1"></a>  <span class="fu">predict</span>(mdl_svm_radial, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>),</span>
+<span id="cb43-4"><a href="support-vector-machines.html#cb43-4" tabindex="-1"></a>  <span class="at">Predicted =</span> <span class="fu">predict</span>(mdl_svm_radial, <span class="at">newdata =</span> dat_train, <span class="at">type =</span> <span class="st">&quot;raw&quot;</span>),</span>
+<span id="cb43-5"><a href="support-vector-machines.html#cb43-5" tabindex="-1"></a>)</span>
+<span id="cb43-6"><a href="support-vector-machines.html#cb43-6" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="support-vector-machines.html#cb43-7" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb43-8"><a href="support-vector-machines.html#cb43-8" tabindex="-1"></a>  fits_svm_radial <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Actual&quot;</span>, <span class="at">outcome =</span> default),</span>
+<span id="cb43-9"><a href="support-vector-machines.html#cb43-9" tabindex="-1"></a>  fits_svm_radial <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">set =</span> <span class="st">&quot;Fitted&quot;</span>, <span class="at">outcome =</span> Predicted)</span>
+<span id="cb43-10"><a href="support-vector-machines.html#cb43-10" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-11"><a href="support-vector-machines.html#cb43-11" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> balance, <span class="at">y =</span> income, <span class="at">color =</span> outcome)) <span class="sc">+</span></span>
+<span id="cb43-12"><a href="support-vector-machines.html#cb43-12" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">shape =</span> student), <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb43-13"><a href="support-vector-machines.html#cb43-13" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb43-14"><a href="support-vector-machines.html#cb43-14" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span>) <span class="sc">+</span></span>
+<span id="cb43-15"><a href="support-vector-machines.html#cb43-15" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb43-16"><a href="support-vector-machines.html#cb43-16" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels=</span>scales<span class="sc">::</span><span class="fu">dollar_format</span>()) <span class="sc">+</span></span>
+<span id="cb43-17"><a href="support-vector-machines.html#cb43-17" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">list</span>(<span class="at">No =</span> <span class="st">&quot;#B6E2D3&quot;</span>, <span class="at">Yes =</span> <span class="st">&quot;#EF7C8E&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb43-18"><a href="support-vector-machines.html#cb43-18" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Training Set, Radial Kernel&quot;</span>) <span class="sc">+</span></span>
+<span id="cb43-19"><a href="support-vector-machines.html#cb43-19" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(set))</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <p>You can see the slight curvature in the hyperplane now. The polynomial and the radial models look pretty much identical to me.</p>
 
 </div>
@@ -740,8 +746,8 @@ Kuhn, Max, and Kjell Johnson. 2016. <em>Applied Predictive Modeling</em>. 1st ed
           </div>
         </div>
       </div>
-<a href="non-linear-models.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="EMMs.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="decision-trees.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="BayesRegression.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

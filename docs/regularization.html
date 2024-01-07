@@ -4,18 +4,18 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 3 Regularization | Supervised Machine Learning</title>
+  <title>Chapter 5 Regularization | Supervised Machine Learning</title>
   <meta name="description" content="These are my personal notes related to supervised machine learning techniques." />
-  <meta name="generator" content="bookdown 0.34 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.36 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 3 Regularization | Supervised Machine Learning" />
+  <meta property="og:title" content="Chapter 5 Regularization | Supervised Machine Learning" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="These are my personal notes related to supervised machine learning techniques." />
   
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 3 Regularization | Supervised Machine Learning" />
+  <meta name="twitter:title" content="Chapter 5 Regularization | Supervised Machine Learning" />
   
   <meta name="twitter:description" content="These are my personal notes related to supervised machine learning techniques." />
   
@@ -23,14 +23,14 @@
 <meta name="author" content="Michael Foley" />
 
 
-<meta name="date" content="2023-07-30" />
+<meta name="date" content="2024-01-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="generalized-linear-models-glm.html"/>
+<link rel="prev" href="non-linear-models.html"/>
 <link rel="next" href="decision-trees.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -192,82 +192,86 @@ div.csl-indent {
 </ul></li>
 <li class="chapter" data-level="2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html"><i class="fa fa-check"></i><b>2</b> Generalized Linear Models (GLM)</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#binomiallogistic"><i class="fa fa-check"></i><b>2.1</b> Binomial Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs1"><i class="fa fa-check"></i>Case Study 1</a>
+<li class="chapter" data-level="2.1" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#binomiallogistic"><i class="fa fa-check"></i><b>2.1</b> Binomial Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#the-model"><i class="fa fa-check"></i>The Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs1"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model"><i class="fa fa-check"></i>Fit the Model</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpretation-1"><i class="fa fa-check"></i>Interpretation</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions"><i class="fa fa-check"></i>Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#model-fit"><i class="fa fa-check"></i>Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#multinomiallogistic"><i class="fa fa-check"></i><b>2.2</b> Multinomial Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs2"><i class="fa fa-check"></i>Case Study 2</a>
+<li class="chapter" data-level="2.2" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#multinomiallogistic"><i class="fa fa-check"></i><b>2.2</b> Multinomial Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#the-model-1"><i class="fa fa-check"></i>The Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs2"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model-1"><i class="fa fa-check"></i>Fit the Model</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpretation-2"><i class="fa fa-check"></i>Interpretation</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions-1"><i class="fa fa-check"></i>Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#model-fit-1"><i class="fa fa-check"></i>Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit-1"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting-1"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.3" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#ordinallogistic"><i class="fa fa-check"></i><b>2.3</b> Ordinal Logistic Regression</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs3"><i class="fa fa-check"></i>Case Study 3</a>
+<li class="chapter" data-level="2.3" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#ordinallogistic"><i class="fa fa-check"></i><b>2.3</b> Ordinal Logistic Regression</a>
 <ul>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model"><i class="fa fa-check"></i>Fit the Model</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#verify-assumptions"><i class="fa fa-check"></i>Verify Assumptions</a></li>
-<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assess-the-model-fit"><i class="fa fa-check"></i>Assess the Model Fit</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs3"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#fit-the-model-2"><i class="fa fa-check"></i>Fit the Model</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#assumptions-2"><i class="fa fa-check"></i>Assumptions</a></li>
+<li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#evaluate-the-fit-2"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#interpret-results"><i class="fa fa-check"></i>Interpret Results</a></li>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#reporting-2"><i class="fa fa-check"></i>Reporting</a></li>
 </ul></li>
-<li class="chapter" data-level="2.4" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#poissonregression"><i class="fa fa-check"></i><b>2.4</b> Poisson Regression</a></li>
+<li class="chapter" data-level="2.4" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#poissonregression"><i class="fa fa-check"></i><b>2.4</b> Poisson Regression</a>
+<ul>
 <li class="chapter" data-level="" data-path="generalized-linear-models-glm.html"><a href="generalized-linear-models-glm.html#cs4"><i class="fa fa-check"></i>Case Study 4</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="regularization.html"><a href="regularization.html"><i class="fa fa-check"></i><b>3</b> Regularization</a>
+</ul></li>
+<li class="chapter" data-level="3" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html"><i class="fa fa-check"></i><b>3</b> Mixed Effects Models</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="regularization.html"><a href="regularization.html#ridge"><i class="fa fa-check"></i><b>3.1</b> Ridge</a></li>
-<li class="chapter" data-level="3.2" data-path="regularization.html"><a href="regularization.html#lasso"><i class="fa fa-check"></i><b>3.2</b> Lasso</a></li>
-<li class="chapter" data-level="3.3" data-path="regularization.html"><a href="regularization.html#elastic-net"><i class="fa fa-check"></i><b>3.3</b> Elastic Net</a></li>
+<li class="chapter" data-level="3.1" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#lme"><i class="fa fa-check"></i><b>3.1</b> Linear Mixed Effects</a>
+<ul>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#lme1"><i class="fa fa-check"></i>Case Study</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#fit-the-model-3"><i class="fa fa-check"></i>Fit the Model</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#interpretation-3"><i class="fa fa-check"></i>Interpretation</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#model-assumptions-1"><i class="fa fa-check"></i>Model Assumptions</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#evaluate-the-fit-3"><i class="fa fa-check"></i>Evaluate the Fit</a></li>
+<li class="chapter" data-level="" data-path="mixed-effects-models.html"><a href="mixed-effects-models.html#reporting-3"><i class="fa fa-check"></i>Reporting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="non-linear-models.html"><a href="non-linear-models.html"><i class="fa fa-check"></i><b>4</b> Non-linear Models</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="non-linear-models.html"><a href="non-linear-models.html#splines"><i class="fa fa-check"></i><b>4.1</b> Splines</a></li>
+<li class="chapter" data-level="4.2" data-path="non-linear-models.html"><a href="non-linear-models.html#mars"><i class="fa fa-check"></i><b>4.2</b> MARS</a></li>
+<li class="chapter" data-level="4.3" data-path="non-linear-models.html"><a href="non-linear-models.html#gam"><i class="fa fa-check"></i><b>4.3</b> GAM</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="regularization.html"><a href="regularization.html"><i class="fa fa-check"></i><b>5</b> Regularization</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="regularization.html"><a href="regularization.html#ridge"><i class="fa fa-check"></i><b>5.1</b> Ridge</a></li>
+<li class="chapter" data-level="5.2" data-path="regularization.html"><a href="regularization.html#lasso"><i class="fa fa-check"></i><b>5.2</b> Lasso</a></li>
+<li class="chapter" data-level="5.3" data-path="regularization.html"><a href="regularization.html#elastic-net"><i class="fa fa-check"></i><b>5.3</b> Elastic Net</a></li>
 <li class="chapter" data-level="" data-path="regularization.html"><a href="regularization.html#model-summary"><i class="fa fa-check"></i>Model Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="decision-trees.html"><a href="decision-trees.html"><i class="fa fa-check"></i><b>4</b> Decision Trees</a>
+<li class="chapter" data-level="6" data-path="decision-trees.html"><a href="decision-trees.html"><i class="fa fa-check"></i><b>6</b> Decision Trees</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-tree"><i class="fa fa-check"></i><b>4.1</b> Classification Tree</a>
+<li class="chapter" data-level="6.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-tree"><i class="fa fa-check"></i><b>6.1</b> Classification Tree</a>
 <ul>
-<li class="chapter" data-level="4.1.1" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance"><i class="fa fa-check"></i><b>4.1.1</b> Measuring Performance</a></li>
-<li class="chapter" data-level="4.1.2" data-path="decision-trees.html"><a href="decision-trees.html#training-with-caret"><i class="fa fa-check"></i><b>4.1.2</b> Training with Caret</a></li>
+<li class="chapter" data-level="" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance"><i class="fa fa-check"></i>Measuring Performance</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-tree"><i class="fa fa-check"></i><b>4.2</b> Regression Tree</a>
+<li class="chapter" data-level="6.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-tree"><i class="fa fa-check"></i><b>6.2</b> Regression Tree</a>
 <ul>
-<li class="chapter" data-level="4.2.1" data-path="decision-trees.html"><a href="decision-trees.html#training-with-caret-1"><i class="fa fa-check"></i><b>4.2.1</b> Training with Caret</a></li>
+<li class="chapter" data-level="" data-path="decision-trees.html"><a href="decision-trees.html#measuring-performance-1"><i class="fa fa-check"></i>Measuring Performance</a></li>
 </ul></li>
-<li class="chapter" data-level="4.3" data-path="decision-trees.html"><a href="decision-trees.html#bagged-trees"><i class="fa fa-check"></i><b>4.3</b> Bagged Trees</a>
+<li class="chapter" data-level="6.3" data-path="decision-trees.html"><a href="decision-trees.html#bagged-trees"><i class="fa fa-check"></i><b>6.3</b> Bagged Trees</a>
 <ul>
-<li class="chapter" data-level="4.3.1" data-path="decision-trees.html"><a href="decision-trees.html#bagged-classification-tree"><i class="fa fa-check"></i><b>4.3.1</b> Bagged Classification Tree</a></li>
-<li class="chapter" data-level="4.3.2" data-path="decision-trees.html"><a href="decision-trees.html#bagging-regression-tree"><i class="fa fa-check"></i><b>4.3.2</b> Bagging Regression Tree</a></li>
+<li class="chapter" data-level="6.3.1" data-path="decision-trees.html"><a href="decision-trees.html#bagged-classification-tree"><i class="fa fa-check"></i><b>6.3.1</b> Bagged Classification Tree</a></li>
+<li class="chapter" data-level="6.3.2" data-path="decision-trees.html"><a href="decision-trees.html#bagging-regression-tree"><i class="fa fa-check"></i><b>6.3.2</b> Bagging Regression Tree</a></li>
 </ul></li>
-<li class="chapter" data-level="4.4" data-path="decision-trees.html"><a href="decision-trees.html#random-forests"><i class="fa fa-check"></i><b>4.4</b> Random Forests</a></li>
-<li class="chapter" data-level="4.5" data-path="decision-trees.html"><a href="decision-trees.html#gradient-boosting"><i class="fa fa-check"></i><b>4.5</b> Gradient Boosting</a></li>
-<li class="chapter" data-level="4.6" data-path="decision-trees.html"><a href="decision-trees.html#summary"><i class="fa fa-check"></i><b>4.6</b> Summary</a>
+<li class="chapter" data-level="6.4" data-path="decision-trees.html"><a href="decision-trees.html#random-forests"><i class="fa fa-check"></i><b>6.4</b> Random Forests</a></li>
+<li class="chapter" data-level="6.5" data-path="decision-trees.html"><a href="decision-trees.html#gradient-boosting"><i class="fa fa-check"></i><b>6.5</b> Gradient Boosting</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="support-vector-machines.html"><a href="support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Support Vector Machines</a>
 <ul>
-<li class="chapter" data-level="4.6.1" data-path="decision-trees.html"><a href="decision-trees.html#classification-trees"><i class="fa fa-check"></i><b>4.6.1</b> Classification Trees</a></li>
-<li class="chapter" data-level="4.6.2" data-path="decision-trees.html"><a href="decision-trees.html#regression-trees"><i class="fa fa-check"></i><b>4.6.2</b> Regression Trees</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="5" data-path="non-linear-models.html"><a href="non-linear-models.html"><i class="fa fa-check"></i><b>5</b> Non-linear Models</a>
-<ul>
-<li class="chapter" data-level="5.1" data-path="non-linear-models.html"><a href="non-linear-models.html#splines"><i class="fa fa-check"></i><b>5.1</b> Splines</a></li>
-<li class="chapter" data-level="5.2" data-path="non-linear-models.html"><a href="non-linear-models.html#mars"><i class="fa fa-check"></i><b>5.2</b> MARS</a></li>
-<li class="chapter" data-level="5.3" data-path="non-linear-models.html"><a href="non-linear-models.html#gam"><i class="fa fa-check"></i><b>5.3</b> GAM</a></li>
-</ul></li>
-<li class="chapter" data-level="6" data-path="support-vector-machines.html"><a href="support-vector-machines.html"><i class="fa fa-check"></i><b>6</b> Support Vector Machines</a>
-<ul>
-<li class="chapter" data-level="6.1" data-path="support-vector-machines.html"><a href="support-vector-machines.html#maximal-margin-classifier"><i class="fa fa-check"></i><b>6.1</b> Maximal Margin Classifier</a></li>
-<li class="chapter" data-level="6.2" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>6.2</b> Support Vector Classifier</a></li>
-<li class="chapter" data-level="6.3" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>6.3</b> Support Vector Machines</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="EMMs.html"><a href="EMMs.html"><i class="fa fa-check"></i><b>7</b> Topics: EMMs</a>
-<ul>
-<li class="chapter" data-level="7.1" data-path="EMMs.html"><a href="EMMs.html#references"><i class="fa fa-check"></i><b>7.1</b> References</a></li>
+<li class="chapter" data-level="7.1" data-path="support-vector-machines.html"><a href="support-vector-machines.html#maximal-margin-classifier"><i class="fa fa-check"></i><b>7.1</b> Maximal Margin Classifier</a></li>
+<li class="chapter" data-level="7.2" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>7.2</b> Support Vector Classifier</a></li>
+<li class="chapter" data-level="7.3" data-path="support-vector-machines.html"><a href="support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>7.3</b> Support Vector Machines</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="BayesRegression.html"><a href="BayesRegression.html"><i class="fa fa-check"></i><b>8</b> Bayesian Regression</a>
 <ul>
@@ -277,6 +281,10 @@ div.csl-indent {
 <li class="chapter" data-level="8.2.1" data-path="BayesRegression.html"><a href="BayesRegression.html#model-comparison"><i class="fa fa-check"></i><b>8.2.1</b> Model Comparison</a></li>
 <li class="chapter" data-level="8.2.2" data-path="BayesRegression.html"><a href="BayesRegression.html#visualization"><i class="fa fa-check"></i><b>8.2.2</b> Visualization</a></li>
 </ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="EMMs.html"><a href="EMMs.html"><i class="fa fa-check"></i><b>9</b> Estimated Marginal Means</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="EMMs.html"><a href="EMMs.html#references"><i class="fa fa-check"></i><b>9.1</b> References</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references-1.html"><a href="references-1.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
@@ -299,8 +307,8 @@ div.csl-indent {
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="regularization" class="section level1 hasAnchor" number="3">
-<h1><span class="header-section-number">Chapter 3</span> Regularization<a href="regularization.html#regularization" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="regularization" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Chapter 5</span> Regularization<a href="regularization.html#regularization" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>These notes are from this <a href="https://www.datacamp.com/community/tutorials/tutorial-ridge-lasso-elastic-net">tutorial</a> on DataCamp, the <a href="https://campus.datacamp.com/courses/machine-learning-toolbox">Machine Learning Toolbox</a> DataCamp class, and Interpretable Machine Learning <span class="citation">(<a href="#ref-Molner2020">Molnar 2020</a>)</span>.</p>
 <p>Regularization is a set of methods that manage the bias-variance trade-off problem in linear regression.</p>
 <p>The linear regression model is <span class="math inline">\(Y = X \beta + \epsilon\)</span>, where <span class="math inline">\(\epsilon \sim N(0, \sigma^2)\)</span>. OLS estimates the coefficients by minimizing the loss function</p>
@@ -315,24 +323,24 @@ and</p>
 <p><span class="math display">\[\hat\sigma^2 = \frac{\epsilon&#39; \epsilon}{n - k}.\]</span></p>
 <p>The OLS estimator is unbiased, but can have a large variance when the predictor variables are highly correlated with each other, or when there are many predictors (notice how <span class="math inline">\(\hat{\sigma}^2\)</span> increases as <span class="math inline">\(k \rightarrow n\)</span>). Stepwise selection balances the trade-off by eliminating variables, but this throws away information. <em>Regularization</em> keeps all the predictors, but reduces coefficient magnitudes to reduce variance at the expense of some bias.</p>
 <p>In the sections below, I’ll use the <code>mtcars</code> data set to predict <code>mpg</code> from the other variables using the <code>caret::glmnet()</code> function. <code>glmnet()</code> uses penalized maximum likelihood to fit generalized linear models such as ridge, lasso, and elastic net. I’ll compare the model performances by creating a training and validation set, and a common <code>trainControl</code> object to make sure the models use the same observations in the cross-validation folds.</p>
-<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb204-1"><a href="regularization.html#cb204-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb204-2"><a href="regularization.html#cb204-2" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
-<span id="cb204-3"><a href="regularization.html#cb204-3" tabindex="-1"></a></span>
-<span id="cb204-4"><a href="regularization.html#cb204-4" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mtcars&quot;</span>)</span>
-<span id="cb204-5"><a href="regularization.html#cb204-5" tabindex="-1"></a></span>
-<span id="cb204-6"><a href="regularization.html#cb204-6" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb204-7"><a href="regularization.html#cb204-7" tabindex="-1"></a>partition <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(mtcars<span class="sc">$</span>mpg, <span class="at">p =</span> <span class="fl">0.8</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb204-8"><a href="regularization.html#cb204-8" tabindex="-1"></a>training <span class="ot">&lt;-</span> mtcars[partition, ]</span>
-<span id="cb204-9"><a href="regularization.html#cb204-9" tabindex="-1"></a>testing <span class="ot">&lt;-</span> mtcars[<span class="sc">-</span>partition, ]</span>
-<span id="cb204-10"><a href="regularization.html#cb204-10" tabindex="-1"></a></span>
-<span id="cb204-11"><a href="regularization.html#cb204-11" tabindex="-1"></a>train_control <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(</span>
-<span id="cb204-12"><a href="regularization.html#cb204-12" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;repeatedcv&quot;</span>,</span>
-<span id="cb204-13"><a href="regularization.html#cb204-13" tabindex="-1"></a>  <span class="at">number =</span> <span class="dv">5</span>,  </span>
-<span id="cb204-14"><a href="regularization.html#cb204-14" tabindex="-1"></a>  <span class="at">repeats =</span> <span class="dv">5</span>,</span>
-<span id="cb204-15"><a href="regularization.html#cb204-15" tabindex="-1"></a>  <span class="at">savePredictions =</span> <span class="st">&quot;final&quot;</span>  <span class="co"># saves predictions from optimal tuning parameters</span></span>
-<span id="cb204-16"><a href="regularization.html#cb204-16" tabindex="-1"></a>)</span></code></pre></div>
-<div id="ridge" class="section level2 hasAnchor" number="3.1">
-<h2><span class="header-section-number">3.1</span> Ridge<a href="regularization.html#ridge" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="regularization.html#cb214-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb214-2"><a href="regularization.html#cb214-2" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb214-3"><a href="regularization.html#cb214-3" tabindex="-1"></a></span>
+<span id="cb214-4"><a href="regularization.html#cb214-4" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;mtcars&quot;</span>)</span>
+<span id="cb214-5"><a href="regularization.html#cb214-5" tabindex="-1"></a></span>
+<span id="cb214-6"><a href="regularization.html#cb214-6" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb214-7"><a href="regularization.html#cb214-7" tabindex="-1"></a>partition <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(mtcars<span class="sc">$</span>mpg, <span class="at">p =</span> <span class="fl">0.8</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb214-8"><a href="regularization.html#cb214-8" tabindex="-1"></a>training <span class="ot">&lt;-</span> mtcars[partition, ]</span>
+<span id="cb214-9"><a href="regularization.html#cb214-9" tabindex="-1"></a>testing <span class="ot">&lt;-</span> mtcars[<span class="sc">-</span>partition, ]</span>
+<span id="cb214-10"><a href="regularization.html#cb214-10" tabindex="-1"></a></span>
+<span id="cb214-11"><a href="regularization.html#cb214-11" tabindex="-1"></a>train_control <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(</span>
+<span id="cb214-12"><a href="regularization.html#cb214-12" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;repeatedcv&quot;</span>,</span>
+<span id="cb214-13"><a href="regularization.html#cb214-13" tabindex="-1"></a>  <span class="at">number =</span> <span class="dv">5</span>,  </span>
+<span id="cb214-14"><a href="regularization.html#cb214-14" tabindex="-1"></a>  <span class="at">repeats =</span> <span class="dv">5</span>,</span>
+<span id="cb214-15"><a href="regularization.html#cb214-15" tabindex="-1"></a>  <span class="at">savePredictions =</span> <span class="st">&quot;final&quot;</span>  <span class="co"># saves predictions from optimal tuning parameters</span></span>
+<span id="cb214-16"><a href="regularization.html#cb214-16" tabindex="-1"></a>)</span></code></pre></div>
+<div id="ridge" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Ridge<a href="regularization.html#ridge" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Ridge regression estimates the linear model coefficients by minimizing an augmented loss function which includes a term, <span class="math inline">\(\lambda\)</span>, that penalizes the magnitude of the coefficient estimates,</p>
 <p><span class="math display">\[L = \sum_{i = 1}^n \left(y_i - x_i^{&#39;} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \hat{\beta}_j^2.\]</span></p>
 <p>The resulting estimate for the coefficients is</p>
@@ -344,20 +352,20 @@ and</p>
 <div id="example-1" class="section level4 unnumbered hasAnchor">
 <h4>Example<a href="regularization.html#example-1" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Specify <code>alpha = 0</code> in a tuning grid for ridge regression (the following sections reveal how alpha distinguishes ridge, lasso, and elastic net). Note that I standardize the predictors in the <code>preProcess</code> step - ridge regression requires standardization.</p>
-<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb205-1"><a href="regularization.html#cb205-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb205-2"><a href="regularization.html#cb205-2" tabindex="-1"></a>mdl_ridge <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb205-3"><a href="regularization.html#cb205-3" tabindex="-1"></a>  mpg <span class="sc">~</span> .,</span>
-<span id="cb205-4"><a href="regularization.html#cb205-4" tabindex="-1"></a>  <span class="at">data =</span> training,</span>
-<span id="cb205-5"><a href="regularization.html#cb205-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>,</span>
-<span id="cb205-6"><a href="regularization.html#cb205-6" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,  <span class="co"># Choose from RMSE, RSquared, AIC, BIC, ...others?</span></span>
-<span id="cb205-7"><a href="regularization.html#cb205-7" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),</span>
-<span id="cb205-8"><a href="regularization.html#cb205-8" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb205-9"><a href="regularization.html#cb205-9" tabindex="-1"></a>    <span class="at">.alpha =</span> <span class="dv">0</span>,  <span class="co"># optimize a ridge regression</span></span>
-<span id="cb205-10"><a href="regularization.html#cb205-10" tabindex="-1"></a>    <span class="at">.lambda =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">101</span>)</span>
-<span id="cb205-11"><a href="regularization.html#cb205-11" tabindex="-1"></a>  ),</span>
-<span id="cb205-12"><a href="regularization.html#cb205-12" tabindex="-1"></a>  <span class="at">trControl =</span> train_control</span>
-<span id="cb205-13"><a href="regularization.html#cb205-13" tabindex="-1"></a>  )</span>
-<span id="cb205-14"><a href="regularization.html#cb205-14" tabindex="-1"></a>mdl_ridge</span></code></pre></div>
+<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="regularization.html#cb215-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb215-2"><a href="regularization.html#cb215-2" tabindex="-1"></a>mdl_ridge <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb215-3"><a href="regularization.html#cb215-3" tabindex="-1"></a>  mpg <span class="sc">~</span> .,</span>
+<span id="cb215-4"><a href="regularization.html#cb215-4" tabindex="-1"></a>  <span class="at">data =</span> training,</span>
+<span id="cb215-5"><a href="regularization.html#cb215-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>,</span>
+<span id="cb215-6"><a href="regularization.html#cb215-6" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,  <span class="co"># Choose from RMSE, RSquared, AIC, BIC, ...others?</span></span>
+<span id="cb215-7"><a href="regularization.html#cb215-7" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),</span>
+<span id="cb215-8"><a href="regularization.html#cb215-8" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb215-9"><a href="regularization.html#cb215-9" tabindex="-1"></a>    <span class="at">.alpha =</span> <span class="dv">0</span>,  <span class="co"># optimize a ridge regression</span></span>
+<span id="cb215-10"><a href="regularization.html#cb215-10" tabindex="-1"></a>    <span class="at">.lambda =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">101</span>)</span>
+<span id="cb215-11"><a href="regularization.html#cb215-11" tabindex="-1"></a>  ),</span>
+<span id="cb215-12"><a href="regularization.html#cb215-12" tabindex="-1"></a>  <span class="at">trControl =</span> train_control</span>
+<span id="cb215-13"><a href="regularization.html#cb215-13" tabindex="-1"></a>  )</span>
+<span id="cb215-14"><a href="regularization.html#cb215-14" tabindex="-1"></a>mdl_ridge</span></code></pre></div>
 <pre><code>## glmnet 
 ## 
 ## 28 samples
@@ -475,91 +483,99 @@ and</p>
 ## RMSE was used to select the optimal model using the smallest value.
 ## The final values used for the model were alpha = 0 and lambda = 2.75.</code></pre>
 <p>The model printout shows the RMSE, R-Squared, and mean absolute error (MAE) values at each lambda specified in the tuning grid. The final three lines summarize what happened. It did not tune alpha because I held it at 0 for ridge regression; it optimized using RMSE; and the optimal tuning values (at the minimum RMSE) were alpha = 0 and lambda = 2.75. You plot the model to see the tuning results.</p>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb207-1"><a href="regularization.html#cb207-1" tabindex="-1"></a><span class="fu">ggplot</span>(mdl_ridge) <span class="sc">+</span></span>
-<span id="cb207-2"><a href="regularization.html#cb207-2" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Ridge Regression Parameter Tuning&quot;</span>, <span class="at">x =</span> <span class="st">&quot;lambda&quot;</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-144-1.png" width="672" /></p>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb217-1"><a href="regularization.html#cb217-1" tabindex="-1"></a><span class="fu">ggplot</span>(mdl_ridge) <span class="sc">+</span></span>
+<span id="cb217-2"><a href="regularization.html#cb217-2" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Ridge Regression Parameter Tuning&quot;</span>, <span class="at">x =</span> <span class="st">&quot;lambda&quot;</span>)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-154-1.png" width="672" /></p>
 <p><code>varImp()</code> ranks the predictors by the absolute value of the coefficients in the tuned model. The most important variables here were <code>wt</code>, <code>disp</code>, and <code>am</code>.</p>
-<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb208-1"><a href="regularization.html#cb208-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">varImp</span>(mdl_ridge))</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-145-1.png" width="672" /></p>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="regularization.html#cb218-1" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">varImp</span>(mdl_ridge))</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-155-1.png" width="672" /></p>
 </div>
 </div>
-<div id="lasso" class="section level2 hasAnchor" number="3.2">
-<h2><span class="header-section-number">3.2</span> Lasso<a href="regularization.html#lasso" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="lasso" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Lasso<a href="regularization.html#lasso" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Lasso stands for “least absolute shrinkage and selection operator”. Like ridge, lasso adds a penalty for coefficients, but instead of penalizing the sum of squared coefficients (L2 penalty), lasso penalizes the sum of absolute values (L1 penalty). As a result, for high values of <span class="math inline">\(\lambda\)</span>, coefficients can be zeroed under lasso.</p>
 <p>The loss function for lasso is</p>
 <p><span class="math display">\[L = \sum_{i = 1}^n \left(y_i - x_i^{&#39;} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \left| \hat{\beta}_j \right|.\]</span></p>
 <div id="example-2" class="section level4 unnumbered hasAnchor">
 <h4>Example<a href="regularization.html#example-2" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Continuing with prediction of <code>mpg</code> from the other variables in the <code>mtcars</code> data set, follow the same steps as before, but with ridge regression. This time specify parameter <code>alpha = 1</code> for ridge regression (it was 0 for ridge, and for elastic net it will be something in between and require optimization).</p>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb209-1"><a href="regularization.html#cb209-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb209-2"><a href="regularization.html#cb209-2" tabindex="-1"></a>mdl_lasso <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb209-3"><a href="regularization.html#cb209-3" tabindex="-1"></a>  mpg <span class="sc">~</span> .,</span>
-<span id="cb209-4"><a href="regularization.html#cb209-4" tabindex="-1"></a>  <span class="at">data =</span> training,</span>
-<span id="cb209-5"><a href="regularization.html#cb209-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>,</span>
-<span id="cb209-6"><a href="regularization.html#cb209-6" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
-<span id="cb209-7"><a href="regularization.html#cb209-7" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),</span>
-<span id="cb209-8"><a href="regularization.html#cb209-8" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb209-9"><a href="regularization.html#cb209-9" tabindex="-1"></a>    <span class="at">.alpha =</span> <span class="dv">1</span>,  <span class="co"># optimize a lasso regression</span></span>
-<span id="cb209-10"><a href="regularization.html#cb209-10" tabindex="-1"></a>    <span class="at">.lambda =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">101</span>)</span>
-<span id="cb209-11"><a href="regularization.html#cb209-11" tabindex="-1"></a>  ),</span>
-<span id="cb209-12"><a href="regularization.html#cb209-12" tabindex="-1"></a>  <span class="at">trControl =</span> train_control</span>
-<span id="cb209-13"><a href="regularization.html#cb209-13" tabindex="-1"></a>  )</span>
-<span id="cb209-14"><a href="regularization.html#cb209-14" tabindex="-1"></a>mdl_lasso<span class="sc">$</span>bestTune</span></code></pre></div>
+<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb219-1"><a href="regularization.html#cb219-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb219-2"><a href="regularization.html#cb219-2" tabindex="-1"></a>mdl_lasso <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb219-3"><a href="regularization.html#cb219-3" tabindex="-1"></a>  mpg <span class="sc">~</span> .,</span>
+<span id="cb219-4"><a href="regularization.html#cb219-4" tabindex="-1"></a>  <span class="at">data =</span> training,</span>
+<span id="cb219-5"><a href="regularization.html#cb219-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>,</span>
+<span id="cb219-6"><a href="regularization.html#cb219-6" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
+<span id="cb219-7"><a href="regularization.html#cb219-7" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),</span>
+<span id="cb219-8"><a href="regularization.html#cb219-8" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb219-9"><a href="regularization.html#cb219-9" tabindex="-1"></a>    <span class="at">.alpha =</span> <span class="dv">1</span>,  <span class="co"># optimize a lasso regression</span></span>
+<span id="cb219-10"><a href="regularization.html#cb219-10" tabindex="-1"></a>    <span class="at">.lambda =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">101</span>)</span>
+<span id="cb219-11"><a href="regularization.html#cb219-11" tabindex="-1"></a>  ),</span>
+<span id="cb219-12"><a href="regularization.html#cb219-12" tabindex="-1"></a>  <span class="at">trControl =</span> train_control</span>
+<span id="cb219-13"><a href="regularization.html#cb219-13" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info = trainInfo,
+## : There were missing values in resampled performance measures.</code></pre>
+<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="regularization.html#cb221-1" tabindex="-1"></a>mdl_lasso<span class="sc">$</span>bestTune</span></code></pre></div>
 <pre><code>##    alpha lambda
 ## 14     1   0.65</code></pre>
 <p>The summary output shows the model did not tune alpha because I held it at 1 for lasso regression. The optimal tuning values (at the minimum RMSE) were alpha = 1 and lambda = 0.65. You can see the RMSE minimum on the the plot.</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb211-1"><a href="regularization.html#cb211-1" tabindex="-1"></a><span class="fu">ggplot</span>(mdl_ridge) <span class="sc">+</span></span>
-<span id="cb211-2"><a href="regularization.html#cb211-2" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Lasso Regression Parameter Tuning&quot;</span>, <span class="at">x =</span> <span class="st">&quot;lambda&quot;</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-147-1.png" width="672" /></p>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="regularization.html#cb223-1" tabindex="-1"></a><span class="fu">ggplot</span>(mdl_ridge) <span class="sc">+</span></span>
+<span id="cb223-2"><a href="regularization.html#cb223-2" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Lasso Regression Parameter Tuning&quot;</span>, <span class="at">x =</span> <span class="st">&quot;lambda&quot;</span>)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-157-1.png" width="672" /></p>
 </div>
 </div>
-<div id="elastic-net" class="section level2 hasAnchor" number="3.3">
-<h2><span class="header-section-number">3.3</span> Elastic Net<a href="regularization.html#elastic-net" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="elastic-net" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Elastic Net<a href="regularization.html#elastic-net" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Elastic Net combines the penalties of ridge and lasso to get the best of both worlds. The loss function for elastic net is</p>
 <p><span class="math display">\[L = \frac{\sum_{i = 1}^n \left(y_i - x_i^{&#39;} \hat\beta \right)^2}{2n} + \lambda \frac{1 - \alpha}{2}\sum_{j=1}^k \hat{\beta}_j^2 + \lambda \alpha\left| \hat{\beta}_j \right|.\]</span></p>
 <p>In this loss function, new parameter <span class="math inline">\(\alpha\)</span> is a “mixing” parameter that balances the two approaches. If <span class="math inline">\(\alpha\)</span> is zero, you are back to ridge regression, and if <span class="math inline">\(\alpha\)</span> is one, you are back to lasso.</p>
 <div id="example-3" class="section level4 unnumbered hasAnchor">
 <h4>Example<a href="regularization.html#example-3" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Continuing with prediction of <code>mpg</code> from the other variables in the <code>mtcars</code> data set, follow the same steps as before, but with elastic net regression there are two parameters to optimize: <span class="math inline">\(\lambda\)</span> and <span class="math inline">\(\alpha\)</span>.</p>
-<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb212-1"><a href="regularization.html#cb212-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb212-2"><a href="regularization.html#cb212-2" tabindex="-1"></a>mdl_elnet <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb212-3"><a href="regularization.html#cb212-3" tabindex="-1"></a>  mpg <span class="sc">~</span> .,</span>
-<span id="cb212-4"><a href="regularization.html#cb212-4" tabindex="-1"></a>  <span class="at">data =</span> training,</span>
-<span id="cb212-5"><a href="regularization.html#cb212-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>,</span>
-<span id="cb212-6"><a href="regularization.html#cb212-6" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
-<span id="cb212-7"><a href="regularization.html#cb212-7" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),</span>
-<span id="cb212-8"><a href="regularization.html#cb212-8" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb212-9"><a href="regularization.html#cb212-9" tabindex="-1"></a>    <span class="at">.alpha =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">10</span>),  <span class="co"># optimize an elnet regression</span></span>
-<span id="cb212-10"><a href="regularization.html#cb212-10" tabindex="-1"></a>    <span class="at">.lambda =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">101</span>)</span>
-<span id="cb212-11"><a href="regularization.html#cb212-11" tabindex="-1"></a>  ),</span>
-<span id="cb212-12"><a href="regularization.html#cb212-12" tabindex="-1"></a>  <span class="at">trControl =</span> train_control</span>
-<span id="cb212-13"><a href="regularization.html#cb212-13" tabindex="-1"></a>  )</span>
-<span id="cb212-14"><a href="regularization.html#cb212-14" tabindex="-1"></a>mdl_elnet<span class="sc">$</span>bestTune</span></code></pre></div>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb224-1"><a href="regularization.html#cb224-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb224-2"><a href="regularization.html#cb224-2" tabindex="-1"></a>mdl_elnet <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb224-3"><a href="regularization.html#cb224-3" tabindex="-1"></a>  mpg <span class="sc">~</span> .,</span>
+<span id="cb224-4"><a href="regularization.html#cb224-4" tabindex="-1"></a>  <span class="at">data =</span> training,</span>
+<span id="cb224-5"><a href="regularization.html#cb224-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>,</span>
+<span id="cb224-6"><a href="regularization.html#cb224-6" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
+<span id="cb224-7"><a href="regularization.html#cb224-7" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),</span>
+<span id="cb224-8"><a href="regularization.html#cb224-8" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb224-9"><a href="regularization.html#cb224-9" tabindex="-1"></a>    <span class="at">.alpha =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">10</span>),  <span class="co"># optimize an elnet regression</span></span>
+<span id="cb224-10"><a href="regularization.html#cb224-10" tabindex="-1"></a>    <span class="at">.lambda =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">101</span>)</span>
+<span id="cb224-11"><a href="regularization.html#cb224-11" tabindex="-1"></a>  ),</span>
+<span id="cb224-12"><a href="regularization.html#cb224-12" tabindex="-1"></a>  <span class="at">trControl =</span> train_control</span>
+<span id="cb224-13"><a href="regularization.html#cb224-13" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info = trainInfo,
+## : There were missing values in resampled performance measures.</code></pre>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb226-1"><a href="regularization.html#cb226-1" tabindex="-1"></a>mdl_elnet<span class="sc">$</span>bestTune</span></code></pre></div>
 <pre><code>##    alpha lambda
 ## 56     0   2.75</code></pre>
 <p>The optimal tuning values (at the mininum RMSE) were alpha = 0.0 and lambda = 2.75, so the mix is 100% ridge, 0% lasso. You can see the RMSE minimum on the the plot. Alpha is on the horizontal axis and the different lambdas are shown as separate series.</p>
-<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb214-1"><a href="regularization.html#cb214-1" tabindex="-1"></a><span class="fu">ggplot</span>(mdl_elnet) <span class="sc">+</span></span>
-<span id="cb214-2"><a href="regularization.html#cb214-2" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Elastic Net Regression Parameter Tuning&quot;</span>, <span class="at">x =</span> <span class="st">&quot;lambda&quot;</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-149-1.png" width="672" /></p>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb228-1"><a href="regularization.html#cb228-1" tabindex="-1"></a><span class="fu">ggplot</span>(mdl_elnet) <span class="sc">+</span></span>
+<span id="cb228-2"><a href="regularization.html#cb228-2" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Elastic Net Regression Parameter Tuning&quot;</span>, <span class="at">x =</span> <span class="st">&quot;lambda&quot;</span>)</span></code></pre></div>
+<pre><code>## Warning: The shape palette can deal with a maximum of 6 discrete values because
+## more than 6 becomes difficult to discriminate; you have 10. Consider
+## specifying shapes manually if you must have them.</code></pre>
+<pre><code>## Warning: Removed 404 rows containing missing values (`geom_point()`).</code></pre>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-159-1.png" width="672" /></p>
 </div>
 </div>
 <div id="model-summary" class="section level2 unnumbered hasAnchor">
 <h2>Model Summary<a href="regularization.html#model-summary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Make predictions on the validation data set for each of the three models.</p>
-<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb215-1"><a href="regularization.html#cb215-1" tabindex="-1"></a>pr_ridge <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="at">pred =</span> <span class="fu">predict</span>(mdl_ridge, <span class="at">newdata =</span> testing), <span class="at">obs =</span> testing<span class="sc">$</span>mpg)</span>
-<span id="cb215-2"><a href="regularization.html#cb215-2" tabindex="-1"></a>pr_lasso <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="at">pred =</span> <span class="fu">predict</span>(mdl_lasso, <span class="at">newdata =</span> testing), <span class="at">obs =</span> testing<span class="sc">$</span>mpg)</span>
-<span id="cb215-3"><a href="regularization.html#cb215-3" tabindex="-1"></a>pr_elnet <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="at">pred =</span> <span class="fu">predict</span>(mdl_elnet, <span class="at">newdata =</span> testing), <span class="at">obs =</span> testing<span class="sc">$</span>mpg)</span></code></pre></div>
-<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb216-1"><a href="regularization.html#cb216-1" tabindex="-1"></a><span class="fu">rbind</span>(pr_ridge, pr_lasso, pr_elnet)</span></code></pre></div>
+<div class="sourceCode" id="cb231"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb231-1"><a href="regularization.html#cb231-1" tabindex="-1"></a>pr_ridge <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="at">pred =</span> <span class="fu">predict</span>(mdl_ridge, <span class="at">newdata =</span> testing), <span class="at">obs =</span> testing<span class="sc">$</span>mpg)</span>
+<span id="cb231-2"><a href="regularization.html#cb231-2" tabindex="-1"></a>pr_lasso <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="at">pred =</span> <span class="fu">predict</span>(mdl_lasso, <span class="at">newdata =</span> testing), <span class="at">obs =</span> testing<span class="sc">$</span>mpg)</span>
+<span id="cb231-3"><a href="regularization.html#cb231-3" tabindex="-1"></a>pr_elnet <span class="ot">&lt;-</span> <span class="fu">postResample</span>(<span class="at">pred =</span> <span class="fu">predict</span>(mdl_elnet, <span class="at">newdata =</span> testing), <span class="at">obs =</span> testing<span class="sc">$</span>mpg)</span></code></pre></div>
+<div class="sourceCode" id="cb232"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb232-1"><a href="regularization.html#cb232-1" tabindex="-1"></a><span class="fu">rbind</span>(pr_ridge, pr_lasso, pr_elnet)</span></code></pre></div>
 <pre><code>##              RMSE  Rsquared      MAE
 ## pr_ridge 3.745350 0.9007955 2.761726
 ## pr_lasso 4.032868 0.9734421 3.009135
 ## pr_elnet 3.745350 0.9007955 2.761726</code></pre>
 <p>It looks like ridge/elnet was the big winner today based on RMSE and MAE. Lasso had the best Rsquared though. On average, ridge/elnet will miss the true value of <code>mpg</code> by 3.75 mpg (RMSE) or 2.76 mpg (MAE). The model explains about 90% of the variation in <code>mpg</code>.</p>
 <p>You can also compare the models by resampling.</p>
-<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb218-1"><a href="regularization.html#cb218-1" tabindex="-1"></a>model.resamples <span class="ot">&lt;-</span> <span class="fu">resamples</span>(<span class="fu">list</span>(<span class="at">Ridge =</span> mdl_ridge,</span>
-<span id="cb218-2"><a href="regularization.html#cb218-2" tabindex="-1"></a>                                  <span class="at">Lasso =</span> mdl_lasso,</span>
-<span id="cb218-3"><a href="regularization.html#cb218-3" tabindex="-1"></a>                                  <span class="at">ELNet =</span> mdl_elnet))</span>
-<span id="cb218-4"><a href="regularization.html#cb218-4" tabindex="-1"></a><span class="fu">summary</span>(model.resamples)</span></code></pre></div>
+<div class="sourceCode" id="cb234"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb234-1"><a href="regularization.html#cb234-1" tabindex="-1"></a>model.resamples <span class="ot">&lt;-</span> <span class="fu">resamples</span>(<span class="fu">list</span>(<span class="at">Ridge =</span> mdl_ridge,</span>
+<span id="cb234-2"><a href="regularization.html#cb234-2" tabindex="-1"></a>                                  <span class="at">Lasso =</span> mdl_lasso,</span>
+<span id="cb234-3"><a href="regularization.html#cb234-3" tabindex="-1"></a>                                  <span class="at">ELNet =</span> mdl_elnet))</span>
+<span id="cb234-4"><a href="regularization.html#cb234-4" tabindex="-1"></a><span class="fu">summary</span>(model.resamples)</span></code></pre></div>
 <pre><code>## 
 ## Call:
 ## summary.resamples(object = model.resamples)
@@ -585,22 +601,22 @@ and</p>
 ## Lasso 0.6263831 0.8100574 0.8656579 0.8593787 0.9407846 0.9955706    0
 ## ELNet 0.6919630 0.8357446 0.8904019 0.8827999 0.9382490 0.9791672    0</code></pre>
 <p>You want the smallest mean RMSE, and a small range of RMSEs. Ridge/elnet had the smallest mean, and a relatively small range. Boxplots are a common way to visualize this information.</p>
-<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb220-1"><a href="regularization.html#cb220-1" tabindex="-1"></a><span class="fu">bwplot</span>(model.resamples, <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Model Comparison on Resamples&quot;</span>)</span></code></pre></div>
-<p><img src="supervised-ml_files/figure-html/unnamed-chunk-153-1.png" width="672" /></p>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="regularization.html#cb236-1" tabindex="-1"></a><span class="fu">bwplot</span>(model.resamples, <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>, <span class="at">main =</span> <span class="st">&quot;Model Comparison on Resamples&quot;</span>)</span></code></pre></div>
+<p><img src="supervised-ml_files/figure-html/unnamed-chunk-163-1.png" width="672" /></p>
 <p>Now that you have identified the optimal model, capture its tuning parameters and refit the model to the entire data set.</p>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb221-1"><a href="regularization.html#cb221-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb221-2"><a href="regularization.html#cb221-2" tabindex="-1"></a>mdl_final <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
-<span id="cb221-3"><a href="regularization.html#cb221-3" tabindex="-1"></a>  mpg <span class="sc">~</span> .,</span>
-<span id="cb221-4"><a href="regularization.html#cb221-4" tabindex="-1"></a>  <span class="at">data =</span> training,</span>
-<span id="cb221-5"><a href="regularization.html#cb221-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>,</span>
-<span id="cb221-6"><a href="regularization.html#cb221-6" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
-<span id="cb221-7"><a href="regularization.html#cb221-7" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),</span>
-<span id="cb221-8"><a href="regularization.html#cb221-8" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(</span>
-<span id="cb221-9"><a href="regularization.html#cb221-9" tabindex="-1"></a>    <span class="at">.alpha =</span> mdl_ridge<span class="sc">$</span>bestTune<span class="sc">$</span>alpha,  <span class="co"># optimized hyperparameters</span></span>
-<span id="cb221-10"><a href="regularization.html#cb221-10" tabindex="-1"></a>    <span class="at">.lambda =</span> mdl_ridge<span class="sc">$</span>bestTune<span class="sc">$</span>lambda),  <span class="co"># optimized hyperparameters</span></span>
-<span id="cb221-11"><a href="regularization.html#cb221-11" tabindex="-1"></a>  <span class="at">trControl =</span> train_control</span>
-<span id="cb221-12"><a href="regularization.html#cb221-12" tabindex="-1"></a>  )</span>
-<span id="cb221-13"><a href="regularization.html#cb221-13" tabindex="-1"></a>mdl_final</span></code></pre></div>
+<div class="sourceCode" id="cb237"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb237-1"><a href="regularization.html#cb237-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb237-2"><a href="regularization.html#cb237-2" tabindex="-1"></a>mdl_final <span class="ot">&lt;-</span> <span class="fu">train</span>(</span>
+<span id="cb237-3"><a href="regularization.html#cb237-3" tabindex="-1"></a>  mpg <span class="sc">~</span> .,</span>
+<span id="cb237-4"><a href="regularization.html#cb237-4" tabindex="-1"></a>  <span class="at">data =</span> training,</span>
+<span id="cb237-5"><a href="regularization.html#cb237-5" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;glmnet&quot;</span>,</span>
+<span id="cb237-6"><a href="regularization.html#cb237-6" tabindex="-1"></a>  <span class="at">metric =</span> <span class="st">&quot;RMSE&quot;</span>,</span>
+<span id="cb237-7"><a href="regularization.html#cb237-7" tabindex="-1"></a>  <span class="at">preProcess =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),</span>
+<span id="cb237-8"><a href="regularization.html#cb237-8" tabindex="-1"></a>  <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(</span>
+<span id="cb237-9"><a href="regularization.html#cb237-9" tabindex="-1"></a>    <span class="at">.alpha =</span> mdl_ridge<span class="sc">$</span>bestTune<span class="sc">$</span>alpha,  <span class="co"># optimized hyperparameters</span></span>
+<span id="cb237-10"><a href="regularization.html#cb237-10" tabindex="-1"></a>    <span class="at">.lambda =</span> mdl_ridge<span class="sc">$</span>bestTune<span class="sc">$</span>lambda),  <span class="co"># optimized hyperparameters</span></span>
+<span id="cb237-11"><a href="regularization.html#cb237-11" tabindex="-1"></a>  <span class="at">trControl =</span> train_control</span>
+<span id="cb237-12"><a href="regularization.html#cb237-12" tabindex="-1"></a>  )</span>
+<span id="cb237-13"><a href="regularization.html#cb237-13" tabindex="-1"></a>mdl_final</span></code></pre></div>
 <pre><code>## glmnet 
 ## 
 ## 28 samples
@@ -638,7 +654,7 @@ Molnar, Christoph. 2020. <em>Interpretable Machine Learning</em>. <a href="https
           </div>
         </div>
       </div>
-<a href="generalized-linear-models-glm.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="non-linear-models.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="decision-trees.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
