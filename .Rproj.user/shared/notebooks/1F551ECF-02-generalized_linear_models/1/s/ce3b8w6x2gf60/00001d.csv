@@ -1,8 +1,0 @@
-"0","saturated <- ordinal::clm(tax_too_high ~ biz_owner*politics + age, data = cs3$dat)"
-"0",""
-"0","(cs3$sat_anova <- anova(cs3$result, saturated))"
-"1","Likelihood ratio tests of cumulative link models:
-"
-"1"," "
-"1","
-"

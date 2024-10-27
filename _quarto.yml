@@ -1,0 +1,45 @@
+project:
+  type: book
+  output-dir: docs
+
+book:
+  title: "Supervised Machine Learning"
+  author: "Michael Foley"
+  date: today
+  cover-image: cover.png
+  chapters:
+    - index.qmd
+    - 01-linear_regression.qmd
+    - 02-generalized_linear_models.qmd
+    - 03-linear_mixed_effects.qmd
+    - 04-nonlinear_regression.qmd
+    - 05-regularization.qmd
+    - 06-decision_trees.qmd
+    - 07-support_vector_machines.qmd
+    - 08-bayesian_regression.qmd
+    - 09-emmeans.qmd
+    - 10-references.qmd
+
+bibliography: references.bib
+
+execute: 
+  echo: true
+  message: false
+  error: false
+  warning: false
+
+format:
+  html:
+    theme: cosmo
+    toc-title: "On this page"
+    toc-depth: 4
+    code-tools: true
+    code-overflow: scroll
+    code-fold: show
+  pdf:
+    documentclass: scrreprt
+
+editor: source
+
+language: 
+  code-summary: "Show the code"

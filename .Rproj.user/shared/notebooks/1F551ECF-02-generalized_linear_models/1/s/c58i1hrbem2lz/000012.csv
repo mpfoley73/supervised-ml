@@ -1,6 +1,0 @@
-"0","gtsummary::tbl_regression("
-"0","  cs2$result,"
-"0","  exponentiate = TRUE"
-"0",") %>%"
-"0","  gtsummary::as_flex_table() %>%"
-"0","  flextable::theme_apa()"

@@ -1,0 +1,442 @@
+# Regularization
+
+```{r include=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(vip)
+
+set.seed(1)
+```
+
+Regularization is a set of methods in linear regression that manage the "bias-variance" tradeoff in machine learning. Bias and variance are two types of errors that affect model performance.
+
+- Bias refers to errors introduced by overly simplistic models that make strong assumptions. High-bias models, like linear models for nonlinear data, tend to underfit, meaning they fail to capture important patterns. This leads to systematic errors when predicting on new data.
+
+- Variance is the model’s sensitivity to fluctuations in the training data. High-variance models, like linear models with highly correlated features and deep neural networks, tend to overfit, meaning they capture noise in the data as if it were part of the underlying pattern. These models perform well on training data but are less reliable on new data. 
+
+The tradeoff is that increasing model complexity to decrease predictive bias (expected prediction error) comes at the cost of increasing prediction variance (variance of expected prediction error). The goal is to find a "sweet spot" with an optimal level of model complexity that minimizes overall error on new, unseen data.
+
+## Bias-Variance Trade-off
+
+The linear regression model is $Y = X \beta + \epsilon$, where $\epsilon \sim N(0, \sigma^2)$. OLS estimates the coefficients by minimizing the loss function
+
+$$L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2$$
+
+where $\hat{f} = x_i^{'} \hat\beta$ is the estimator of the true regression function, $f$. 
+
+This results estimate for the coefficients of
+
+$$\hat{\beta} = \left(X'X\right)^{-1}\left(X'Y\right).$$
+
+There are two important characteristics of any estimator: its *bias* and its *variance*.  For OLS, these are
+
+$$Bias(\hat{\beta}) = E(\hat{\beta}) - \beta = 0$$
+
+and
+
+$$Var(\hat{\beta}) = \sigma^2(X'X)^{-1}$$
+
+where the unknown population variance $\sigma^2$ is estimated from the residuals
+
+$$\hat\sigma^2 = \frac{\epsilon' \epsilon}{n - k}.$$
+
+The OLS estimator is unbiased, but can have a large variance when the predictor variables are highly correlated with each other, or when there are many predictors (notice how $\hat{\sigma}^2$ increases as $k \rightarrow n$).  Stepwise selection balances the trade-off by eliminating variables, but this throws away information.  *Regularization* keeps all the predictors, but reduces coefficient magnitudes to reduce variance at the expense of some bias.
+
+We can decompose the expected prediction error (EPE) into a *reducible error* related to the type of model, and *irreducible error* related to the variance $y$ (noise).
+
+$$
+\text{EPE} = \mathbb{E}\left[\left(f(x) - \hat{f}(x)\right)^2\right] + 
+  \mathbb{V}[y|x]
+$$
+
+The reducible error, which is the mean squared error (MSE) of the estimate, can be further decomposed into the estimator bias and variance.
+
+$$
+\text{EPE} = \left(f(x) - \mathbb{E}\left[\hat{f}(x)\right]\right)^2 +
+  \mathbb{E}\left[\left(\hat{f}(x) - \mathbb{E}\left[\hat{f}(x)\right]\right)^2\right] +
+  \mathbb{V}[y|x]
+$$
+
+**Illustration**.  Let's set up a bias-variance tradeoff by fitting several models of increasing complexity to a random data-generating process, $f(x) = x^3$. We'll create 250 random samples by choosing $x$ between 1 and 5 and $y = f(x) + e$ where $e$ is noise.
+
+```{r}
+#| code-fold: false
+f <- function(x) {x^3}
+
+make_sample = function() {
+  x = runif(n = 100, 1, 5)
+  e = rnorm(n = 100, 0, 5)
+  y = f(x) + e
+  data.frame(x, y)
+}
+
+sim_dat <-
+  tibble(sim = 1:250) |>
+  mutate(dat = map(sim, ~ make_sample()))
+```
+
+We'll fit five models. The first is a linear model, $y \sim x$. Then we'll fit polynomial model of degree 2. These first two models underfit the data. Then one of degree 3 - matching the underlying data-generating process. Then we'll overfit with one of degree 9. Finally, we'll use regularization to improve on the degree 9 model.
+
+```{r}
+#| code-fold: false
+sim_fit <-
+  sim_dat |>
+  mutate(
+    dat = map(sim, ~ make_sample()),
+    fit_1 = map(dat, ~ linear_reg() |> fit(y ~ poly(x, degree = 1), data = .)),
+    fit_2 = map(dat, ~ linear_reg() |> fit(y ~ poly(x, degree = 2), data = .)),
+    fit_3 = map(dat, ~ linear_reg() |> fit(y ~ poly(x, degree = 3), data = .)),
+    fit_9 = map(dat, ~ linear_reg() |> fit(y ~ poly(x, degree = 9), data = .)),
+    fit_9a = map(dat, 
+                  ~ linear_reg(engine = "glmnet", penalty = 0.2, mixture = 1) |>
+                    fit(y ~ poly(x, degree = 9), data = .))
+  )
+```
+
+This gives us 5 models fit to 250 random samples, each sample containing 100 points from an $f(x) = x^3 + \epsilon$ data-generating process. Let's predict a single value, $f(x = 4)$ from each model.
+
+```{r}
+#| code-fold: false
+test_dat <- data.frame(x = 4)
+
+sim_preds <-
+  sim_fit |>
+  mutate(
+    `1` = map_dbl(fit_1, ~ predict(., new_data = test_dat) |> pull(.pred)),
+    `2` = map_dbl(fit_2, ~ predict(., new_data = test_dat) |> pull(.pred)),
+    `3` = map_dbl(fit_3, ~ predict(., new_data = test_dat) |> pull(.pred)),
+    `9` = map_dbl(fit_9, ~ predict(., new_data = test_dat) |> pull(.pred)),
+    `9 (LASSO)` = map_dbl(fit_9a, ~ predict(., new_data = test_dat) |> pull(.pred))
+  )
+```
+
+Check out the distribution of fitted values. The degree 3 polynomial is the gold standard, and you see both low bias and variance. The degree-1 polynomial was just bad. The degree 2 had a high bias, but at least the variance was small. The degree 9 model overfit the data. It had low bias overall, but very high variance. The last model used regularization to improve its reliability, and you see the variance has shrunk with only a small reduction in bias.
+
+```{r}
+#| code-fold: true
+sim_preds |>
+  select(`1`:`9 (LASSO)`) |>
+  pivot_longer(c(everything())) |>
+  ggplot(aes(x = name, y = value)) +
+  geom_hline(yintercept = f(4), linewidth = 1, color = "goldenrod") +
+  geom_boxplot(fill = NA, outlier.shape = NA) +
+  geom_jitter(height = 0, width = .2, alpha = .2) +
+  theme(panel.grid = element_blank()) +
+  labs(
+    x = "Polynomial Degree", y = "Preds",
+    title = "Increasing complexity improves bias at expense of higher variance.",
+    subtitle = "Simulated Predictions from Four Linear Models"
+  )
+```
+
+## Case Study
+
+The sections below use the `mtcars` dataset to predict `mpg` from the other variables with regularization function `glmnet::glmnet()`. Set up a train-test split, training on 5-fold CV.
+
+```{r}
+#| code-fold: false
+data("mtcars")
+
+glimpse(mtcars)
+
+(mt_split <- initial_split(mtcars))
+
+(mt_folds <- vfold_cv(training(mt_split), v = 5))
+```
+
+## Ridge
+
+Ridge regression estimates the linear model coefficients by minimizing an augmented loss function which includes a term, $\lambda$, that penalizes the magnitude of the coefficient estimates,
+
+$$L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \hat{\beta}_j^2.$$
+
+The resulting estimate for the coefficients is 
+
+$$\hat{\beta} = \left(X'X + \lambda I\right)^{-1}\left(X'Y \right).$$
+
+As $\lambda \rightarrow 0$, ridge regression approaches OLS.  The bias and variance for the ridge estimator are
+
+$$\mathrm{Bias}(\hat{\beta}) = -\lambda \left(X'X + \lambda I \right)^{-1} \beta$$
+$$\mathbb{V}(\hat{\beta}) = \sigma^2 \left(X'X + \lambda I \right)^{-1}X'X \left(X'X + \lambda I \right)^{-1}$$
+
+Notice how the estimator bias increases with $\lambda$ while the variance decreases with $\lambda$. The optimal level for $\lambda$ is the one that minimizes the root mean squared error (RMSE) or the Akaike or Bayesian Information Criterion (AIC or BIC), or R-squared.
+
+To fit a linear model with ridge regression, specify `linear_reg(mixture = 0)`. Standardize the predictors in the recipe so that each contributes to the model on a similar scale. Otherwise, predictors with larger scales would naturally have larger coefficients.
+
+```{r}
+#| code-fold: false
+ridge_mdl <- linear_reg(engine = "glmnet", penalty = tune(), mixture = 0)
+
+ridge_rec <-
+  recipe(mpg ~ ., data = mtcars) |>
+  step_normalize(all_numeric_predictors())
+
+ridge_wflow <-
+  workflow() |>
+  add_model(ridge_mdl) |>
+  add_recipe(ridge_rec)
+
+# Set up the hyperparameter space for penalty. Set range through trial and error.
+ridge_grid <-
+  grid_latin_hypercube(
+    penalty(range = c(0, 10), trans = NULL), 
+    size = 30
+  )
+
+# tune_grid() returns a resamples object, essentially a tibble with turning
+# results for each hyperparameter combination and fold.
+ridge_resamples <-
+  ridge_wflow |>
+  tune_grid(
+    resamples = mt_folds,
+    grid = ridge_grid
+  )
+
+ridge_resamples |> show_best(metric = "rmse") |> knitr::kable()
+```
+
+```{r}
+#| code-fold: true
+ridge_resamples |>
+  collect_metrics() |>
+  ggplot(aes(x = penalty, y = mean)) +
+  geom_point() +
+  facet_wrap(facets = vars(.metric), scales = "free_y") +
+  labs(title = "Ridge Regression Hyperparameter Tuning")
+```
+
+Finalize the workflow with the optimal hyperparameter setting.
+
+```{r}
+# Update the workflow with the optimal hyperparameter values.
+ridge_final <-
+  ridge_wflow |>
+  finalize_workflow(parameters = select_best(ridge_resamples, metric = "rmse"))
+
+# Refit the model with the optimal hyperparameters using the _full_ training 
+# dataset (not the folds).
+ridge_fit <- ridge_final |> last_fit(mt_split)
+
+# Metrics are evaluated on the testing dataset.
+ridge_fit |> collect_metrics() |> knitr::kable()
+```
+
+<br>
+The most important variables here were `am` and `wt`.
+
+```{r}
+#| code-fold: true
+ridge_final |>
+  fit(training(mt_split)) |>
+  pull_workflow_fit() |>
+  vi() |>
+  ggplot(aes(x = Importance, y = fct_rev(fct_inorder(Variable)), color = Sign)) +
+  geom_point(size = 2) +
+  geom_segment(aes(x = 0, xend = Importance))  +
+  theme(legend.position = "top") +
+  labs(
+    color = NULL, y = NULL,
+    title = "Ridge Variable Importance"
+  )
+```
+
+## Lasso
+
+Lasso stands for “least absolute shrinkage and selection operator”. Like ridge, lasso adds a penalty for coefficients, but instead of penalizing the sum of squared coefficients (L2 penalty), lasso penalizes the sum of absolute values (L1 penalty). As a result, coefficients can be zeroed under lasso for high values of $\lambda$.
+
+The loss function for lasso is
+
+$$L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \left| \hat{\beta}_j \right|.$$
+
+To fit a linear model with lasso regression, specify `linear_reg(mixture = 1)`.
+
+```{r}
+#| code-fold: false
+lasso_mdl <- linear_reg(engine = "glmnet", penalty = tune(), mixture = 1)
+
+lasso_rec <-
+  recipe(mpg ~ ., data = mtcars) |>
+  step_normalize(all_numeric_predictors())
+
+lasso_wflow <-
+  workflow() |>
+  add_model(lasso_mdl) |>
+  add_recipe(lasso_rec)
+
+# Set up the hyperparameter space for penalty. Set range through trial and error.
+lasso_grid <-
+  grid_latin_hypercube(
+    penalty(range = c(0, 4), trans = NULL), 
+    size = 30
+  )
+
+# tune_grid() returns a resamples object, essentially a tibble with turning
+# results for each hyperparameter combination and fold.
+lasso_resamples <-
+  lasso_wflow |>
+  tune_grid(
+    resamples = mt_folds,
+    grid = lasso_grid
+  )
+
+lasso_resamples |> show_best(metric = "rmse") |> knitr::kable()
+```
+
+```{r}
+#| code-fold: true
+lasso_resamples |>
+  collect_metrics() |>
+  ggplot(aes(x = penalty, y = mean)) +
+  geom_point() +
+  facet_wrap(facets = vars(.metric), scales = "free_y") +
+  labs(title = "Lasso Regression Hyperparameter Tuning")
+```
+
+Finalize the workflow with the optimal hyperparameter setting.
+
+```{r}
+# Update the workflow with the optimal hyperparameter values.
+lasso_final <-
+  lasso_wflow |>
+  finalize_workflow(parameters = select_best(lasso_resamples, metric = "rmse"))
+
+# Refit the model with the optimal hyperparameters using the _full_ training 
+# dataset (not the folds).
+lasso_fit <- lasso_final |> last_fit(mt_split)
+
+# Metrics are evaluated on the testing dataset.
+lasso_fit |> collect_metrics() |> knitr::kable()
+```
+
+<br>
+The most important variables here were `am` and `wt`.
+
+```{r}
+#| code-fold: true
+lasso_final |>
+  fit(training(mt_split)) |>
+  pull_workflow_fit() |>
+  vi() |>
+  ggplot(aes(x = Importance, y = fct_rev(fct_inorder(Variable)), color = Sign)) +
+  geom_point(size = 2) +
+  geom_segment(aes(x = 0, xend = Importance))  +
+  theme(legend.position = "top") +
+  labs(
+    color = NULL, y = NULL,
+    title = "Lasso Variable Importance"
+  )
+```
+
+## Elastic Net
+
+Elastic Net combines the penalties of ridge and lasso to get the best of both worlds. The loss function for elastic net is
+
+$$L = \frac{\sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2}{2n} + \lambda \frac{1 - \alpha}{2}\sum_{j=1}^k \hat{\beta}_j^2 + \lambda \alpha\left| \hat{\beta}_j \right|.$$
+
+In this loss function, new parameter $\alpha$ is a "mixing" parameter that balances the two approaches.  If $\alpha$ is zero, you are back to ridge regression, and if $\alpha$ is one, you are back to lasso. To fit a linear model with elastic net regression, specify `linear_reg(mixture = tune())`.
+
+```{r}
+#| code-fold: false
+elnet_mdl <- linear_reg(engine = "glmnet", penalty = tune(), mixture = tune())
+
+elnet_rec <-
+  recipe(mpg ~ ., data = mtcars) |>
+  step_normalize(all_numeric_predictors())
+
+elnet_wflow <-
+  workflow() |>
+  add_model(elnet_mdl) |>
+  add_recipe(elnet_rec)
+
+# Set up the hyperparameter space for penalty and mixture. Set penalty range 
+# through trial and error.
+elnet_grid <-
+  grid_latin_hypercube(
+    penalty(range = c(2, 7), trans = NULL), 
+    mixture(range = c(.1, .8)),
+    size = 30
+  )
+
+# tune_grid() returns a resamples object, essentially a tibble with turning
+# results for each hyperparameter combination and fold.
+elnet_resamples <-
+  elnet_wflow |>
+  tune_grid(
+    resamples = mt_folds,
+    grid = elnet_grid
+  )
+
+elnet_resamples |> show_best(metric = "rmse") |> knitr::kable()
+```
+
+```{r}
+#| code-fold: true
+elnet_resamples |>
+  collect_metrics() |>
+  filter(.metric == "rmse") |>
+  ggplot(aes(x = penalty, y = mixture, color = mean)) +
+  geom_point(size = 2) +
+  scale_color_gradient(low = "red", high = "blue") +
+  # facet_wrap(facets = vars(.metric), scales = "free_y") +
+  labs(title = "Elastic Net Regression Hyperparameter Tuning", color = "rmse")
+```
+
+Finalize the workflow with the optimal hyperparameter setting.
+
+```{r}
+#| code-fold: false
+# Update the workflow with the optimal hyperparameter values.
+elnet_final <-
+  elnet_wflow |>
+  finalize_workflow(parameters = select_best(elnet_resamples, metric = "rmse"))
+
+# Refit the model with the optimal hyperparameters using the _full_ training 
+# dataset (not the folds).
+elnet_fit <- elnet_final |> last_fit(mt_split)
+
+# Metrics are evaluated on the testing dataset.
+elnet_fit |> collect_metrics() |> knitr::kable()
+```
+
+<br>
+The most important variables here were `wt`, `qsec` and `disp`.
+
+```{r}
+#| code-fold: true
+elnet_final |>
+  fit(training(mt_split)) |>
+  pull_workflow_fit() |>
+  vi() |>
+  ggplot(aes(x = Importance, y = fct_rev(fct_inorder(Variable)), color = Sign)) +
+  geom_point(size = 2) +
+  geom_segment(aes(x = 0, xend = Importance))  +
+  theme(legend.position = "top") +
+  labs(
+    color = NULL, y = NULL,
+    title = "Elastic Net Variable Importance"
+  )
+```
+
+## Model Summary {-}
+
+Lasso performed best on RMSE and R-squared.
+
+```{r}
+#| code-fold: true
+bind_rows(
+  Ridge = collect_metrics(ridge_fit),
+  Lasso = collect_metrics(lasso_fit),
+  ElNet = collect_metrics(elnet_fit),
+  .id = "Model"
+) |>
+  select(Model, .metric, .estimate) |>
+  pivot_wider(names_from = .metric, values_from = .estimate) |>
+  knitr::kable()
+```
+
+Final thoughts on the models.
+
+* Lasso can set some coefficients to zero, thus performing variable selection.
+* Lasso and Ridge address multicollinearity differently: in ridge regression, the coefficients of correlated predictors are similar; In lasso, one of the correlated predictors has a larger coefficient, while the rest are (nearly) zeroed.
+* Lasso tends to do well if there are a small number of significant parameters and the others are close to zero. Ridge tends to work well if there are many large parameters of about the same value.
+* In practice, you don't know which will be best, so run cross-validation pick the best.

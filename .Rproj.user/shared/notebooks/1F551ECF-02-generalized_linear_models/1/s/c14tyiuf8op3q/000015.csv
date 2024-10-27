@@ -1,6 +1,0 @@
-"0","cs1$dat_testing %>%"
-"0","  bind_cols(predict(cs1$fit, new_data = cs1$dat_testing, type = ""prob"")) %>%"
-"0","  # event_level = ""second"" sets the second level as success"
-"0","  yardstick::roc_curve(.pred_Yes, truth = heart_disease, event_level = ""second"") %>%"
-"0","  autoplot() +"
-"0","  labs(title = ""ROC Curve"")"

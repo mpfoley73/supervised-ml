@@ -1,6 +1,0 @@
-"0","cs1$dat %>%"
-"0","  pivot_longer(cols = c(age, weight, VO2max)) %>%"
-"0","  ggplot(aes(x = heart_disease, y = value)) + "
-"0","  geom_boxplot(outlier.shape = NA) +"
-"0","  geom_jitter(aes(color = name)) +"
-"0","  facet_wrap(facets = vars(name), scales = ""free_y"")"

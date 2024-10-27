@@ -1,1 +1,0 @@
-"0","lm(mpg ~ hp, data = mt_cars_boxcox) %>% plot(which = 1, main = ""hp - after Box-Cox"")"

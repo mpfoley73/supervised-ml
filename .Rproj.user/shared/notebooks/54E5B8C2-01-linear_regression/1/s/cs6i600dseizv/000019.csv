@@ -1,4 +1,0 @@
-"0","mt_cars %>%"
-"0","  select(where(is.numeric)) %>%"
-"0","  cor() %>%"
-"0","  corrplot::corrplot(type = ""upper"", method = ""number"")"

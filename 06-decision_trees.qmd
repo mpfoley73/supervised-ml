@@ -1,0 +1,1057 @@
+# Decision Trees
+
+```{r include=FALSE}
+library(tidyverse)
+library(tidymodels)
+library(baguette)
+
+tidymodels_prefer()
+
+theme_set(
+  theme_light() +
+    theme(
+      plot.caption = element_text(hjust = 0),
+      strip.background = element_rect(fill="gray90", color="gray60"),
+      strip.text = element_text(color = "gray20")
+    )
+)
+
+scoreboard <- function(dat){
+   dat %>%
+      flextable::flextable() %>%
+      flextable::colformat_num(j = 2, digits = 4) %>%
+      flextable::autofit()
+}
+```
+
+Decision trees, also known as classification and regression tree (CART) models, are tree-based methods for supervised machine learning.^[These notes rely on [PSU STAT 508](https://online.stat.psu.edu/stat508/) and on the [tidymodels vignettes](https://www.tidymodels.org/start/) for model building.]  Simple classification trees and regression trees are easy to use and interpret, but are not competitive with the best machine learning methods. However, they form the foundation for ensemble models such as bagged trees, random forests, and boosted trees, which although less interpretable, are very accurate.
+
+CART models segment the predictor space into $K$ non-overlapping terminal nodes (leaves). Each node is described by a set of rules which can be used to predict new responses. The predicted value $\hat{y}$ for each node is the mode (classification) or mean (regression).
+
+CART models define the nodes through a *top-down greedy* process called *recursive binary splitting*. The process is *top-down* because it begins at the top of the tree with all observations in a single region and successively splits the predictor space. It is *greedy* because at each splitting step, the best split is made at that particular step without consideration to subsequent splits.
+
+The best split is the predictor variable and cut point that minimizes a cost function. The most common cost function for regression trees is the sum of squared residuals, 
+
+$$RSS = \sum_{k=1}^K\sum_{i \in A_k}{\left(y_i - \hat{y}_{A_k} \right)^2}.$$
+
+For classification trees, it is the Gini index, 
+
+$$G = \sum_{c=1}^C{\hat{p}_{kc}(1 - \hat{p}_{kc})},$$
+
+and the entropy (aka information statistic)
+
+$$D = - \sum_{c=1}^C{\hat{p}_{kc} \log \hat{p}_{kc}}$$
+
+where $\hat{p}_{kc}$ is the proportion of training observations in node $k$ that are class $c$.  A completely *pure* node in a binary tree would have $\hat{p} \in \{ 0, 1 \}$ and $G = D = 0$. A completely *impure* node in a binary tree would have $\hat{p} = 0.5$ and $G = 0.5^2 \cdot 2 = 0.25$ and $D = -(0.5 \log(0.5)) \cdot 2 = 0.69$.
+
+CART repeats the splitting process for each child node until a *stopping criterion* is satisfied, usually when no node size surpasses a predefined maximum, or continued splitting does not improve the model significantly.  CART may also impose a minimum number of observations in each node.
+
+The resulting tree likely over-fits the training data and therefore does not generalize well to test data, so CART *prunes* the tree, minimizing the cross-validated prediction error. Rather than cross-validating every possible subtree to find the one with minimum error, CART uses *cost-complexity pruning*. Cost-complexity is the trade off between error (cost) and tree size (complexity) where the trade off is quantified with cost-complexity parameter $c_p$. The cost complexity of the tree, $R_{c_p}(T)$, is the sum of its risk (error) plus a "cost complexity" factor $c_p$ multiple of the tree size $|T|$.  
+
+$$R_{c_p}(T) = R(T) + c_p|T|$$
+
+$c_p$ can take on any value from $[0..\infty]$, but it turns out there is an optimal tree for *ranges* of $c_p$ values, so there are only a finite set of *interesting* values for $c_p$ [@James2013] [@Therneau2019] [@Kuhn2016].  A parametric algorithm identifies the interesting $c_p$ values and their associated pruned trees, $T_{c_p}$. CART uses cross-validation to determine which $c_p$ is optimal.
+
+The sections in this chapter work through two case studies, using the `ISLR::OJ` data set to fit classification trees and predict which brand of orange juice, Citrus Hill (CH) or Minute Maid = (MM), customers opurchase from its 17 predictor variables, and using the `ISLR::Carseats` data set to predict average sales from its 10 feature variables.
+
+```{r message=FALSE}
+library(rpart.plot)  # better formatted plots than the ones in rpart
+
+oj_dat <- ISLR::OJ
+
+glimpse(oj_dat)
+
+cs_dat <- ISLR::Carseats
+
+glimpse(cs_dat)
+```
+
+Partition the data sets into training and testing sets. Use the training set to estimate parameters, compare models and feature engineering techniques, and tune models. Use the testing set as an unbiased source for measuring final model performance. The test set is held in reserve until the end of the project at which point there are only be one or two models under serious consideration.
+
+```{r collapse=TRUE}
+set.seed(12345)
+
+(oj_split <- initial_split(oj_dat, prop = 0.8, strata = Purchase))
+oj_train <- training(oj_split)
+oj_test <- testing(oj_split)
+
+(cs_split <- initial_split(cs_dat, prop = 0.8))
+cs_train <- training(cs_split)
+cs_test <- testing(cs_split)
+```
+
+## Classification Tree
+
+The simple classification tree is uncommon, but it is the foundation for the more complex ensemble models. 
+
+Function `rpart::rpart()` builds a full tree, minimizing the Gini index $G$ by default (`parms = list(split = "gini")`), until the stopping criterion is satisfied.  The default stopping criterion is 
+
+* only attempt a split if the current node has at least `minsplit = 20` observations, and
+* only accept a split if 
+   * the resulting nodes have at least `minbucket = round(minsplit/3)` observations, and 
+   * the resulting overall fit improves by `cp = 0.01` (i.e., $\Delta G <= 0.01$).
+   
+Some model parameters like `cp` (see `?rpart.control`) are hyperparameters that cannot be optimized directly from the training data set. You can tune hyperparameters by training many models on resampled data sets and exploring how well the models perform. 
+
+The [tidymodels vignette](https://www.tidymodels.org/start) explains that predictive models should train with resampling methods such as cross-validation to get a short list of candidate models, then choose the best model by comparing performance on the test set. I.e., model selection is a two-phased competition. In this context, we can use CV to fit the best classification tree, then in the next section fit the best bagged tree, then random forest, and so on. The second phase would be to compare all models on the test set.^[I think for a production system, you would take one more step: re-fit the final model to the entire data set using the hyperparemeter settings from the winning model.] 
+
+```{r, fit-cart-class, cache=TRUE}
+oj_cart <- list()
+
+# `decision_tree` has 3 hyperparameters (`cost_complexity`, `tree_depth`, and
+# `min_n`). Set their value to `tune()` if you want to optimize any one. Let's
+# optimize just `cost_complexity` and `tree_depth`.
+oj_cart$model <-
+  decision_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+
+# Tune a model using the workflow framework.
+oj_cart$workflow <-
+  workflow() %>%
+  add_model(oj_cart$model) %>%
+  add_formula(Purchase ~ .)
+
+# Tune the model with 10-fold CV using a regular grid of cost complexity values.
+# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
+# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
+oj_cart$tune_grid <-
+  oj_cart$workflow %>%
+  tune_grid(
+    resamples = vfold_cv(oj_train, v = 10), 
+    grid = grid_regular(cost_complexity(), tree_depth(), levels = 5)
+  )
+
+# `collect_metrics()` returns two metrics: accuracy and ROC-AUC.
+oj_cart$tune_grid %>% 
+  collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(x = cost_complexity, y = mean, color = tree_depth)) +
+  geom_line(linewidth = 1.5, alpha = .6) +
+  facet_wrap(facets = vars(.metric), scales = "free") +
+  scale_x_log10()
+```
+
+The best models in terms of accuracy and ROC was the tree depth of 4 and any cp < .01.
+
+```{r}
+oj_cart$tune |> show_best(metric = "accuracy") |> knitr::kable()
+```
+
+Select the best model in terms of accuracy and finalize the model.
+
+```{r}
+oj_cart$best_tune <- select_best(oj_cart$tune_grid, metric = "accuracy")
+
+# `finalize_workflow()` applies the tuning parameters to the workflow.
+oj_cart$final_workflow <- finalize_workflow(oj_cart$workflow, oj_cart$best_tune)
+
+# last_fit() fits the model with the full training set and evaluates it on the 
+# testing data.
+oj_cart$fit <-
+  oj_cart$final_workflow %>%
+  last_fit(oj_split)
+```
+
+Here is the tree. The output starts with the root node.  The predicted class at the root is `CH` and this prediction produces 333 errors on the 855 observations for a 61% success rate (accuracy) and 39% error rate. The child nodes of node "x" are labeled 2x) and 2x+1), so the child nodes of 1) are 2) and 3), and the child nodes of 2) are 4) and 5), etc.  Terminal nodes are labeled with an asterisk (*).
+
+```{r}
+oj_cart$fit %>% extract_workflow()
+```
+
+The first split is at `LoyalCH` = 0.48285. Here is a diagram of the tree. The node label indicates the predicted value, error rate, and proportion of observations included. Below the nodes are the splitting criteria.
+
+```{r}
+oj_cart$fit %>%
+  extract_workflow() %>%
+  extract_fit_engine() %>%
+  rpart.plot(yesno = TRUE, roundint = FALSE)
+```
+
+The boxes show the node classification (based on mode), the proportion of observations that are *not* `CH`, and the proportion of observations included in the node. 
+
+`LoyalCH` was the most important variable, followed by `PriceDiff`. A variable's importance is the sum of the improvement in the overall Gini (or RMSE) measure produced by the nodes in which it appears. From the **rpart** [vignette](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf) (page 12), 
+
+> "An overall measure of variable importance is the sum of the goodness of split measures for each split for which it was the primary variable, plus goodness (adjusted agreement) for all splits in which it was a surrogate."
+
+```{r}
+oj_cart$fit %>%
+  extract_workflow() %>%
+  extract_fit_parsnip() %>%
+  vip::vip()
+```
+
+### Measuring Performance {-}
+
+`collect_metrics()` shows the accuracy and ROC AUC metrics. 
+
+```{r}
+oj_cart$fit %>% collect_metrics()
+```
+
+You can explore the performance by calculating the full confusion matrix and visualizing the ROC curve.
+
+#### Confusion Matrix {-}
+
+The confusion matrix calculates the model performance predicting on the holdout testing data set.
+
+```{r collapse=TRUE}
+oj_cart$confmat <-
+  oj_cart$fit %>% 
+  collect_predictions() %>% 
+  conf_mat(truth = Purchase, estimate = .pred_class)
+
+# oj_cart$preds <- 
+#   bind_cols(
+#      predict(oj_cart$fit, new_data = oj_test, type = "prob"),
+#      predicted = predict(oj_cart$fit, new_data = oj_test, type = "class"),
+#      actual = oj_test$Purchase
+#   )
+
+oj_cart$confmat
+
+summary(oj_cart$confmat)
+```
+
+You can bound the accuracy with a 95% CI using the binomial test.
+
+```{r}
+binom.test(
+  x = oj_cart$confmat$table %>% diag() %>% sum(), 
+  n = oj_cart$confmat$table %>% sum()
+)
+```
+
+The detection prevalence (aka, no information rate (NIR)) statistic is the class rate for the largest class. In this case CH is the largest class, so NIR = 133/213 = 0.6186. The binomial test for NIR is the probability of that the model accuracy is significantly better than the NIR (i.e., significantly better than just always guessing CH).
+
+```{r}
+binom.test(
+  x = oj_cart$confmat$table["CH", ] %>% sum(), 
+  n = oj_cart$confmat$table %>% sum(),
+  p = sum(oj_cart$confmat$table[, "CH"]) / sum(oj_cart$confmat$table),
+  alternative = "greater"
+)
+binom.test(x = 116 + 67, n = sum(oj_cart$confmat$table), 
+           p = (116+17)/sum(oj_cart$confmat$table), 
+           alternative = "greater")
+```
+
+The accuracy statistic indicates the model predicts `r summary(oj_cart$confmat) %>% filter(.metric == "accuracy") %>% pull(.estimate) %>% percent(.1)` of the observations correctly. That's good, but less impressive when you consider the prevalence of CH is `r (sum(oj_cart$confmat$table[1, ]) / sum(oj_cart$confmat$table)) %>% percent(.1)` - you could achieve that accuracy just by predicting CH every time. A measure that controls for the prevalence is Cohen's kappa statistic. The kappa statistic is explained [here](https://standardwisdom.com/softwarejournal/2011/12/confusion-matrix-another-single-value-metric-kappa-statistic/). It compares the accuracy to the accuracy of a "random system". It is defined as
+
+$$\kappa = \frac{\text{Accuracy} - RA}{1-RA}$$
+
+where 
+
+$$RA = \frac{\text{ActFalse} \times \text{PredFalse} + \text{ActTrue} \times \text{PredTrue}}{\text{Total} \times \text{Total}}$$
+
+is the hypothetical probability of a chance agreement. 
+
+The kappa statistic varies from 0 to 1 where 0 means accurate predictions occur merely by chance, and 1 means the predictions are in perfect agreement with the observations.  In this case, a kappa statistic of 0.7064 is "substantial".  See chart [here](https://www.statisticshowto.datasciencecentral.com/cohens-kappa-statistic/).
+
+You can remind yourself what the other confusion matrix measures are from the documentation. Visuals are almost always helpful. Here is a plot of the confusion matrix.
+
+```{r}
+oj_cart$fit %>% 
+  collect_predictions() %>% 
+  select(Purchase, .pred_class) %>%
+  plot(
+    main = "Simple Classification: Predicted vs. Actual",
+    xlab = "Actual",
+    ylab = "Predicted"
+  )
+```
+
+#### ROC Curve {-}
+
+The ROC (receiver operating characteristics) curve [@Fawcett2005] is another measure of accuracy. The ROC curve is a plot of the true positive rate (TPR, sensitivity) versus the false positive rate (FPR, 1 - specificity) for a set of thresholds. By default, the threshold for predicting the default classification is 0.50, but it could be any threshold. `precrec::evalmod()` calculates the confusion matrix values from the model using the holdout data set. The AUC on the holdout set is `r oj_cart$fit %>% collect_predictions() %>% yardstick::roc_auc(Purchase, .pred_CH) %>% pull(.estimate) %>% comma(.001)`. `pRoc::plot.roc()`, `plotROC::geom_roc()`, and `yardstick::roc_curve()` are options for plotting a ROC curve.
+
+```{r}
+oj_cart$fit %>%
+  collect_predictions() %>%
+  yardstick::roc_curve(Purchase, .pred_CH) %>%
+  autoplot() +
+  labs(title = "OJ CART ROC Curve")
+```
+
+A few points on the ROC space are helpful for understanding how to use it.  
+
+* The lower left point (0, 0) is the result of *always* predicting "negative" or in this case "MM" if "CH" is taken as the default class. No false positives, but no true positives either.
+* The upper right point (1, 1) is the result of *always* predicting "positive" ("CH" here).  You catch all true positives, but miss all the true negatives.
+* The upper left point (0, 1) is the result of perfect accuracy.
+* The lower right point (1, 0) is the result of perfect imbecility. You made the exact wrong prediction every time. 
+* The 45 degree diagonal is the result of randomly guessing positive (CH) X percent of the time.  If you guess positive 90% of the time and the prevalence is 50%, your TPR will be 90% and your FPR will also be 90%, etc.
+
+The goal is for all nodes to bunch up in the upper left.
+
+Points to the left of the diagonal with a low TPR can be thought of as "conservative" predictors - they only make positive (CH) predictions with strong evidence.  Points to the left of the diagonal with a high TPR can be thought of as "liberal" predictors - they make positive (CH) predictions with weak evidence.
+
+#### Gain Curve
+
+The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. The “wizard” curve is the gain curve when the data is sorted by the true outcome. If the model’s gain curve is close to the wizard curve, then the model predicted the response variable well. The gray area is the “gain” over a random prediction.
+
+```{r include=FALSE}
+x <- oj_cart$fit %>% collect_predictions() %>% yardstick::gain_curve(Purchase, .pred_CH)
+```
+
+`r sum(oj_test$Purchase == "CH")` of the `r nrow(oj_test)` consumers in the holdout testing set purchased CH.
+
+```{r}
+oj_cart$fit %>%
+  collect_predictions() %>%
+  yardstick::gain_curve(Purchase, .pred_CH)
+```
+
+* The gain curve encountered `r x[2, ]$.n_events` CH purchasers (`r x[2, ]$.percent_found %>% comma(.1)`%) within the first `r x[2, ]$.n` observations (`r x[2, ]$.percent_tested %>% comma(.1)`%). 
+
+* It encountered all `r sum(oj_test$Purchase == "CH")` CH purchasers on the `r x[8, ]$.n`th observation (100%).
+
+* The bottom of the gray area is the outcome of a random model. Only half the CH purchasers would be observed within 50% of the observations. The top of the gray area is the outcome of the perfect model, the “wizard curve”. Half the CH purchasers would be observed in ~30% of the observations.
+
+```{r}
+oj_cart$fit %>%
+  collect_predictions() %>%
+  yardstick::gain_curve(Purchase, .pred_CH) %>%
+  autoplot() +
+  labs(title = "OJ CART Gain Curve")
+```
+
+## Regression Tree
+
+A simple regression tree is built in a manner similar to a simple classification tree, and like the simple classification tree, it is rarely invoked on its own; the bagged, random forest, and gradient boosting methods build on this logic.  
+
+The first step is to build a full tree, then perform k-fold cross-validation to help select the optimal cost complexity (cp). The only difference here is the `set_Mode("regression")` call to produce a regression tree.
+
+```{r, fit-cart-reg, cache=TRUE}
+cs_cart <- list()
+
+# `decision_tree` has 3 hyperparameters (`cost_complexity`, `tree_depth`, and
+# `min_n`). Set their value to `tune()` if you want to optimize any one. Let's
+# optimize just `cost_complexity` and `tree_depth`.
+cs_cart$model <-
+  decision_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# Tune a model using the workflow framework.
+cs_cart$workflow <-
+  workflow() %>%
+  add_model(cs_cart$model) %>%
+  add_formula(Sales ~ .)
+
+# Tune the model with 10-fold CV using a regular grid of cost complexity values.
+# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
+# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
+cs_cart$tune_grid <-
+  cs_cart$workflow %>%
+  tune_grid(
+    resamples = vfold_cv(cs_train, v = 10), 
+    grid = grid_regular(cost_complexity(), tree_depth(), levels = 5)
+  )
+
+# `collect_metrics()` returns two metrics: rmse and rsq.
+cs_cart$tune_grid %>% 
+  collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(x = cost_complexity, y = mean, color = tree_depth)) +
+  geom_line(linewidth = 1.5, alpha = .6) +
+  facet_wrap(facets = vars(.metric), scales = "free") +
+  scale_x_log10()
+```
+
+The best models in terms of RMSE was the tree depth of 8 and any cp < 5.6E-04.
+
+```{r}
+cs_cart$tune %>% show_best(metric = "rmse")
+```
+
+Select the best model in terms of rmse and finalize the model. 
+
+```{r}
+cs_cart$best_tune <- select_best(cs_cart$tune_grid, metric = "rmse")
+
+# `finalize_workflow()` applies the tuning parameters to the workflow.
+cs_cart$final_workflow <- finalize_workflow(cs_cart$workflow, cs_cart$best_tune)
+
+# last_fit() fits the model with the full training set and evaluates it on the 
+# testing data.
+cs_cart$fit <-
+  cs_cart$final_workflow %>%
+  last_fit(cs_split)
+```
+
+Here is the tree. The output starts with the root node. The predicted sales at the root is the mean sales in the testing data set is `r cs_cart$fit %>% extract_workflow() %>% pluck("fit", "fit", "fit", "frame") %>% filter(var == "ShelveLoc") %>% head(1) %>% pull(yval) %>% comma(.01)` (values are \$000s). The deviance at the root is the SSE, `r cs_cart$fit %>% extract_workflow() %>% pluck("fit", "fit", "fit", "frame") %>% filter(var == "ShelveLoc") %>% head(1) %>% pull(dev) %>% comma(1)`. The first split is at `ShelveLoc` = [Bad, Medium] vs Good.
+
+```{r}
+cs_cart$fit %>% extract_workflow()
+```
+
+Here is a diagram of the tree. The node label indicates the predicted value (mean) and the proportion of observations that are in the node (or child nodes). Below the nodes are the splitting criteria.
+
+```{r}
+cs_cart$fit %>%
+  extract_workflow() %>%
+  extract_fit_engine() %>%
+  rpart.plot(yesno = TRUE, roundint = FALSE)
+```
+
+`Price` and `ShelveLoc` were the most important variables.
+
+```{r}
+cs_cart$fit %>%
+  extract_workflow() %>%
+  extract_fit_parsnip() %>%
+  vip::vip()
+```
+
+### Measuring Performance {-}
+
+`collect_metrics()` returns the RMSE, $RMSE = \sqrt{(1/2) \sum{(actual - pred)^2}})$ and the model $R^2$. The RMSE of `r cs_cart$fit %>% collect_metrics() %>% filter(.metric == "rmse") %>% pull(.estimate) %>% comma(.01)` in the test data set is pretty good considering the standard deviation of `Sales` is `r comma(sd(cs_test$Sales), .01)`.
+
+```{r}
+cs_cart$fit %>% collect_metrics()
+```
+
+Here is a predicted vs actual plot. 
+
+```{r}
+cs_cart$fit %>% 
+  collect_predictions() %>%
+   ggplot(aes(x = Sales, y = .pred)) +
+   geom_point(alpha = 0.6, color = "cadetblue") +
+   geom_smooth(method = "loess", formula = "y~x") +
+   geom_abline(intercept = 0, slope = 1, linetype = 2) +
+   labs(title = "Carseats CART, Predicted vs Actual")
+```
+
+The tree nodes do a decent job of binning the observations. The predictions vs actuals plot suggests the model over-estimates at the low end and underestimates at the high end. Calculate the test data set RMSE.
+
+## Bagged Trees
+
+One drawback of decision trees is that they are high-variance estimators. A small number of additional training observations can dramatically alter the prediction performance of a learned tree.
+
+Bootstrap aggregation, or *bagging*, is a general-purpose procedure for reducing the variance of a statistical learning method.  The algorithm constructs *B* regression trees using *B* bootstrapped training sets, and averages the resulting predictions. These trees are grown deep, and are not pruned. Hence each individual tree has high variance, but low bias. Averaging the *B* trees reduces the variance.  The predicted value for an observation is the mode (classification) or mean (regression) of the trees. *B* usually equals ~25.
+
+To test the model accuracy, the out-of-bag observations are predicted from the models. For a training set of size *n*, each tree is composed of $\sim (1 - e^{-1})n = .632n$ unique observations in-bag and $.368n$ out-of-bag. For each tree in the ensemble, bagging makes predictions on the tree's out-of-bag observations. I think (*see* page 197 of [@Kuhn2016]) bagging measures the performance (RMSE, Accuracy, ROC, etc.) of each tree in the ensemble and averages them to produce an overall performance estimate. (This makes no sense to me. If each tree has poor performance, then the average performance of many trees will still be poor. An ensemble of *B* trees will produce $\sim .368 B$ predictions per unique observation. Seems like you should take the mean/mode of each observation's prediction as the final prediction. Then you have *n* predictions to compare to *n* actuals, and you assess performance on that.)
+
+The downside to bagging is that there is no single tree with a set of rules to interpret. It becomes unclear which variables are more important than others. 
+
+The next section explains how bagged trees are a special case of random forests.
+
+### Bagged Classification Tree
+
+Leaning by example, I'll predict `Purchase` from the `OJ` data set again, this time using the bagging with `parsnip::bag_tree()`.
+
+```{r, fit-bag-class, cache=TRUE}
+oj_bag <- list()
+
+# `bag_tree` has 4 hyperparameters (`cost_complexity`, `tree_depth`, and
+# `min_n`). Set their value to `tune()` if you want to optimize any one. Let's
+# optimize just `cost_complexity` and `tree_depth`.
+oj_bag$model <-
+  bag_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+
+# Tune a model using the workflow framework.
+oj_bag$workflow <-
+  workflow() %>%
+  add_model(oj_bag$model) %>%
+  add_formula(Purchase ~ .)
+
+# Tune the model with 10-fold CV using a regular grid of cost complexity values.
+# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
+# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
+oj_bag$tune_grid <-
+  oj_bag$workflow %>%
+  tune_grid(
+    resamples = vfold_cv(oj_train, v = 10), 
+    grid = grid_regular(cost_complexity(), tree_depth(), levels = 5)
+  )
+
+# `collect_metrics()` returns two metrics: accuracy and ROC-AUC.
+oj_bag$tune_grid %>% 
+  collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(x = cost_complexity, y = mean, color = tree_depth)) +
+  geom_line(linewidth = 1.5, alpha = .6) +
+  facet_wrap(facets = vars(.metric), scales = "free") +
+  scale_x_log10()
+```
+
+The best models in terms of accuracy and ROC was the tree depth of 4 and any cp <= 3.16e-06.
+
+```{r}
+oj_bag$tune %>% show_best(metric = "accuracy")
+```
+
+Select the best model in terms of accuracy and finalize the model.
+
+```{r}
+oj_bag$best_tune <- select_best(oj_bag$tune_grid, metric = "accuracy")
+
+# `finalize_workflow()` applies the tuning parameters to the workflow.
+oj_bag$final_workflow <- finalize_workflow(oj_bag$workflow, oj_bag$best_tune)
+
+# last_fit() fits the model with the full training set and evaluates it on the 
+# testing data.
+oj_bag$fit <-
+  oj_bag$final_workflow %>%
+  last_fit(oj_split)
+```
+
+I *think* tidymodels started by splitting the training set into 10 folds, then using 9 of the folds to run the bagging algorithm and collect performance measures on the hold-out fold. After repeating the process for all 10 folds, it averaged the performance measures to produce the resampling results shown below. With hyperparameters, the process is repeated for all combinations and the resampling results above are from the best performing combination.
+
+There is no single tree to visualize, and you can't even produce a VIP. Let's look at the performance on the holdout data set. `collect_metrics()` shows the accuracy and ROC AUC metrics. The accuracy is slightly lower than the single tree, but ROC AUC is higher.
+
+```{r}
+oj_bag$fit %>% collect_metrics()
+```
+
+You can explore the performance by calculating the full confusion matrix and visualizing the ROC curve. The confusion matrix calculates the model performance predicting on the holdout testing data set.
+
+```{r collapse=TRUE}
+oj_bag$confmat <-
+  oj_bag$fit %>% 
+  collect_predictions() %>% 
+  conf_mat(truth = Purchase, estimate = .pred_class)
+
+oj_bag$confmat
+
+summary(oj_bag$confmat)
+
+oj_bag$fit %>% 
+  collect_predictions() %>% 
+  select(Purchase, .pred_class) %>%
+  plot(
+    main = "Bagged Trees: Predicted vs. Actual",
+    xlab = "Actual",
+    ylab = "Predicted"
+  )
+```
+
+The ROC curve is a plot of the true positive rate (TPR, sensitivity) versus the false positive rate (FPR, 1 - specificity) for a set of thresholds. The AUC on the holdout set is `r oj_bag$fit %>% collect_predictions() %>% yardstick::roc_auc(Purchase, .pred_CH) %>% pull(.estimate) %>% comma(.001)`.
+
+```{r}
+oj_bag$fit %>%
+  collect_predictions() %>%
+  yardstick::roc_curve(Purchase, .pred_CH) %>%
+  autoplot() +
+  labs(title = "OJ Bagged Trees ROC Curve")
+```
+
+The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. 
+
+```{r}
+oj_bag$fit %>%
+  collect_predictions() %>%
+  yardstick::gain_curve(Purchase, .pred_CH) %>%
+  autoplot() +
+  labs(title = "OJ Bagged Trees Gain Curve")
+```
+
+### Bagging Regression Tree
+
+I'll predict `Sales` from the `Carseats` data set again, this time with `parsnip::bag_tree()`.
+
+```{r, fit-bag-reg, cache=TRUE}
+library(baguette)
+
+cs_bag <- list()
+
+# `bag_tree` has 4 hyperparameters (`cost_complexity`, `tree_depth`, and
+# `min_n`). Set their value to `tune()` if you want to optimize any one. Let's
+# optimize just `cost_complexity` and `tree_depth`.
+cs_bag$model <-
+  bag_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+# Tune a model using the workflow framework.
+cs_bag$workflow <-
+  workflow() %>%
+  add_model(cs_bag$model) %>%
+  add_formula(Sales ~ .)
+
+# Tune the model with 10-fold CV using a regular grid of cost complexity values.
+# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
+# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
+cs_bag$tune_grid <-
+  cs_bag$workflow %>%
+  tune_grid(
+    resamples = vfold_cv(cs_train, v = 10), 
+    grid = grid_regular(cost_complexity(), tree_depth(), levels = 5)
+  )
+
+# `collect_metrics()` returns two metrics: accuracy and ROC-AUC.
+cs_bag$tune_grid %>% 
+  collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(x = cost_complexity, y = mean, color = tree_depth)) +
+  geom_line(linewidth = 1.5, alpha = .6) +
+  facet_wrap(facets = vars(.metric), scales = "free") +
+  scale_x_log10()
+```
+
+The best models in terms of RMSE was the tree depth of 8 and any cp < 5.6E-04.
+
+```{r}
+cs_bag$tune %>% show_best(metric = "rmse")
+```
+
+Select the best model in terms of rmse and finalize the model. 
+
+```{r}
+cs_bag$best_tune <- select_best(cs_bag$tune_grid, metric = "rmse")
+
+# `finalize_workflow()` applies the tuning parameters to the workflow.
+cs_bag$final_workflow <- finalize_workflow(cs_bag$workflow, cs_bag$best_tune)
+
+# last_fit() fits the model with the full training set and evaluates it on the 
+# testing data.
+cs_bag$fit <-
+  cs_bag$final_workflow %>%
+  last_fit(cs_split)
+```
+
+`collect_metrics()` returns the RMSE, $RMSE = \sqrt{(1/2) \sum{(actual - pred)^2}})$ and the model $R^2$. The RMSE of ` cs_bag$fit %>% collect_metrics() %>% filter(.metric == "rmse") %>% pull(.estimate) %>% comma(.01)` in the test data set is pretty good considering the standard deviation of `Sales` is ` comma(sd(cs_test$Sales), .01)`.
+
+```{r}
+cs_bag$fit %>% collect_metrics()
+```
+
+Here is a predicted vs actual plot. 
+
+```{r}
+cs_bag$fit %>% 
+  collect_predictions() %>%
+   ggplot(aes(x = Sales, y = .pred)) +
+   geom_point(alpha = 0.6, color = "cadetblue") +
+   geom_smooth(method = "loess", formula = "y~x") +
+   geom_abline(intercept = 0, slope = 1, linetype = 2) +
+   labs(title = "Carseats Bagged Trees, Predicted vs Actual")
+```
+
+## Random Forests
+
+Random forests improve bagged trees by way of a small tweak that de-correlates the trees.  As in bagging, the algorithm builds a number of decision trees on bootstrapped training samples. But when building these decision trees, each time a split in a tree is considered, a random sample of *mtry* predictors is chosen as split candidates from the full set of *p* predictors.  A fresh sample of *mtry* predictors is taken at each split.  Typically $mtry \sim \sqrt{p}$.  Bagged trees are thus a special case of random forests where *mtry = p*.
+
+#### Random Forest Classification Tree
+
+Leaning by example, I'll predict `Purchase` from the `OJ` data set again, this time using the bagging with `parsnip::rand_forest()`.
+
+```{r, fit-rf-class, cache=TRUE}
+oj_rf <- list()
+
+# `rand_forest` has 3 hyperparameters (`mtry`, `trees`, and
+# `min_n`). Set their value to `tune()` if you want to optimize any one. Let's
+# optimize just `trees` and `min_n`.
+oj_rf$model <-
+  rand_forest(
+    trees = tune(),
+    min_n = tune()
+  ) %>%
+  set_engine("ranger") %>%
+  set_mode("classification")
+
+# Tune a model using the workflow framework.
+oj_rf$workflow <-
+  workflow() %>%
+  add_model(oj_rf$model) %>%
+  add_formula(Purchase ~ .)
+
+# Tune the model with 10-fold CV using a regular grid of cost complexity values.
+# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
+# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
+oj_rf$tune_grid <-
+  oj_rf$workflow %>%
+  tune_grid(
+    resamples = vfold_cv(oj_train, v = 10), 
+    grid = grid_regular(trees(), min_n(), levels = 5)
+  )
+
+# `collect_metrics()` returns two metrics: accuracy and ROC-AUC.
+oj_rf$tune_grid %>% 
+  collect_metrics() %>%
+  mutate(trees = factor(trees)) %>%
+  ggplot(aes(x = min_n, y = mean, color = trees)) +
+  geom_line(linewidth = 1.5, alpha = .6) +
+  facet_wrap(facets = vars(.metric), scales = "free") +
+  scale_x_log10()
+```
+
+The best models in terms of accuracy and ROC was the trees of 1000 and any minimum node size of 40.
+
+```{r}
+oj_rf$tune %>% show_best(metric = "accuracy")
+```
+
+Select the best model in terms of accuracy and finalize the model.
+
+```{r}
+oj_rf$best_tune <- select_best(oj_rf$tune_grid, metric = "accuracy")
+
+# `finalize_workflow()` applies the tuning parameters to the workflow.
+oj_rf$final_workflow <- finalize_workflow(oj_rf$workflow, oj_rf$best_tune)
+
+# last_fit() fits the model with the full training set and evaluates it on the 
+# testing data.
+oj_rf$fit <-
+  oj_rf$final_workflow %>%
+  last_fit(oj_split)
+```
+
+There is no single tree to visualize, and you can't even produce a VIP. Let's look at the performance on the holdout data set. `collect_metrics()` shows the accuracy and ROC AUC metrics. The accuracy is slightly lower than the single tree, but ROC AUC is higher than both the single tree and bagged trees.
+
+```{r}
+oj_rf$fit %>% collect_metrics()
+```
+
+You can explore the performance by calculating the full confusion matrix and visualizing the ROC curve. The confusion matrix calculates the model performance predicting on the holdout testing data set.
+
+```{r collapse=TRUE}
+oj_rf$confmat <-
+  oj_rf$fit %>% 
+  collect_predictions() %>% 
+  conf_mat(truth = Purchase, estimate = .pred_class)
+
+oj_rf$confmat
+
+summary(oj_rf$confmat)
+
+oj_rf$fit %>% 
+  collect_predictions() %>% 
+  select(Purchase, .pred_class) %>%
+  plot(
+    main = "Random Forest: Predicted vs. Actual",
+    xlab = "Actual",
+    ylab = "Predicted"
+  )
+```
+
+The ROC curve is a plot of the true positive rate (TPR, sensitivity) versus the false positive rate (FPR, 1 - specificity) for a set of thresholds. The AUC on the holdout set is `r oj_rf$fit %>% collect_predictions() %>% yardstick::roc_auc(Purchase, .pred_CH) %>% pull(.estimate) %>% comma(.001)`.
+
+```{r}
+oj_rf$fit %>%
+  collect_predictions() %>%
+  yardstick::roc_curve(Purchase, .pred_CH) %>%
+  autoplot() +
+  labs(title = "OJ Random Forest ROC Curve")
+```
+
+The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. 
+
+```{r}
+oj_rf$fit %>%
+  collect_predictions() %>%
+  yardstick::gain_curve(Purchase, .pred_CH) %>%
+  autoplot() +
+  labs(title = "OJ Random Forest Gain Curve")
+```
+
+#### Random Forest Regression Tree
+
+I'll predict `Sales` from the `Carseats` data set again, this time with `parsnip::rand_forest()`.
+
+```{r, fit-rf-reg, cache=TRUE}
+cs_rf <- list()
+
+# `rand_forest` has 3 hyperparameters (`mtry`, `trees`, and
+# `min_n`). Set their value to `tune()` if you want to optimize any one. Let's
+# optimize just `trees` and `min_n`.
+cs_rf$model <-
+  rand_forest(
+    trees = tune(),
+    min_n = tune()
+  ) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+# Tune a model using the workflow framework.
+cs_rf$workflow <-
+  workflow() %>%
+  add_model(cs_rf$model) %>%
+  add_formula(Sales ~ .)
+
+# Tune the model with 10-fold CV using a regular grid of cost complexity values.
+# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
+# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
+cs_rf$tune_grid <-
+  cs_rf$workflow %>%
+  tune_grid(
+    resamples = vfold_cv(cs_train, v = 10), 
+    grid = grid_regular(trees(), min_n(), levels = 5)
+  )
+
+# `collect_metrics()` returns two metrics: accuracy and ROC-AUC.
+cs_rf$tune_grid %>% 
+  collect_metrics() %>%
+  mutate(trees = factor(trees)) %>%
+  ggplot(aes(x = min_n, y = mean, color = trees)) +
+  geom_line(linewidth = 1.5, alpha = .6) +
+  facet_wrap(facets = vars(.metric), scales = "free") +
+  scale_x_log10()
+```
+
+The best models in terms of RMSE was 2000 tree with at least 2 data points per node.
+
+```{r}
+cs_rf$tune %>% show_best(metric = "rmse")
+```
+
+Select the best model in terms of rmse and finalize the model. 
+
+```{r}
+cs_rf$best_tune <- select_best(cs_rf$tune_grid, metric = "rmse")
+
+# `finalize_workflow()` applies the tuning parameters to the workflow.
+cs_rf$final_workflow <- finalize_workflow(cs_rf$workflow, cs_rf$best_tune)
+
+# last_fit() fits the model with the full training set and evaluates it on the 
+# testing data.
+cs_rf$fit <-
+  cs_rf$final_workflow %>%
+  last_fit(cs_split)
+```
+
+`collect_metrics()` returns the RMSE, $RMSE = \sqrt{(1/2) \sum{(actual - pred)^2}})$ and the model $R^2$. The RMSE of `r cs_rf$fit %>% collect_metrics() %>% filter(.metric == "rmse") %>% pull(.estimate) %>% comma(.01)` in the test data set is pretty good considering the standard deviation of `Sales` is `r comma(sd(cs_test$Sales), .01)`.
+
+```{r}
+cs_rf$fit %>% collect_metrics()
+```
+
+Here is a predicted vs actual plot. 
+
+```{r}
+cs_rf$fit %>% 
+  collect_predictions() %>%
+   ggplot(aes(x = Sales, y = .pred)) +
+   geom_point(alpha = 0.6, color = "cadetblue") +
+   geom_smooth(method = "loess", formula = "y~x") +
+   geom_abline(intercept = 0, slope = 1, linetype = 2) +
+   labs(title = "Carseats Random Forest, Predicted vs Actual")
+```
+
+## Gradient Boosting
+
+**Note**: I learned gradient boosting from [explained.ai](https://explained.ai/gradient-boosting/L2-loss.html).
+
+Gradient boosting machine (GBM) is an additive modeling algorithm that gradually builds a composite model by iteratively adding *M* weak sub-models based on the performance of the prior iteration's composite,
+
+$$F_M(x) = \sum_m^M f_m(x).$$
+
+The idea is to fit a weak model, then replace the response values with the residuals from that model, and fit another model. Adding the residual prediction model to the original response prediction model produces a more accurate model. GBM repeats this process over and over, running new models to predict the residuals of the previous composite models, and adding the results to produce new composites. With each iteration, the model becomes stronger and stronger. The successive trees are usually weighted to slow down the learning rate. "Shrinkage" reduces the influence of each individual tree and leaves space for future trees to improve the model.
+
+$$F_M(x) = f_0 + \eta\sum_{m = 1}^M f_m(x).$$
+
+The smaller the learning rate, $\eta$, the larger the number of trees, $M$. $\eta$ and $M$ are hyperparameters. Other constraints to the trees are usually applied as additional hyperparameters, including, tree depth, number of nodes, minimum observations per split, and minimum improvement to loss.
+
+The name "gradient boosting" refers to the *boosting* of a model with a *gradient*. Each round of training builds a *weak learner* and uses the residuals to calculate a gradient, the partial derivative of the loss function. Gradient boosting "descends the gradient" to adjust the model parameters to reduce the error in the next round of training.
+
+In the case of classification problems, the loss function is the log-loss; for regression problems, the loss function is mean squared error. GBM continues until it reaches maximum number of trees or an acceptable error level.
+
+#### Gradient Boosting Classification Tree
+
+Leaning by example, I'll predict `Purchase` from the `OJ` data set again, this time using the bagging with `parsnip::boost_tree()`
+
+```{r, fit-xgboost-class, cache=TRUE}
+oj_xgb <- list()
+
+# `boost_tree` has 8 hyperparameters. Let's optimize just `trees` and `min_n`.
+oj_xgb$model <-
+  boost_tree(
+    trees = tune(),
+    min_n = tune()
+  ) %>%
+  set_engine("xgboost") %>%
+  set_mode("classification")
+
+# Tune a model using the workflow framework.
+oj_xgb$workflow <-
+  workflow() %>%
+  add_model(oj_xgb$model) %>%
+  add_formula(Purchase ~ .)
+
+# Tune the model with 10-fold CV using a regular grid of cost complexity values.
+# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
+# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
+oj_xgb$tune_grid <-
+  oj_xgb$workflow %>%
+  tune_grid(
+    resamples = vfold_cv(oj_train, v = 10), 
+    grid = grid_regular(trees(), min_n(), levels = 5)
+  )
+
+# `collect_metrics()` returns two metrics: accuracy and ROC-AUC.
+oj_xgb$tune_grid %>% 
+  collect_metrics() %>%
+  mutate(trees = factor(trees)) %>%
+  ggplot(aes(x = min_n, y = mean, color = trees)) +
+  geom_line(linewidth = 1.5, alpha = .6) +
+  facet_wrap(facets = vars(.metric), scales = "free") +
+  scale_x_log10()
+```
+
+The best models in terms of accuracy and ROC was the trees of 1000 and any minimum node size of 40.
+
+```{r}
+oj_xgb$tune %>% show_best(metric = "accuracy")
+```
+
+Select the best model in terms of accuracy and finalize the model.
+
+```{r}
+oj_xgb$best_tune <- select_best(oj_xgb$tune_grid, metric = "accuracy")
+
+# `finalize_workflow()` applies the tuning parameters to the workflow.
+oj_xgb$final_workflow <- finalize_workflow(oj_xgb$workflow, oj_xgb$best_tune)
+
+# last_fit() fits the model with the full training set and evaluates it on the 
+# testing data.
+oj_xgb$fit <-
+  oj_xgb$final_workflow %>%
+  last_fit(oj_split)
+```
+
+There is no single tree to visualize, and you can't even produce a VIP. Let's look at the performance on the holdout data set. `collect_metrics()` shows the accuracy and ROC AUC metrics.
+
+```{r}
+oj_xgb$fit %>% collect_metrics()
+```
+
+You can explore the performance by calculating the full confusion matrix and visualizing the ROC curve. The confusion matrix calculates the model performance predicting on the holdout testing data set.
+
+```{r collapse=TRUE}
+oj_xgb$confmat <-
+  oj_xgb$fit %>% 
+  collect_predictions() %>% 
+  conf_mat(truth = Purchase, estimate = .pred_class)
+
+oj_xgb$confmat
+
+summary(oj_xgb$confmat)
+
+oj_xgb$fit %>% 
+  collect_predictions() %>% 
+  select(Purchase, .pred_class) %>%
+  plot(
+    main = "XGBoost: Predicted vs. Actual",
+    xlab = "Actual",
+    ylab = "Predicted"
+  )
+```
+
+The ROC curve is a plot of the true positive rate (TPR, sensitivity) versus the false positive rate (FPR, 1 - specificity) for a set of thresholds. The AUC on the holdout set is `r oj_xgb$fit %>% collect_predictions() %>% yardstick::roc_auc(Purchase, .pred_CH) %>% pull(.estimate) %>% comma(.001)`.
+
+```{r}
+oj_xgb$fit %>%
+  collect_predictions() %>%
+  yardstick::roc_curve(Purchase, .pred_CH) %>%
+  autoplot() +
+  labs(title = "OJ XGBoost ROC Curve")
+```
+
+The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. 
+
+```{r}
+oj_xgb$fit %>%
+  collect_predictions() %>%
+  yardstick::gain_curve(Purchase, .pred_CH) %>%
+  autoplot() +
+  labs(title = "OJ XGBoost Gain Curve")
+```
+
+#### Gradient Boosting Regression Tree
+
+I'll predict `Sales` from the `Carseats` data set again, this time with `parsnip::rand_forest()`.
+
+```{r, fit-xgboost-reg, cache=TRUE}
+cs_xgb <- list()
+
+# `rand_forest` has 3 hyperparameters (`mtry`, `trees`, and
+# `min_n`). Set their value to `tune()` if you want to optimize any one. Let's
+# optimize just `trees` and `min_n`.
+cs_xgb$model <-
+  boost_tree(
+    trees = tune(),
+    min_n = tune()
+  ) %>%
+  set_engine("xgboost") %>%
+  set_mode("regression")
+
+# Tune a model using the workflow framework.
+cs_xgb$workflow <-
+  workflow() %>%
+  add_model(cs_xgb$model) %>%
+  add_formula(Sales ~ .)
+
+# Tune the model with 10-fold CV using a regular grid of cost complexity values.
+# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
+# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
+cs_xgb$tune_grid <-
+  cs_xgb$workflow %>%
+  tune_grid(
+    resamples = vfold_cv(cs_train, v = 10), 
+    grid = grid_regular(trees(), min_n(), levels = 5)
+  )
+
+# `collect_metrics()` returns two metrics: accuracy and ROC-AUC.
+cs_xgb$tune_grid %>% 
+  collect_metrics() %>%
+  mutate(trees = factor(trees)) %>%
+  ggplot(aes(x = min_n, y = mean, color = trees)) +
+  geom_line(linewidth = 1.5, alpha = .6) +
+  facet_wrap(facets = vars(.metric), scales = "free") +
+  scale_x_log10()
+```
+
+The best models in terms of RMSE was 500 trees with at least 21 data points per node.
+
+```{r}
+cs_xgb$tune %>% show_best(metric = "rmse")
+```
+
+Select the best model in terms of rmse and finalize the model. 
+
+```{r}
+cs_xgb$best_tune <- select_best(cs_xgb$tune_grid, metric = "rmse")
+
+# `finalize_workflow()` applies the tuning parameters to the workflow.
+cs_xgb$final_workflow <- finalize_workflow(cs_xgb$workflow, cs_xgb$best_tune)
+
+# last_fit() fits the model with the full training set and evaluates it on the 
+# testing data.
+cs_xgb$fit <-
+  cs_rf$final_workflow %>%
+  last_fit(cs_split)
+```
+
+`collect_metrics()` returns the RMSE, $RMSE = \sqrt{(1/2) \sum{(actual - pred)^2}})$ and the model $R^2$. The RMSE of `r cs_xgb$fit %>% collect_metrics() %>% filter(.metric == "rmse") %>% pull(.estimate) %>% comma(.01)` in the test data set is pretty good considering the standard deviation of `Sales` is `r comma(sd(cs_test$Sales), .01)`.
+
+```{r}
+cs_xgb$fit %>% collect_metrics()
+```
+
+Here is a predicted vs actual plot. 
+
+```{r}
+cs_xgb$fit %>% 
+  collect_predictions() %>%
+   ggplot(aes(x = Sales, y = .pred)) +
+   geom_point(alpha = 0.6, color = "cadetblue") +
+   geom_smooth(method = "loess", formula = "y~x") +
+   geom_abline(intercept = 0, slope = 1, linetype = 2) +
+   labs(title = "Carseats Random Forest, Predicted vs Actual")
+```
+

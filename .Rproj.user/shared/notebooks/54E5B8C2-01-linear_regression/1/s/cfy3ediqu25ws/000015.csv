@@ -1,1 +1,0 @@
-"0","glance(lm(mpg ~ . - cyl, mt_cars)) %>% select(adj.r.squared, sigma, AIC, BIC, p.value)"

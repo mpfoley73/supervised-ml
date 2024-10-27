@@ -1,1 +1,0 @@
-"0","ses_high <- predict(cs2$result, newdata = list(ses = ""high"", write = 0), type = ""probs"")"

@@ -1,7 +1,0 @@
-"0","bind_rows("
-"0","  Raw = cs1$result %>% residuals(type = ""response"") %>% summary(),"
-"0","  Pearson = cs1$result %>% residuals(type = ""pearson"") %>% summary(),"
-"0","  `Standardized Pearson` = cs1$result %>% rstandard(type = ""pearson"") %>% summary(),"
-"0","  Deviance = cs1$result %>% residuals(type = ""deviance"") %>% summary(),"
-"0","  .id = ""Residual"""
-"0",")"

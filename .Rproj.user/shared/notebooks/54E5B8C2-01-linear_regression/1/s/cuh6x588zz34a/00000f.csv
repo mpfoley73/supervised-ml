@@ -1,6 +1,0 @@
-"0","sqrt(mean((mt_cars$mpg - fit$fitted.values)^2))
-"
-"1","[1]"
-"1"," 2.146905"
-"1","
-"

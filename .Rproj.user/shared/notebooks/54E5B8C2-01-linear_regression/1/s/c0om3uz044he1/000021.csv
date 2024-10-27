@@ -1,2 +1,0 @@
-"0",""
-"0","# caret::postResample(pred = fit_validation$.pred, obs = fit_validation$mpg)"

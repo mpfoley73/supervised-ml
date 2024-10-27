@@ -1,8 +1,0 @@
-"0","cs1$fit %>%"
-"0","  augment(new_data = cs1$dat) %>%"
-"0","  pivot_longer(c(age, weight, VO2max)) %>%"
-"0","  ggplot(aes(x = value, y = .pred_Yes)) +"
-"0","  geom_point() +"
-"0","  facet_wrap(facets = vars(name), scales = ""free_x"") +"
-"0","  geom_smooth(method = ""lm"", formula = ""y~x"") +"
-"0","  labs(title = ""Linearity Test: predicted vs continuous predictors"", x = NULL)"
