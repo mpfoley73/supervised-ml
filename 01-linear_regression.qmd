@@ -37,6 +37,30 @@ The standard error for the coefficient estimators is the square root of the erro
 
 $$SE(\hat{\beta}) = \sqrt{\hat{\sigma}^2 (X'X)^{-1}}.$$
 
+Linear regression is related to correlation. The coefficient estimator for $\beta_1$ in simple linear regression is equal to the Pearson correlation coefficient multiplied by the ratio of the standard deviations of $y$ and $x$.
+
+$$
+\begin{align}
+\hat{\beta}_1 &= \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n(x_i - \bar{x})^2} \\
+&= \frac{Cov(X,Y)}{Var(X)} \\
+&= r \cdot \frac{\sigma_Y}{\sigma_X}
+\end{align}
+$$
+
+The Pearson correlation is the ratio of the covariance of $X$ and $Y$ and product of their standard deviations.
+
+$$
+\begin{align}
+r &= \frac{\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^n(x_i - \bar{x})^2}  \sqrt{\sum_{i=1}^n(y_i - \bar{y})^2}} \\
+&= \frac{\text{Cov}(X,Y)}{\sigma_X \sigma_Y}
+\end{align}
+$$
+
+The formula for $\hat{\beta}$ is almost identical to that of $r$ with the exception that the denominator is the variance of $X$ rather than the product of the standard deviations. The Pearson correlation is the _standardized_ linear relationship. Pearson correlation measures the strength and direction of the linear relationship between $X$ and $Y$ in a standardized form.
+
+- If $r = 0$, then $\beta_1 = 0$ and there is no linear relationship.
+- if $r = 1$ or $r = -1$, then the relationship is perfectly linear, and $\beta_1$ measures the relative _scale_ of $Y$ and $X$.
+
 ### Example {-}
 
 Dataset `mtcars` contains response variable fuel consumption `mpg` and 10 aspects of automobile design and performance for 32 automobiles.  What is the relationship between the response and its predictors?
