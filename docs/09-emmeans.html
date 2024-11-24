@@ -216,7 +216,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#references" id="toc-references" class="nav-link active" data-scroll-target="#references"><span class="header-section-number">9.1</span> References</a></li>
+  <li><a href="#ordinary-and-estimated-marginal-means" id="toc-ordinary-and-estimated-marginal-means" class="nav-link active" data-scroll-target="#ordinary-and-estimated-marginal-means"><span class="header-section-number">9.1</span> Ordinary and Estimated Marginal Means</a></li>
+  <li><a href="#ggeffects" id="toc-ggeffects" class="nav-link" data-scroll-target="#ggeffects"><span class="header-section-number">9.2</span> ggeffects</a></li>
+  <li><a href="#learn-more" id="toc-learn-more" class="nav-link" data-scroll-target="#learn-more"><span class="header-section-number">9.3</span> Learn More</a></li>
   </ul>
 </nav>
     </div>
@@ -242,133 +244,140 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Estimated marginal means (EMMs) are the marginal means of the predicted values from a reference grid. Data set <code>pigs</code> shows the result of an observational study of the leucine concentration in 29 pigs whose diets differed in to attributes: source (fish, soy, milk) and protein percent (9, 12, 15, 18). The heat map below shows how concentration increase from left to right on the sources, and with higher percentages of protein.</p>
+<p>Estimated marginal means (EMMs) are the marginal means of the predicted values from a reference grid. Data set <code>pigs</code> is an observational study of the leucine concentration (<code>conc</code>) in 29 pigs whose diets differed in two attributes: <code>source</code> (fish, soy, milk) and protein <code>percent</code> (9, 12, 15, 18).</p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(pigs, <span class="at">package =</span> <span class="st">"emmeans"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pigs <span class="ot">&lt;-</span> pigs <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">percent =</span> <span class="fu">factor</span>(percent))</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>pigs <span class="sc">%&gt;%</span> </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">.by =</span> <span class="fu">c</span>(source, percent), <span class="at">M =</span> <span class="fu">mean</span>(conc), <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> source, <span class="at">y =</span> percent, <span class="at">fill =</span> M)) <span class="sc">+</span> </span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"n ="</span>, n)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pigs <span class="ot">&lt;-</span> pigs <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">percent =</span> <span class="fu">factor</span>(percent))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A plot of the data shows concentration increases varies by source, and increases with protein percent.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  pigs <span class="sc">|&gt;</span> <span class="fu">summarize</span>(<span class="at">.by =</span> <span class="fu">c</span>(source, percent), <span class="at">M =</span> <span class="fu">mean</span>(conc), <span class="at">n =</span> <span class="fu">n</span>()),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  pigs <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">source =</span> <span class="st">"total"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">.by =</span> <span class="fu">c</span>(source, percent), <span class="at">M =</span> <span class="fu">mean</span>(conc), <span class="at">n =</span> <span class="fu">n</span>())</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> percent, <span class="at">y =</span> M, <span class="at">color =</span> source)) <span class="sc">+</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> n)) <span class="sc">+</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> source), <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Mean Concentration"</span>, <span class="at">size =</span> <span class="st">"pigs"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Leucine concentration by protein percent vs food source for 29 pigs."</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> emm_pal) <span class="sc">+</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.justification =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="09-emmeans_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="09-emmeans_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>This data exhibits Simpson’s paradox: For each source, concentration increases with percent. Yet, they have different base levels and numbers of observations, so the marginal means actually <em>decrease</em> at percent 18. The culprit is the over-weighted fish at percent 18.</p>
+<p>This is an instance of Simpson’s paradox: concentration increases with percent for each source, but <em>decreases</em> at percent 18 when not grouping. The culprit is the over-weighted fish group (<em>n</em> = 3) at percent 18.</p>
+<section id="ordinary-and-estimated-marginal-means" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="ordinary-and-estimated-marginal-means"><span class="header-section-number">9.1</span> Ordinary and Estimated Marginal Means</h2>
+<p>The “ordinary” marginal means (OMM) are just the conditional means of the data. The OMM monotonically increases until percent = 18.</p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pigs <span class="sc">%&gt;%</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">.by =</span> <span class="fu">c</span>(source, percent), <span class="at">M =</span> <span class="fu">mean</span>(<span class="dv">1</span><span class="sc">/</span>conc)) <span class="sc">%&gt;%</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> percent, <span class="at">values_from =</span> M)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 3 × 5</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="do">##   source    `9`   `12`   `15`   `18`</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;fct&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 fish   0.0391 0.0324 0.0324 0.0310</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 soy    0.0292 0.0252 0.0255 0.0233</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="do">## 3 skim   0.0286 0.0233 0.0205 0.0167</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>pigs <span class="sc">%&gt;%</span> </span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">source =</span> <span class="st">"Total"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">.by =</span> <span class="fu">c</span>(source, percent), <span class="at">M =</span> <span class="fu">mean</span>(<span class="dv">1</span><span class="sc">/</span>conc)) <span class="sc">%&gt;%</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> percent, <span class="at">values_from =</span> M)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 1 × 5</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="do">##   source    `9`   `12`   `15`   `18`</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="do">##   &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="do">## 1 Total  0.0315 0.0270 0.0260 0.0266</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details open="" class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit a model</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">fit</span>(<span class="fu">inverse</span>(conc) <span class="sc">~</span> ., <span class="at">data =</span> pigs) <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>()</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>mdl <span class="sc">%&gt;%</span> <span class="fu">emmeans</span>(<span class="st">"percent"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pigs <span class="sc">|&gt;</span> <span class="fu">summarize</span>(<span class="at">.by =</span> percent, <span class="at">OMM =</span> <span class="fu">mean</span>(conc))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code> percent emmean       SE df lower.CL upper.CL
- 9       0.0322 0.001030 23   0.0301   0.0344
- 12      0.0270 0.000969 23   0.0250   0.0290
- 15      0.0263 0.001100 23   0.0240   0.0286
- 18      0.0241 0.001340 23   0.0213   0.0268
+<pre><code>  percent      OMM
+1       9 32.70000
+2      12 38.01111
+3      15 40.12857
+4      18 39.94000</code></pre>
+</div>
+</div>
+<p>The <em>estimated</em> marginal means are the means of a model’s predicted values over some reference grid. Fit the inverse concentration (that’s the best linear relationship).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mdl <span class="ot">&lt;-</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="fu">inverse</span>(conc) <span class="sc">~</span> ., <span class="at">data =</span> pigs) <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The reference grid is a grid of the model predictor variables. For factor vars, there’s a row for each level, and for continuous vars, there is a row for the mean. The manual way to calculate this is</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>RG <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">source =</span> <span class="fu">levels</span>(pigs<span class="sc">$</span>source), <span class="at">percent =</span> <span class="fu">levels</span>(pigs<span class="sc">$</span>percent))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(mdl, <span class="at">newdata =</span> RG) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">.by =</span> percent, <span class="at">EMM =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">mean</span>(.fitted)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  percent   EMM
+  &lt;fct&gt;   &lt;dbl&gt;
+1 9        31.0
+2 12       37.0
+3 15       38.1
+4 18       41.5</code></pre>
+</div>
+</div>
+<p>That’s what <code>emmeans()</code> does by default. This is like a weighted average so that groups with many observations are underweighted.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(mdl, <span class="st">"percent"</span>, <span class="at">type =</span> <span class="st">"response"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> percent response    SE df lower.CL upper.CL
+ 9           31.0 0.993 23     29.1     33.2
+ 12          37.0 1.330 23     34.5     40.0
+ 15          38.1 1.600 23     35.0     41.7
+ 18          41.5 2.310 23     37.3     46.9
 
 Results are averaged over the levels of: source 
-Results are given on the inverse (not the response) scale. 
-Confidence level used: 0.95 </code></pre>
-</div>
-<details open="" class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying `weights` brings you back to the ordinary marginal means.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>mdl <span class="sc">%&gt;%</span> <span class="fu">emmeans</span>(<span class="st">"percent"</span>, <span class="at">weights =</span> <span class="st">"cells"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code> percent emmean       SE df lower.CL upper.CL
- 9       0.0315 0.001030 23   0.0293   0.0336
- 12      0.0270 0.000969 23   0.0250   0.0290
- 15      0.0260 0.001100 23   0.0238   0.0283
- 18      0.0266 0.001300 23   0.0239   0.0293
-
-Results are averaged over the levels of: source 
-Results are given on the inverse (not the response) scale. 
-Confidence level used: 0.95 </code></pre>
+Confidence level used: 0.95 
+Intervals are back-transformed from the inverse scale </code></pre>
 </div>
 </div>
-<div class="rmdnote">
-<p>Today we’re talking about pigs.</p>
-</div>
-<p>This section is an overview of estimated marginal means, and its implementation in in the <strong>emmeans</strong> package.</p>
+</section>
+<section id="ggeffects" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="ggeffects"><span class="header-section-number">9.2</span> ggeffects</h2>
+<p>The <strong>ggeffects</strong> package does a nice job working with EMMs.</p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pigs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mdl_2 <span class="ot">&lt;-</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="dv">1</span><span class="sc">/</span>conc <span class="sc">~</span> ., <span class="at">data =</span> pigs) <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>() </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">predict_response</span>(mdl_2, <span class="at">terms =</span> <span class="st">"percent"</span>, <span class="at">margin =</span> <span class="st">"marginalmeans"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   source percent conc
-1    fish       9 27.8
-2    fish       9 23.7
-3    fish      12 31.5
-4    fish      12 28.5
-5    fish      12 32.8
-6    fish      15 34.0
-7    fish      15 28.3
-8    fish      18 30.6
-9    fish      18 32.7
-10   fish      18 33.7
-11    soy       9 39.3
-12    soy       9 34.8
-13    soy       9 29.8
-14    soy      12 39.8
-15    soy      12 40.0
-16    soy      12 39.1
-17    soy      15 38.5
-18    soy      15 39.2
-19    soy      15 40.0
-20    soy      18 42.9
-21   skim       9 40.6
-22   skim       9 31.0
-23   skim       9 34.6
-24   skim      12 42.9
-25   skim      12 50.1
-26   skim      12 37.4
-27   skim      15 59.5
-28   skim      15 41.4
-29   skim      18 59.8</code></pre>
+<pre><code># Predicted values of conc
+
+percent | Predicted |       95% CI
+----------------------------------
+9       |     31.01 | 33.21, 29.08
+12      |     37.03 | 40.00, 34.47
+15      |     38.06 | 41.68, 35.01
+18      |     41.53 | 46.92, 37.25</code></pre>
 </div>
 </div>
-<section id="references" class="level2" data-number="9.1">
-<h2 data-number="9.1" class="anchored" data-anchor-id="references"><span class="header-section-number">9.1</span> References</h2>
-<p>This <a href="https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/">Very statisticious</a> blog post is helpful. I also worked through the <strong>emmeans</strong> vignettes on <a href="https://cran.r-project.org/web/packages/emmeans/">CRAN</a>.</p>
+<p>You can pipe the responses right into <strong>ggplot</strong>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">predict_response</span>(mdl_2, <span class="at">terms =</span> <span class="fu">c</span>(<span class="st">"percent"</span>, <span class="st">"source"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> predicted, <span class="at">color =</span> group)) <span class="sc">+</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> group), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Marginal predicted values of leucine from regression model."</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Marginal predicted concentration"</span>, <span class="at">x =</span> <span class="st">"protein percent"</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> emm_pal) <span class="sc">+</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.justification =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="09-emmeans_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="learn-more" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="learn-more"><span class="header-section-number">9.3</span> Learn More</h2>
+<p>This <a href="https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/">Very statisticious</a> blog post is helpful. I also worked through the <strong>emmeans</strong> vignettes on <a href="https://cran.r-project.org/web/packages/emmeans/">CRAN</a> and <strong>ggeffects</strong> on <a href="https://strengejacke.github.io/ggeffects/index.html">GitHub</a>.</p>
 
 
 <!-- -->
@@ -859,68 +868,124 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb9" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r include=FALSE}</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidymodels)</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="in">library(janitor)</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="in">library(emmeans)</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="fu"># Estimated Marginal Means {#EMMs}</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>Estimated marginal means (EMMs) are the marginal means of the predicted values from a reference grid. Data set <span class="in">`pigs`</span> shows the result of an observational study of the leucine concentration in 29 pigs whose diets differed in to attributes: source (fish, soy, milk) and protein percent (9, 12, 15, 18). The heat map below shows how concentration increase from left to right on the sources, and with higher percentages of protein.</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(pigs, <span class="at">package =</span> <span class="st">"emmeans"</span>)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>pigs <span class="ot">&lt;-</span> pigs <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">percent =</span> <span class="fu">factor</span>(percent))</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>pigs <span class="sc">%&gt;%</span> </span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">.by =</span> <span class="fu">c</span>(source, percent), <span class="at">M =</span> <span class="fu">mean</span>(conc), <span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> source, <span class="at">y =</span> percent, <span class="at">fill =</span> M)) <span class="sc">+</span> </span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">paste</span>(<span class="st">"n ="</span>, n)))</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>This data exhibits Simpson's paradox: For each source, concentration increases with percent. Yet, they have different base levels and numbers of observations, so the marginal means actually *decrease* at percent 18. The culprit is the over-weighted fish at percent 18.</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="in">```{r collapse=TRUE}</span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="in">pigs %&gt;% </span></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="in">  summarize(.by = c(source, percent), M = mean(1/conc)) %&gt;%</span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="in">  pivot_wider(names_from = percent, values_from = M)</span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="in">pigs %&gt;% </span></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="in">  mutate(source = "Total") %&gt;%</span></span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="in">  summarize(.by = c(source, percent), M = mean(1/conc)) %&gt;%</span></span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="in">  pivot_wider(names_from = percent, values_from = M)</span></span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit a model</span></span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">%&gt;%</span> <span class="fu">fit</span>(<span class="fu">inverse</span>(conc) <span class="sc">~</span> ., <span class="at">data =</span> pigs) <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>()</span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>mdl <span class="sc">%&gt;%</span> <span class="fu">emmeans</span>(<span class="st">"percent"</span>)</span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying `weights` brings you back to the ordinary marginal means.</span></span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>mdl <span class="sc">%&gt;%</span> <span class="fu">emmeans</span>(<span class="st">"percent"</span>, <span class="at">weights =</span> <span class="st">"cells"</span>)</span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>:::rmdnote</span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>Today we're talking about pigs.</span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>This section is an overview of estimated marginal means, and its implementation in in the **emmeans** package. </span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>pigs</span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a><span class="fu">## References</span></span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>This <span class="co">[</span><span class="ot">Very statisticious</span><span class="co">](https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/)</span> blog post is helpful. I also worked through the **emmeans** vignettes on <span class="co">[</span><span class="ot">CRAN</span><span class="co">](https://cran.r-project.org/web/packages/emmeans/)</span>.</span>
+<div class="sourceCode" id="cb13" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r include=FALSE}</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidymodels)</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="in">library(gtsummary)</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="in">library(janitor)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="in">library(emmeans)</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggeffects)</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="in">emm_pal &lt;- c(fish = "#228B22", skim = "#A0522D", soy = "#6A5ACD", total = "#333333")</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="fu"># Estimated Marginal Means {#EMMs}</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>Estimated marginal means (EMMs) are the marginal means of the predicted values from a reference grid. Data set <span class="in">`pigs`</span> is an observational study of the leucine concentration (<span class="in">`conc`</span>) in 29 pigs whose diets differed in two attributes: <span class="in">`source`</span> (fish, soy, milk) and protein <span class="in">`percent`</span> (9, 12, 15, 18).</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(pigs, <span class="at">package =</span> <span class="st">"emmeans"</span>)</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>pigs <span class="ot">&lt;-</span> pigs <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">percent =</span> <span class="fu">factor</span>(percent))</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>A plot of the data shows concentration increases varies by source, and increases with protein percent.</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  pigs <span class="sc">|&gt;</span> <span class="fu">summarize</span>(<span class="at">.by =</span> <span class="fu">c</span>(source, percent), <span class="at">M =</span> <span class="fu">mean</span>(conc), <span class="at">n =</span> <span class="fu">n</span>()),</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>  pigs <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">source =</span> <span class="st">"total"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(<span class="at">.by =</span> <span class="fu">c</span>(source, percent), <span class="at">M =</span> <span class="fu">mean</span>(conc), <span class="at">n =</span> <span class="fu">n</span>())</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> percent, <span class="at">y =</span> M, <span class="at">color =</span> source)) <span class="sc">+</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">size =</span> n)) <span class="sc">+</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> source), <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">"Mean Concentration"</span>, <span class="at">size =</span> <span class="st">"pigs"</span>,</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Leucine concentration by protein percent vs food source for 29 pigs."</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> emm_pal) <span class="sc">+</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.justification =</span> <span class="st">"left"</span>)</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>This is an instance of Simpson's paradox: concentration increases with percent for each source, but _decreases_ at percent 18 when not grouping. The culprit is the over-weighted fish group (*n* = 3) at percent 18.</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ordinary and Estimated Marginal Means</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>The "ordinary" marginal means (OMM) are just the conditional means of the data. The OMM monotonically increases until percent = 18.</span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>pigs <span class="sc">|&gt;</span> <span class="fu">summarize</span>(<span class="at">.by =</span> percent, <span class="at">OMM =</span> <span class="fu">mean</span>(conc))</span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true" tabindex="-1"></a>The _estimated_ marginal means are the means of a model's predicted values over some reference grid. Fit the inverse concentration (that's the best linear relationship).</span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a>mdl <span class="ot">&lt;-</span> </span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="fu">inverse</span>(conc) <span class="sc">~</span> ., <span class="at">data =</span> pigs) <span class="sc">|&gt;</span></span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true" tabindex="-1"></a><span class="in">```{r include=FALSE, eval=FALSE}</span></span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: true</span></span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true" tabindex="-1"></a><span class="in">tbl_regression(mdl, estimate_fun = label_style_number(digits = 4))</span></span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true" tabindex="-1"></a>The reference grid is a grid of the model predictor variables. For factor vars, there's a row for each level, and for continuous vars, there is a row for the mean. The manual way to calculate this is</span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true" tabindex="-1"></a>RG <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">source =</span> <span class="fu">levels</span>(pigs<span class="sc">$</span>source), <span class="at">percent =</span> <span class="fu">levels</span>(pigs<span class="sc">$</span>percent))</span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(mdl, <span class="at">newdata =</span> RG) <span class="sc">|&gt;</span></span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">.by =</span> percent, <span class="at">EMM =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">mean</span>(.fitted)) </span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true" tabindex="-1"></a>That's what <span class="in">`emmeans()`</span> does by default. This is like a weighted average so that groups with many observations are underweighted.</span>
+<span id="cb13-90"><a href="#cb13-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-93"><a href="#cb13-93" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-94"><a href="#cb13-94" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb13-95"><a href="#cb13-95" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(mdl, <span class="st">"percent"</span>, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb13-96"><a href="#cb13-96" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-98"><a href="#cb13-98" aria-hidden="true" tabindex="-1"></a><span class="fu">## ggeffects</span></span>
+<span id="cb13-99"><a href="#cb13-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-100"><a href="#cb13-100" aria-hidden="true" tabindex="-1"></a>The **ggeffects** package does a nice job working with EMMs.</span>
+<span id="cb13-101"><a href="#cb13-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-104"><a href="#cb13-104" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-105"><a href="#cb13-105" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb13-106"><a href="#cb13-106" aria-hidden="true" tabindex="-1"></a>mdl_2 <span class="ot">&lt;-</span> </span>
+<span id="cb13-107"><a href="#cb13-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb13-108"><a href="#cb13-108" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="dv">1</span><span class="sc">/</span>conc <span class="sc">~</span> ., <span class="at">data =</span> pigs) <span class="sc">|&gt;</span></span>
+<span id="cb13-109"><a href="#cb13-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>() </span>
+<span id="cb13-110"><a href="#cb13-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-111"><a href="#cb13-111" aria-hidden="true" tabindex="-1"></a><span class="fu">predict_response</span>(mdl_2, <span class="at">terms =</span> <span class="st">"percent"</span>, <span class="at">margin =</span> <span class="st">"marginalmeans"</span>)</span>
+<span id="cb13-112"><a href="#cb13-112" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-113"><a href="#cb13-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-114"><a href="#cb13-114" aria-hidden="true" tabindex="-1"></a>You can pipe the responses right into **ggplot**.</span>
+<span id="cb13-115"><a href="#cb13-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-118"><a href="#cb13-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb13-119"><a href="#cb13-119" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb13-120"><a href="#cb13-120" aria-hidden="true" tabindex="-1"></a><span class="fu">predict_response</span>(mdl_2, <span class="at">terms =</span> <span class="fu">c</span>(<span class="st">"percent"</span>, <span class="st">"source"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb13-121"><a href="#cb13-121" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> predicted, <span class="at">color =</span> group)) <span class="sc">+</span></span>
+<span id="cb13-122"><a href="#cb13-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb13-123"><a href="#cb13-123" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">group =</span> group), <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb13-124"><a href="#cb13-124" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-125"><a href="#cb13-125" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Marginal predicted values of leucine from regression model."</span>,</span>
+<span id="cb13-126"><a href="#cb13-126" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Marginal predicted concentration"</span>, <span class="at">x =</span> <span class="st">"protein percent"</span></span>
+<span id="cb13-127"><a href="#cb13-127" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-128"><a href="#cb13-128" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> emm_pal) <span class="sc">+</span></span>
+<span id="cb13-129"><a href="#cb13-129" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>, <span class="at">legend.justification =</span> <span class="st">"left"</span>)</span>
+<span id="cb13-130"><a href="#cb13-130" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb13-131"><a href="#cb13-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-132"><a href="#cb13-132" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learn More</span></span>
+<span id="cb13-133"><a href="#cb13-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-134"><a href="#cb13-134" aria-hidden="true" tabindex="-1"></a>This <span class="co">[</span><span class="ot">Very statisticious</span><span class="co">](https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/)</span> blog post is helpful. I also worked through the **emmeans** vignettes on [CRAN](https://cran.r-project.org/web/packages/emmeans/) and **ggeffects** on <span class="co">[</span><span class="ot">GitHub</span><span class="co">](https://strengejacke.github.io/ggeffects/index.html)</span>.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

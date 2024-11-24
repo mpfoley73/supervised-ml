@@ -384,7 +384,7 @@
     "href": "09-emmeans.html",
     "title": "9  Estimated Marginal Means",
     "section": "",
-    "text": "9.1 References\nThis Very statisticious blog post is helpful. I also worked through the emmeans vignettes on CRAN.",
+    "text": "9.1 Ordinary and Estimated Marginal Means\nThe “ordinary” marginal means (OMM) are just the conditional means of the data. The OMM monotonically increases until percent = 18.\npigs |&gt; summarize(.by = percent, OMM = mean(conc))\n\n  percent      OMM\n1       9 32.70000\n2      12 38.01111\n3      15 40.12857\n4      18 39.94000\nThe estimated marginal means are the means of a model’s predicted values over some reference grid. Fit the inverse concentration (that’s the best linear relationship).\nmdl &lt;- \n  linear_reg() |&gt;\n  fit(inverse(conc) ~ ., data = pigs) |&gt;\n  extract_fit_engine()\nThe reference grid is a grid of the model predictor variables. For factor vars, there’s a row for each level, and for continuous vars, there is a row for the mean. The manual way to calculate this is\nRG &lt;- expand.grid(source = levels(pigs$source), percent = levels(pigs$percent))\n\naugment(mdl, newdata = RG) |&gt;\n  summarize(.by = percent, EMM = 1 / mean(.fitted)) \n\n# A tibble: 4 × 2\n  percent   EMM\n  &lt;fct&gt;   &lt;dbl&gt;\n1 9        31.0\n2 12       37.0\n3 15       38.1\n4 18       41.5\nThat’s what emmeans() does by default. This is like a weighted average so that groups with many observations are underweighted.\nemmeans(mdl, \"percent\", type = \"response\")\n\n percent response    SE df lower.CL upper.CL\n 9           31.0 0.993 23     29.1     33.2\n 12          37.0 1.330 23     34.5     40.0\n 15          38.1 1.600 23     35.0     41.7\n 18          41.5 2.310 23     37.3     46.9\n\nResults are averaged over the levels of: source \nConfidence level used: 0.95 \nIntervals are back-transformed from the inverse scale",
     "crumbs": [
       "<span class='chapter-number'>9</span>  <span class='chapter-title'>Estimated Marginal Means</span>"
     ]
@@ -397,6 +397,26 @@
     "text": "Agresti, Alan. 2013. Categorical Data Analysis. 3rd ed. Wiley.\nhttps://www.amazon.com/Categorical-Analysis-Wiley-Probability-Statistics-ebook-dp-B00CAYUFM2/dp/B00CAYUFM2/ref=mt_kindle?_encoding=UTF8&me=&qid=.\n\n\nBrown, Violet A. 2021. “An Introduction to Linear Mixed-Effects\nModeling in r.” Advances in Methods and Practices in\nPsychological Science 4 (1): 2515245920960351. https://doi.org/10.1177/2515245920960351.\n\n\nFawcett, Tom. 2005. An Introduction to ROC Analysis. ELSEVIER.\nhttps://ccrma.stanford.edu/workshops/mir2009/references/ROCintro.pdf.\n\n\nHastie, Trevor, Robert Tibshirani, and Jerome Friedman. 2017. The\nElements of Statistical Learning. 2nd ed. New York, NY: Springer.\nhttps://web.stanford.edu/~hastie/ElemStatLearn/.\n\n\nJames, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani.\n2013. An Introduction to Statistical Learning: With Applications in\nr. 1st ed. New York, NY: Springer. http://faculty.marshall.usc.edu/gareth-james/ISL/book.html.\n\n\nKuhn, Max, and Kjell Johnson. 2016. Applied Predictive\nModeling. 1st ed. New York, NY: Springer. http://appliedpredictivemodeling.com/.\n\n\nMolnar, Christoph. 2020. Interpretable Machine Learning. https://christophm.github.io/interpretable-ml-book/.\n\n\nTherneau, Terry, and Elizabeth Atkinson. 2019. An Introduction to\nRecursive Partitioning Using the RPART Routines. Boca Raton,\nFlorida: Chapman; Hall/CRC. https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf.",
     "crumbs": [
       "References"
+    ]
+  },
+  {
+    "objectID": "09-emmeans.html#learn-more",
+    "href": "09-emmeans.html#learn-more",
+    "title": "9  Estimated Marginal Means",
+    "section": "9.3 Learn More",
+    "text": "9.3 Learn More\nThis Very statisticious blog post is helpful. I also worked through the emmeans vignettes on CRAN and ggeffects on GitHub.",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Estimated Marginal Means</span>"
+    ]
+  },
+  {
+    "objectID": "09-emmeans.html#ggeffects",
+    "href": "09-emmeans.html#ggeffects",
+    "title": "9  Estimated Marginal Means",
+    "section": "9.2 ggeffects",
+    "text": "9.2 ggeffects\nThe ggeffects package does a nice job working with EMMs.\n\nmdl_2 &lt;- \n  linear_reg() |&gt; \n  fit(1/conc ~ ., data = pigs) |&gt;\n  extract_fit_engine() \n\npredict_response(mdl_2, terms = \"percent\", margin = \"marginalmeans\")\n\n# Predicted values of conc\n\npercent | Predicted |       95% CI\n----------------------------------\n9       |     31.01 | 33.21, 29.08\n12      |     37.03 | 40.00, 34.47\n15      |     38.06 | 41.68, 35.01\n18      |     41.53 | 46.92, 37.25\n\n\nYou can pipe the responses right into ggplot.\n\n\nShow the code\npredict_response(mdl_2, terms = c(\"percent\", \"source\")) |&gt;\n  ggplot(aes(x = x, y = predicted, color = group)) +\n  geom_point(size = 1.5) +\n  geom_line(aes(group = group), size = 1) +\n  labs(\n    title = \"Marginal predicted values of leucine from regression model.\",\n    y = \"Marginal predicted concentration\", x = \"protein percent\"\n  ) +\n  scale_color_manual(values = emm_pal) +\n  theme(legend.position = \"top\", legend.justification = \"left\")",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Estimated Marginal Means</span>"
     ]
   }
 ]

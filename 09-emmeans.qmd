@@ -1,62 +1,118 @@
 ```{r include=FALSE}
 library(tidyverse)
 library(tidymodels)
+library(gtsummary)
 library(janitor)
 library(emmeans)
+library(ggeffects)
+
+emm_pal <- c(fish = "#228B22", skim = "#A0522D", soy = "#6A5ACD", total = "#333333")
 ```
 
 # Estimated Marginal Means {#EMMs}
 
-Estimated marginal means (EMMs) are the marginal means of the predicted values from a reference grid. Data set `pigs` shows the result of an observational study of the leucine concentration in 29 pigs whose diets differed in to attributes: source (fish, soy, milk) and protein percent (9, 12, 15, 18). The heat map below shows how concentration increase from left to right on the sources, and with higher percentages of protein.
+Estimated marginal means (EMMs) are the marginal means of the predicted values from a reference grid. Data set `pigs` is an observational study of the leucine concentration (`conc`) in 29 pigs whose diets differed in two attributes: `source` (fish, soy, milk) and protein `percent` (9, 12, 15, 18).
 
 ```{r}
+#| code-fold: false
 data(pigs, package = "emmeans")
 
 pigs <- pigs %>% mutate(percent = factor(percent))
-
-pigs %>% 
-  summarize(.by = c(source, percent), M = mean(conc), n = n()) %>%
-  ggplot(aes(x = source, y = percent, fill = M)) + 
-  geom_tile() +
-  geom_text(aes(label = paste("n =", n)))
 ```
 
-This data exhibits Simpson's paradox: For each source, concentration increases with percent. Yet, they have different base levels and numbers of observations, so the marginal means actually *decrease* at percent 18. The culprit is the over-weighted fish at percent 18.
-
-```{r collapse=TRUE}
-pigs %>% 
-  summarize(.by = c(source, percent), M = mean(1/conc)) %>%
-  pivot_wider(names_from = percent, values_from = M)
-
-pigs %>% 
-  mutate(source = "Total") %>%
-  summarize(.by = c(source, percent), M = mean(1/conc)) %>%
-  pivot_wider(names_from = percent, values_from = M)
-```
+A plot of the data shows concentration increases varies by source, and increases with protein percent.
 
 ```{r}
-# Fit a model
-mdl <- linear_reg() %>% fit(inverse(conc) ~ ., data = pigs) %>% extract_fit_engine()
-
-mdl %>% emmeans("percent")
-
-# Specifying `weights` brings you back to the ordinary marginal means.
-mdl %>% emmeans("percent", weights = "cells")
-
+#| code-fold: true
+bind_rows(
+  pigs |> summarize(.by = c(source, percent), M = mean(conc), n = n()),
+  pigs |> mutate(source = "total") |> 
+    summarize(.by = c(source, percent), M = mean(conc), n = n())
+) |>
+  ggplot(aes(x = percent, y = M, color = source)) +
+  geom_point(aes(size = n)) +
+  geom_line(aes(group = source), linewidth = 1) +
+  labs(
+    color = NULL, y = "Mean Concentration", size = "pigs",
+    title = "Leucine concentration by protein percent vs food source for 29 pigs."
+  ) +
+  scale_color_manual(values = emm_pal) +
+  theme(legend.position = "top", legend.justification = "left")
 ```
 
+This is an instance of Simpson's paradox: concentration increases with percent for each source, but _decreases_ at percent 18 when not grouping. The culprit is the over-weighted fish group (*n* = 3) at percent 18.
 
-:::rmdnote
-Today we're talking about pigs.
-:::
+## Ordinary and Estimated Marginal Means
 
-This section is an overview of estimated marginal means, and its implementation in in the **emmeans** package. 
+The "ordinary" marginal means (OMM) are just the conditional means of the data. The OMM monotonically increases until percent = 18.
 
 ```{r}
-pigs
+#| code-fold: false
+pigs |> summarize(.by = percent, OMM = mean(conc))
 ```
 
+The _estimated_ marginal means are the means of a model's predicted values over some reference grid. Fit the inverse concentration (that's the best linear relationship).
 
-## References
+```{r}
+#| code-fold: false
+mdl <- 
+  linear_reg() |>
+  fit(inverse(conc) ~ ., data = pigs) |>
+  extract_fit_engine()
+```
 
-This [Very statisticious](https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/) blog post is helpful. I also worked through the **emmeans** vignettes on [CRAN](https://cran.r-project.org/web/packages/emmeans/).
+```{r include=FALSE, eval=FALSE}
+#| code-fold: true
+tbl_regression(mdl, estimate_fun = label_style_number(digits = 4))
+```
+
+The reference grid is a grid of the model predictor variables. For factor vars, there's a row for each level, and for continuous vars, there is a row for the mean. The manual way to calculate this is
+
+```{r}
+#| code-fold: false
+RG <- expand.grid(source = levels(pigs$source), percent = levels(pigs$percent))
+
+augment(mdl, newdata = RG) |>
+  summarize(.by = percent, EMM = 1 / mean(.fitted)) 
+```
+
+That's what `emmeans()` does by default. This is like a weighted average so that groups with many observations are underweighted.
+
+```{r}
+#| code-fold: false
+emmeans(mdl, "percent", type = "response")
+```
+
+## ggeffects
+
+The **ggeffects** package does a nice job working with EMMs.
+
+```{r}
+#| code-fold: false
+mdl_2 <- 
+  linear_reg() |> 
+  fit(1/conc ~ ., data = pigs) |>
+  extract_fit_engine() 
+
+predict_response(mdl_2, terms = "percent", margin = "marginalmeans")
+```
+
+You can pipe the responses right into **ggplot**.
+
+```{r}
+#| code-fold: true
+predict_response(mdl_2, terms = c("percent", "source")) |>
+  ggplot(aes(x = x, y = predicted, color = group)) +
+  geom_point(size = 1.5) +
+  geom_line(aes(group = group), size = 1) +
+  labs(
+    title = "Marginal predicted values of leucine from regression model.",
+    y = "Marginal predicted concentration", x = "protein percent"
+  ) +
+  scale_color_manual(values = emm_pal) +
+  theme(legend.position = "top", legend.justification = "left")
+```
+
+## Learn More
+
+This [Very statisticious](https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/) blog post is helpful. I also worked through the **emmeans** vignettes on [CRAN](https://cran.r-project.org/web/packages/emmeans/) and **ggeffects** on [GitHub](https://strengejacke.github.io/ggeffects/index.html).
