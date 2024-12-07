@@ -7,6 +7,8 @@ library(emmeans)
 library(ggeffects)
 
 emm_pal <- c(fish = "#228B22", skim = "#A0522D", soy = "#6A5ACD", total = "#333333")
+
+set.seed(123)
 ```
 
 # Estimated Marginal Means {#EMMs}
@@ -112,6 +114,129 @@ predict_response(mdl_2, terms = c("percent", "source")) |>
   scale_color_manual(values = emm_pal) +
   theme(legend.position = "top", legend.justification = "left")
 ```
+
+## Nusisance Variables
+
+Suppose you have a model with several predictors and want to estimate the marginal means for a factor. Let's create a dataset to estimate the effect of sex on salary. By construction, salary is a function only of career level, but, 2/3 of entry-level employees are female, and only 2/5 of senior-level employees are female. Our EMM analysis should convey this. We'll throw in age just to have a continuous variable in model.
+
+```{r}
+#| code-fold: false
+
+set.seed(123)
+
+sal_dat <- tibble(
+  salary = c(rnorm(30, 30e3, 2e3), rnorm(15, 50e3, 3e3), rnorm(5, 100e3, 5e3)),
+  car_level = c(rep("Entry", 30), rep("Mid", 15), rep("Senior", 5)),
+  sex = c(rep("F",20), rep("M",10), rep("F",8), rep("M",7), rep("F",2), rep("M",3)),
+  age = c(rnorm(30, 25, 2), rnorm(15, 40, 2), rnorm(5, 55, 2))
+)
+
+sal_fit <-
+  linear_reg() |>
+  fit(salary ~ car_level + sex + age, data = sal_dat) |>
+  extract_fit_engine()
+
+sal_fit |> tidy()
+```
+
+As designed, `sex` and `age` are insignificant while `car_level` is significant and a large. Let's calculate the EMMs for `sex`.
+
+```{r}
+(sal_emm_1 <- emmeans(sal_fit, specs = "sex"))
+```
+
+`emmeans()` averaged the predicted values from the default reference grid. The grid is the combination of factor levels and means of continuous variables.
+
+```{r}
+ref_grid(sal_fit) |> tidy()
+```
+
+The EMM for `sex=F` (\$61,281) is the average of the three `sex=F` salaries in the reference grid. From here, you can use `contrast()` to say females get paid a premium of \$354 and men get paid \$354 less (although neither result is significant).
+
+```{r}
+emmeans::contrast(sal_emm_1)
+```
+
+\$354 more (less) than what though? Well, it's \$354 less than whatever predicted value you would have at any career level (at the average age). A nice reference point is the "mediod" employee - the employee who is a proportional mixture of all career levels and all sexes. Not the proportional mixture of the combinations (women are entry-level, men senior-level), but just the proportional mixture of all variables taken independently. The way to do that is by reducing "nuisance" factor levels into a single set. Instead of `car_levelEntry = [0,1]`, we let it, and each other level, have a continuous range, with the sum across levels adding to 1. The values could be equal, but far better for them to be prortional - .6 for entry-level, .3 for mid-level, and .1 for senior.
+
+```{r}
+(nuis_grid <- ref_grid(sal_fit, nuisance = "car_level", wt.nuis = "proportional"))
+```
+
+Now let's see the EMMs and contrast.
+
+```{r}
+(sal_emm_2 <- emmeans(nuis_grid, specs = "sex"))
+```
+
+Those are more realistic marginal means. The contrast is still the same.
+
+```{r}
+contrast(sal_emm_2)
+```
+
+But now the reference point is the "mediod" employee.
+
+```{r}
+emmeans(nuis_grid, specs = ~1)
+```
+
+Finally, how about this slick way to show EMMs? We'll show the reference point, then all factor levels. (Code below pretends .5 is a significant level, just so I can show the color contrast.)
+
+```{r}
+#| code-fold: true
+
+contrast_color <- function(bg) {
+  if_else(colorspace::contrast_ratio(bg, "black") > 
+            colorspace::contrast_ratio(bg, "white"),
+          "black", "white")
+}
+
+smry <- 
+  bind_rows(
+    emmeans(sal_emm_2, specs = ~1) |> tidy() |> rename(contrast = `1`),
+    contrast(sal_emm_2) |> tidy()
+  ) |>
+  select(contrast, estimate, adj.p.value) |>
+  mutate(contrast = fct_relevel(contrast, "overall", after = 0)) |>
+  arrange(contrast) |>
+  mutate(
+    pct = estimate / first(estimate),
+    bg = case_when(
+      adj.p.value < .50 & estimate < 0 ~ "firebrick",
+      adj.p.value < .50 & estimate > 0 ~ "dodgerblue",
+      TRUE ~ "white"
+    ),
+    color = contrast_color(bg)
+  )
+
+smry |>
+  select(contrast, estimate) |>
+  mutate(contrast = str_remove(contrast, " effect")) |>
+  pivot_wider(names_from = contrast, values_from = estimate) |>
+  gt::gt() |>
+  gt::fmt_currency(decimals = 0) |>
+  gt::tab_spanner("Effect", columns = 2:3) |>
+  gt::tab_header(title = "Effect of gender on estimated marginal means.") |>
+  gt::tab_options(heading.align = "left") |>
+  gt::tab_style(
+    style = gt::cell_fill("firebrick"),
+    locations = gt::cells_body(columns = which(smry$bg == "firebrick"))
+  ) |>
+  gt::tab_style(
+    style = gt::cell_fill("dodgerblue"),
+    locations = gt::cells_body(columns = which(smry$bg == "dodgerblue"))
+  ) |>
+  gt::tab_style(
+    style = gt::cell_text("white"),
+    locations = gt::cells_body(columns = which(smry$color == "white"))
+  ) |>
+  gt::tab_style(
+    style = gt::cell_text("black"),
+    locations = gt::cells_body(columns = which(smry$color == "black"))
+  )
+```
+
 
 ## Learn More
 
