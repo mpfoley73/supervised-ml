@@ -3,6 +3,8 @@
 ```{r include=FALSE}
 library(tidyverse)
 library(tidymodels)
+library(tictoc)
+library(rpart.plot)  # better formatted plots than the ones in rpart
 library(baguette)
 
 tidymodels_prefer()
@@ -11,7 +13,7 @@ theme_set(
   theme_light() +
     theme(
       plot.caption = element_text(hjust = 0),
-      strip.background = element_rect(fill="gray90", color="gray60"),
+      strip.background = element_rect(fill = "gray90", color = "gray60"),
       strip.text = element_text(color = "gray20")
     )
 )
@@ -24,38 +26,36 @@ scoreboard <- function(dat){
 }
 ```
 
-Decision trees, also known as classification and regression tree (CART) models, are tree-based methods for supervised machine learning.^[These notes rely on [PSU STAT 508](https://online.stat.psu.edu/stat508/) and on the [tidymodels vignettes](https://www.tidymodels.org/start/) for model building.]  Simple classification trees and regression trees are easy to use and interpret, but are not competitive with the best machine learning methods. However, they form the foundation for ensemble models such as bagged trees, random forests, and boosted trees, which although less interpretable, are very accurate.
+Decision tree models, also known as classification and regression trees (CART), split the dataset into subsets based on the value of input features, creating a tree-like structure of decision rules. At each node, the algorithm chooses the best split. The process continues recursively until a stopping condition is met. The result is a tree that can be used to make predictions for new data points.
 
-CART models segment the predictor space into $K$ non-overlapping terminal nodes (leaves). Each node is described by a set of rules which can be used to predict new responses. The predicted value $\hat{y}$ for each node is the mode (classification) or mean (regression).
+CART models define the nodes through a *top-down greedy* process called *recursive binary splitting*. *Top-down* because it begins at the top of the tree with all observations in a single region and successively splits the predictor space; and *greedy* because at each splitting step, the best split is made at that particular step without consideration to subsequent splits.
 
-CART models define the nodes through a *top-down greedy* process called *recursive binary splitting*. The process is *top-down* because it begins at the top of the tree with all observations in a single region and successively splits the predictor space. It is *greedy* because at each splitting step, the best split is made at that particular step without consideration to subsequent splits.
+The best split is the predictor variable and cut point that minimizes its cost function. For regression trees, that's the sum of squared residuals. In @eq-06-rss, $A_k$ is node $k$ of $K$ nodes.
 
-The best split is the predictor variable and cut point that minimizes a cost function. The most common cost function for regression trees is the sum of squared residuals, 
+$$RSS = \sum_{k=1}^K\sum_{i \in A_k}{\left(y_i - \hat{y}_{A_k} \right)^2}.$$ {#eq-06-rss}
 
-$$RSS = \sum_{k=1}^K\sum_{i \in A_k}{\left(y_i - \hat{y}_{A_k} \right)^2}.$$
+For classification trees, it's the Gini index,
 
-For classification trees, it is the Gini index, 
+$$G = \sum_{c=1}^C{\hat{p}_{kc}(1 - \hat{p}_{kc})},$$ {#eq-06-gini}
 
-$$G = \sum_{c=1}^C{\hat{p}_{kc}(1 - \hat{p}_{kc})},$$
+$\hat{p}_{kc}$ is the proportion of predictions in node $k$ that are class $c$. A completely *pure* node in a binary tree would have $\hat{p} \in \{ 0, 1 \}$ for a Gini index of $G = 0$. A completely *impure* node would have $\hat{p} = 0.5$ and $G = (0.5)(0.5) = 0.25$.[^fn-06-entropy]
 
-and the entropy (aka information statistic)
+[^fn-06-entropy]: You might come across a variation of the Gini index called entropy, the *information statistic*, $D = - \sum_{c=1}^C{\hat{p}_{kc} \log \hat{p}_{kc}}$. Whereas Gini can range from 0 to .25, entropy ranges from 0 to $-(.5 \log(.5)) \cdot 2 = 0.69$.
 
-$$D = - \sum_{c=1}^C{\hat{p}_{kc} \log \hat{p}_{kc}}$$
+CART repeats the splitting process for each child node until a *stopping criterion* is satisfied, usually when no node size surpasses a predefined maximum, or continued splitting does not improve the model significantly. CART may also impose a minimum number of observations in each node.
 
-where $\hat{p}_{kc}$ is the proportion of training observations in node $k$ that are class $c$.  A completely *pure* node in a binary tree would have $\hat{p} \in \{ 0, 1 \}$ and $G = D = 0$. A completely *impure* node in a binary tree would have $\hat{p} = 0.5$ and $G = 0.5^2 \cdot 2 = 0.25$ and $D = -(0.5 \log(0.5)) \cdot 2 = 0.69$.
+The resulting tree will over-fit the data and not generalize well, so CART *prunes* the tree, minimizing the cross-validated prediction error. Rather than cross-validating every possible subtree, CART uses *cost-complexity pruning*. Cost complexity is the tradeoff between error (cost) and tree size (complexity). The cost complexity of the tree, $R_{c_p}(T)$, is the sum of its risk (error) plus a cost complexity factor, $c_p$, multiple of the tree size $|T|$.
 
-CART repeats the splitting process for each child node until a *stopping criterion* is satisfied, usually when no node size surpasses a predefined maximum, or continued splitting does not improve the model significantly.  CART may also impose a minimum number of observations in each node.
+$$R_{c_p}(T) = R(T) + c_p|T|$$ {#eq-06-cp}
 
-The resulting tree likely over-fits the training data and therefore does not generalize well to test data, so CART *prunes* the tree, minimizing the cross-validated prediction error. Rather than cross-validating every possible subtree to find the one with minimum error, CART uses *cost-complexity pruning*. Cost-complexity is the trade off between error (cost) and tree size (complexity) where the trade off is quantified with cost-complexity parameter $c_p$. The cost complexity of the tree, $R_{c_p}(T)$, is the sum of its risk (error) plus a "cost complexity" factor $c_p$ multiple of the tree size $|T|$.  
+$c_p$ can take any value from $[0..\infty]$, but it turns out there is an optimal tree for ranges of $c_p$ values, so there is only a finite set of interesting values for $c_p$ [@James2013; @Therneau2019; and @Kuhn2016]. A parametric algorithm identifies the interesting $c_p$ values and their associated pruned trees, $T_{c_p}$.
 
-$$R_{c_p}(T) = R(T) + c_p|T|$$
+## Case Studies
 
-$c_p$ can take on any value from $[0..\infty]$, but it turns out there is an optimal tree for *ranges* of $c_p$ values, so there are only a finite set of *interesting* values for $c_p$ [@James2013] [@Therneau2019] [@Kuhn2016].  A parametric algorithm identifies the interesting $c_p$ values and their associated pruned trees, $T_{c_p}$. CART uses cross-validation to determine which $c_p$ is optimal.
+The sections in this chapter work through two case studies. The first fits classification trees to the `ISLR::OJ` dataset to predict which of two brands of orange juice customers `Purchase`. The second fits regression trees to the `ISLR::Carseats` dataset to predict `Sales`.
 
-The sections in this chapter work through two case studies, using the `ISLR::OJ` data set to fit classification trees and predict which brand of orange juice, Citrus Hill (CH) or Minute Maid = (MM), customers opurchase from its 17 predictor variables, and using the `ISLR::Carseats` data set to predict average sales from its 10 feature variables.
-
-```{r message=FALSE}
-library(rpart.plot)  # better formatted plots than the ones in rpart
+```{r}
+#| code-fold: false
 
 oj_dat <- ISLR::OJ
 
@@ -66,162 +66,212 @@ cs_dat <- ISLR::Carseats
 glimpse(cs_dat)
 ```
 
-Partition the data sets into training and testing sets. Use the training set to estimate parameters, compare models and feature engineering techniques, and tune models. Use the testing set as an unbiased source for measuring final model performance. The test set is held in reserve until the end of the project at which point there are only be one or two models under serious consideration.
+Partition the data into training and testing datasets. We'll fit models to the training data and compare their performance using testing data.
 
 ```{r collapse=TRUE}
+#| code-fold: false
+
 set.seed(12345)
 
 (oj_split <- initial_split(oj_dat, prop = 0.8, strata = Purchase))
 oj_train <- training(oj_split)
 oj_test <- testing(oj_split)
 
-(cs_split <- initial_split(cs_dat, prop = 0.8))
+(cs_split <- initial_split(cs_dat, prop = 0.8, strata = Sales))
 cs_train <- training(cs_split)
 cs_test <- testing(cs_split)
 ```
 
 ## Classification Tree
 
-The simple classification tree is uncommon, but it is the foundation for the more complex ensemble models. 
+Function `parsnip::decision_tree()` defines a decision tree model. Its default engine is `rpart` and has three hyperparameters.
 
-Function `rpart::rpart()` builds a full tree, minimizing the Gini index $G$ by default (`parms = list(split = "gini")`), until the stopping criterion is satisfied.  The default stopping criterion is 
+-   `tree_depth`: maximum number of layers. Larger depths result in more complex models, but they are also more prone to overfitting.
+-   `min_n`: minimal node size required for splitting.
+- `cost_complexity`: a penalty for adding more nodes to the tree. This is another control regulating the tree complexity.
 
-* only attempt a split if the current node has at least `minsplit = 20` observations, and
-* only accept a split if 
-   * the resulting nodes have at least `minbucket = round(minsplit/3)` observations, and 
-   * the resulting overall fit improves by `cp = 0.01` (i.e., $\Delta G <= 0.01$).
-   
-Some model parameters like `cp` (see `?rpart.control`) are hyperparameters that cannot be optimized directly from the training data set. You can tune hyperparameters by training many models on resampled data sets and exploring how well the models perform. 
+The hyperparameters can either take assigned values, or you can tune them with `tune()`. We'll predict `Purchase` [CH, MM] as a function of all 17 predictors.
 
-The [tidymodels vignette](https://www.tidymodels.org/start) explains that predictive models should train with resampling methods such as cross-validation to get a short list of candidate models, then choose the best model by comparing performance on the test set. I.e., model selection is a two-phased competition. In this context, we can use CV to fit the best classification tree, then in the next section fit the best bagged tree, then random forest, and so on. The second phase would be to compare all models on the test set.^[I think for a production system, you would take one more step: re-fit the final model to the entire data set using the hyperparemeter settings from the winning model.] 
+```{r}
+#| code-fold: false
 
-```{r, fit-cart-class, cache=TRUE}
-oj_cart <- list()
-
-# `decision_tree` has 3 hyperparameters (`cost_complexity`, `tree_depth`, and
-# `min_n`). Set their value to `tune()` if you want to optimize any one. Let's
-# optimize just `cost_complexity` and `tree_depth`.
-oj_cart$model <-
+oj_cart_mdl <-
   decision_tree(
     cost_complexity = tune(),
-    tree_depth = tune()
+    tree_depth = tune(),
+    min_n = tune()
   ) %>%
-  set_engine("rpart") %>%
+  set_engine("rpart") |>
   set_mode("classification")
 
-# Tune a model using the workflow framework.
-oj_cart$workflow <-
-  workflow() %>%
-  add_model(oj_cart$model) %>%
+oj_cart_wf <-
+  workflow() |>
+  add_model(oj_cart_mdl) |>
   add_formula(Purchase ~ .)
+```
 
-# Tune the model with 10-fold CV using a regular grid of cost complexity values.
-# With 2 hyperparameters and 5 levels, the grid has 5^2=25 combinations. That
-# means the tuning exercise will fit 25 models to each of 10 folds = 250 fits.
-oj_cart$tune_grid <-
-  oj_cart$workflow %>%
+### Fit the Model {.unnumbered}
+
+Tune the hyperparameters with 10-fold CV using a regular grid. With 3 hyperparameters and 5 levels, the grid has 5\^3=125 combinations. That means the tuning exercise will fit 125 models for each of the 10 folds - 1,250 fits! We'll evaluate the fits based on accuracy and AUC. The dataset is somewhat imbalanced (`r percent(mean(oj_dat$Purchase == "CH"), 1)` "CH"), so AUC will be the more important metric. It takes about a minute and a half to fit the `r nrow(oj_train)` x `r ncol(oj_train)` dataset.
+
+```{r}
+#| label: fit-cart-class
+#| cache: true
+#| code-fold: false
+
+tic()
+
+oj_cart_resamples <-
+  oj_cart_wf |>
   tune_grid(
     resamples = vfold_cv(oj_train, v = 10), 
-    grid = grid_regular(cost_complexity(), tree_depth(), levels = 5)
+    grid = grid_regular(
+      cost_complexity(), 
+      tree_depth(), 
+      min_n(), 
+      levels = 5
+    ),
+    metrics = metric_set(roc_auc, accuracy)
   )
 
-# `collect_metrics()` returns two metrics: accuracy and ROC-AUC.
-oj_cart$tune_grid %>% 
-  collect_metrics() %>%
-  mutate(tree_depth = factor(tree_depth)) %>%
-  ggplot(aes(x = cost_complexity, y = mean, color = tree_depth)) +
+toc()
+```
+
+`tune_grid()` returns a `resamples` object with one row per fold. 
+
+```{r}
+#| code-fold: false
+
+oj_cart_resamples
+```
+
+Each row contains a metrics list with values for each hyperparameter combination and performance metric. There were 125 parameter combinations and two metrics, so 250 rows. Here's what the metrics object from the first fold look like.
+
+```{r}
+#| code-fold: false
+
+oj_cart_resamples[1, ]$.metrics[[1]] |> glimpse()
+```
+
+`collect_metrics()` unnests the `metrics` column and averages the values over the folds. `show_best()` shows the best model hyperparameter combination, but the mean AUC is the same for several combinations. The best performing tree is 8 layers deep.
+
+```{r}
+#| code-fold: false
+
+oj_cart_resamples |> show_best(metric = "roc_auc") |> knitr::kable()
+```
+
+Plot the sensitivity to the hyperparameter combinations to make sure you've explored a range that gives you a peek.
+
+```{r}
+#| code-fold: true
+
+df <- collect_metrics(oj_cart_resamples)
+
+bind_rows(
+  cost_complextity = df |> rename(x = cost_complexity) |>
+    summarize(.by = c(x, .metric), mean_auc = mean(mean)),
+  tree_depth = df |> rename(x = tree_depth) |>
+    summarize(.by = c(x, .metric), mean_auc = mean(mean)),
+  min_n = df |> rename(x = min_n) |>
+    summarize(.by = c(x, .metric), mean_auc = mean(mean)),
+  .id = "hyperparameter"
+) |>
+  ggplot(aes(x = x, y = mean_auc, color = .metric)) +
   geom_line(linewidth = 1.5, alpha = .6) +
-  facet_wrap(facets = vars(.metric), scales = "free") +
-  scale_x_log10()
+  facet_wrap(vars(hyperparameter), scales = "free_x") +
+  labs(x = NULL, y = "Mean AUC", color = NULL, title = "Hyperparameter Tuning") +
+  theme(legend.position = "top")
 ```
 
-The best models in terms of accuracy and ROC was the tree depth of 4 and any cp < .01.
+Select the hyperparameter combination with the highest AUC and finalize the workflow. `last_fit()` fits the model with the full training set and evaluates it on the testing data.
 
 ```{r}
-oj_cart$tune |> show_best(metric = "accuracy") |> knitr::kable()
-```
+oj_cart_hyperparameters <- select_best(oj_cart_resamples, metric = "roc_auc")
 
-Select the best model in terms of accuracy and finalize the model.
-
-```{r}
-oj_cart$best_tune <- select_best(oj_cart$tune_grid, metric = "accuracy")
-
-# `finalize_workflow()` applies the tuning parameters to the workflow.
-oj_cart$final_workflow <- finalize_workflow(oj_cart$workflow, oj_cart$best_tune)
-
-# last_fit() fits the model with the full training set and evaluates it on the 
-# testing data.
-oj_cart$fit <-
-  oj_cart$final_workflow %>%
+oj_cart_fit <- 
+  finalize_workflow(oj_cart_wf, oj_cart_hyperparameters) |>
   last_fit(oj_split)
 ```
 
-Here is the tree. The output starts with the root node.  The predicted class at the root is `CH` and this prediction produces 333 errors on the 855 observations for a 61% success rate (accuracy) and 39% error rate. The child nodes of node "x" are labeled 2x) and 2x+1), so the child nodes of 1) are 2) and 3), and the child nodes of 2) are 4) and 5), etc.  Terminal nodes are labeled with an asterisk (*).
+Here is the tree. The output starts with the root node. Terminal nodes are labeled with an asterisk (\*), so this is just a summary node of everything beneath. Node 1 Contains all 855 observations with 333 misclassifications. The majority class is CH, with a proportion of 0.6105 for CH and 0.3895 for MM. Node 2 Splits on `LoyalCH` >= 0.48285, containing 534 observations with 92 misclassifications. The majority class is CH, with a higher proportion of CH. The child nodes of node "x" having labeling pattern 2x) and 2x+1), so for node 1) it's 2) and 3), and for 2) it's 4) and 5).
 
 ```{r}
-oj_cart$fit %>% extract_workflow()
+#| code-fold: false
+extract_workflow(oj_cart_fit)
 ```
 
-The first split is at `LoyalCH` = 0.48285. Here is a diagram of the tree. The node label indicates the predicted value, error rate, and proportion of observations included. Below the nodes are the splitting criteria.
+A diagram of the tree can sometimes help if its not too large. The node label indicates the predicted value, error rate, and proportion of observations included. Below the nodes are the splitting criteria.
 
 ```{r}
-oj_cart$fit %>%
-  extract_workflow() %>%
-  extract_fit_engine() %>%
+oj_cart_fit |>
+  extract_workflow() |>
+  extract_fit_engine() |>
   rpart.plot(yesno = TRUE, roundint = FALSE)
 ```
 
-The boxes show the node classification (based on mode), the proportion of observations that are *not* `CH`, and the proportion of observations included in the node. 
-
-`LoyalCH` was the most important variable, followed by `PriceDiff`. A variable's importance is the sum of the improvement in the overall Gini (or RMSE) measure produced by the nodes in which it appears. From the **rpart** [vignette](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf) (page 12), 
+A variable's importance is the sum of the improvement in the overall Gini (or RMSE) measure produced by the nodes in which it appears. From the **rpart** [vignette](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf) (page 12),
 
 > "An overall measure of variable importance is the sum of the goodness of split measures for each split for which it was the primary variable, plus goodness (adjusted agreement) for all splits in which it was a surrogate."
 
+`LoyalCH` was the most important variable, followed by `PriceDiff`.
+
 ```{r}
-oj_cart$fit %>%
-  extract_workflow() %>%
-  extract_fit_parsnip() %>%
+oj_cart_fit |>
+  extract_workflow() |>
+  extract_fit_parsnip() |>
   vip::vip()
 ```
 
-### Measuring Performance {-}
+### Performance {.unnumbered}
 
-`collect_metrics()` shows the accuracy and ROC AUC metrics. 
+`collect_metrics()` shows the performance metrics on the `r nrow(oj_test)` testing dataset observations.
 
 ```{r}
-oj_cart$fit %>% collect_metrics()
+collect_metrics(oj_cart_fit)
 ```
 
-You can explore the performance by calculating the full confusion matrix and visualizing the ROC curve.
+Use the full confusion matrix and ROC curve to explore performance.
 
-#### Confusion Matrix {-}
+#### Confusion Matrix {.unnumbered}
 
-The confusion matrix calculates the model performance predicting on the holdout testing data set.
+The confusion matrix calculates the model performance on the testing dataset.
 
-```{r collapse=TRUE}
-oj_cart$confmat <-
-  oj_cart$fit %>% 
-  collect_predictions() %>% 
+```{r}
+#| code-fold: false
+
+oj_cart_conf_mtrx <-
+  oj_cart_fit |>
+  collect_predictions() |>
   conf_mat(truth = Purchase, estimate = .pred_class)
 
-# oj_cart$preds <- 
-#   bind_cols(
-#      predict(oj_cart$fit, new_data = oj_test, type = "prob"),
-#      predicted = predict(oj_cart$fit, new_data = oj_test, type = "class"),
-#      actual = oj_test$Purchase
-#   )
-
-oj_cart$confmat
-
-summary(oj_cart$confmat)
+summary(oj_cart_conf_mtrx)
 ```
 
+These measures come directly from the confusion matrix. The first value (CH) is considered a "positive" result and the second (MM) "negative". The metrics are usually expressed in terms of true and false positives and negatives.
+
+```{r}
+#| code-fold: false
+
+oj_cart_conf_mtrx
+```
+
+| Metric | Desc   | Formula | Calculation |
+|--------|:-------|:------- |:------------|
+| **Accuracy** | Correct predictions percent. | $\frac{TP + FP}{total}$ | $\frac{117+67}{215}=.856$ |
+| **Sensitivity**, <br>**Recall** | Proportion of positives identified. | $\frac{TP}{TP + FN}$ | $\frac{117}{117+114}=.893$ |
+| **Specificity** | Proportion of negatives identified.   | $\frac{TN}{TN + FP}$ | $\frac{67}{67 + 17}=.798$ |
+| **Positive Predictive Value**, <br>**Precision** | Proportion of positive predictions that are correct. | $\frac{TP}{TP + FP}$ | $\frac{117}{117 + 17}=.873$ |
+| **Negative Predictive Value** | Proportion of negative predictions that are correct.   | $\frac{TN}{TN + FN}$ | $\frac{67}{67 + 14}=.827$ |
+| **F1-Score** | Harmonic mean of precision and recall.   | $2 \times \frac{\text{prec} \times \text{recall}} {\text{prec} + \text{recall}}$| $2 \times \frac{0.873 \times 0.893} {0.873 + 0.893} = .883$ |
+
+<br>
 You can bound the accuracy with a 95% CI using the binomial test.
 
 ```{r}
 binom.test(
-  x = oj_cart$confmat$table %>% diag() %>% sum(), 
-  n = oj_cart$confmat$table %>% sum()
+  x = oj_cart_conf_mtrx$table %>% diag() %>% sum(), 
+  n = oj_cart_conf_mtrx$table %>% sum()
 )
 ```
 
@@ -229,32 +279,32 @@ The detection prevalence (aka, no information rate (NIR)) statistic is the class
 
 ```{r}
 binom.test(
-  x = oj_cart$confmat$table["CH", ] %>% sum(), 
-  n = oj_cart$confmat$table %>% sum(),
-  p = sum(oj_cart$confmat$table[, "CH"]) / sum(oj_cart$confmat$table),
+  x = oj_cart_conf_mtrx$table["CH", ] %>% sum(), 
+  n = oj_cart_conf_mtrx$table %>% sum(),
+  p = sum(oj_cart_conf_mtrx$table[, "CH"]) / sum(oj_cart_conf_mtrx$table),
   alternative = "greater"
 )
-binom.test(x = 116 + 67, n = sum(oj_cart$confmat$table), 
-           p = (116+17)/sum(oj_cart$confmat$table), 
+binom.test(x = 116 + 67, n = sum(oj_cart_conf_mtrx$table), 
+           p = (116+17)/sum(oj_cart_conf_mtrx$table), 
            alternative = "greater")
 ```
 
-The accuracy statistic indicates the model predicts `r summary(oj_cart$confmat) %>% filter(.metric == "accuracy") %>% pull(.estimate) %>% percent(.1)` of the observations correctly. That's good, but less impressive when you consider the prevalence of CH is `r (sum(oj_cart$confmat$table[1, ]) / sum(oj_cart$confmat$table)) %>% percent(.1)` - you could achieve that accuracy just by predicting CH every time. A measure that controls for the prevalence is Cohen's kappa statistic. The kappa statistic is explained [here](https://standardwisdom.com/softwarejournal/2011/12/confusion-matrix-another-single-value-metric-kappa-statistic/). It compares the accuracy to the accuracy of a "random system". It is defined as
+The accuracy statistic indicates the model predicts `r summary(oj_cart_conf_mtrx) %>% filter(.metric == "accuracy") %>% pull(.estimate) %>% percent(.1)` of the observations correctly. That's good, but less impressive when you consider the prevalence of CH is `r (sum(oj_cart_conf_mtrx$table[1, ]) / sum(oj_cart_conf_mtrx$table)) %>% percent(.1)` - you could achieve that accuracy just by predicting CH every time. A measure that controls for the prevalence is Cohen's kappa statistic. The kappa statistic is explained [here](https://standardwisdom.com/softwarejournal/2011/12/confusion-matrix-another-single-value-metric-kappa-statistic/). It compares the accuracy to the accuracy of a "random system". It is defined as
 
 $$\kappa = \frac{\text{Accuracy} - RA}{1-RA}$$
 
-where 
+where
 
 $$RA = \frac{\text{ActFalse} \times \text{PredFalse} + \text{ActTrue} \times \text{PredTrue}}{\text{Total} \times \text{Total}}$$
 
-is the hypothetical probability of a chance agreement. 
+is the hypothetical probability of a chance agreement.
 
-The kappa statistic varies from 0 to 1 where 0 means accurate predictions occur merely by chance, and 1 means the predictions are in perfect agreement with the observations.  In this case, a kappa statistic of 0.7064 is "substantial".  See chart [here](https://www.statisticshowto.datasciencecentral.com/cohens-kappa-statistic/).
+The kappa statistic varies from 0 to 1 where 0 means accurate predictions occur merely by chance, and 1 means the predictions are in perfect agreement with the observations. In this case, a kappa statistic of 0.7064 is "substantial". See chart [here](https://www.statisticshowto.datasciencecentral.com/cohens-kappa-statistic/).
 
 You can remind yourself what the other confusion matrix measures are from the documentation. Visuals are almost always helpful. Here is a plot of the confusion matrix.
 
 ```{r}
-oj_cart$fit %>% 
+oj_cart_fit %>% 
   collect_predictions() %>% 
   select(Purchase, .pred_class) %>%
   plot(
@@ -264,54 +314,54 @@ oj_cart$fit %>%
   )
 ```
 
-#### ROC Curve {-}
+#### ROC Curve {.unnumbered}
 
-The ROC (receiver operating characteristics) curve [@Fawcett2005] is another measure of accuracy. The ROC curve is a plot of the true positive rate (TPR, sensitivity) versus the false positive rate (FPR, 1 - specificity) for a set of thresholds. By default, the threshold for predicting the default classification is 0.50, but it could be any threshold. `precrec::evalmod()` calculates the confusion matrix values from the model using the holdout data set. The AUC on the holdout set is `r oj_cart$fit %>% collect_predictions() %>% yardstick::roc_auc(Purchase, .pred_CH) %>% pull(.estimate) %>% comma(.001)`. `pRoc::plot.roc()`, `plotROC::geom_roc()`, and `yardstick::roc_curve()` are options for plotting a ROC curve.
+The ROC (receiver operating characteristics) curve [@Fawcett2005] is another measure of accuracy. The ROC curve is a plot of the true positive rate (TPR, sensitivity) versus the false positive rate (FPR, 1 - specificity) for a set of thresholds. By default, the threshold for predicting the default classification is 0.50, but it could be any threshold. `precrec::evalmod()` calculates the confusion matrix values from the model using the holdout data set. The AUC on the holdout set is `r oj_cart_fit %>% collect_predictions() %>% yardstick::roc_auc(Purchase, .pred_CH) %>% pull(.estimate) %>% comma(.001)`. `pRoc::plot.roc()`, `plotROC::geom_roc()`, and `yardstick::roc_curve()` are options for plotting a ROC curve.
 
 ```{r}
-oj_cart$fit %>%
+oj_cart_fit %>%
   collect_predictions() %>%
   yardstick::roc_curve(Purchase, .pred_CH) %>%
   autoplot() +
   labs(title = "OJ CART ROC Curve")
 ```
 
-A few points on the ROC space are helpful for understanding how to use it.  
+A few points on the ROC space are helpful for understanding how to use it.
 
-* The lower left point (0, 0) is the result of *always* predicting "negative" or in this case "MM" if "CH" is taken as the default class. No false positives, but no true positives either.
-* The upper right point (1, 1) is the result of *always* predicting "positive" ("CH" here).  You catch all true positives, but miss all the true negatives.
-* The upper left point (0, 1) is the result of perfect accuracy.
-* The lower right point (1, 0) is the result of perfect imbecility. You made the exact wrong prediction every time. 
-* The 45 degree diagonal is the result of randomly guessing positive (CH) X percent of the time.  If you guess positive 90% of the time and the prevalence is 50%, your TPR will be 90% and your FPR will also be 90%, etc.
+-   The lower left point (0, 0) is the result of *always* predicting "negative" or in this case "MM" if "CH" is taken as the default class. No false positives, but no true positives either.
+-   The upper right point (1, 1) is the result of *always* predicting "positive" ("CH" here). You catch all true positives, but miss all the true negatives.
+-   The upper left point (0, 1) is the result of perfect accuracy.
+-   The lower right point (1, 0) is the result of perfect imbecility. You made the exact wrong prediction every time.
+-   The 45 degree diagonal is the result of randomly guessing positive (CH) X percent of the time. If you guess positive 90% of the time and the prevalence is 50%, your TPR will be 90% and your FPR will also be 90%, etc.
 
 The goal is for all nodes to bunch up in the upper left.
 
-Points to the left of the diagonal with a low TPR can be thought of as "conservative" predictors - they only make positive (CH) predictions with strong evidence.  Points to the left of the diagonal with a high TPR can be thought of as "liberal" predictors - they make positive (CH) predictions with weak evidence.
+Points to the left of the diagonal with a low TPR can be thought of as "conservative" predictors - they only make positive (CH) predictions with strong evidence. Points to the left of the diagonal with a high TPR can be thought of as "liberal" predictors - they make positive (CH) predictions with weak evidence.
 
 #### Gain Curve
 
 The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. The “wizard” curve is the gain curve when the data is sorted by the true outcome. If the model’s gain curve is close to the wizard curve, then the model predicted the response variable well. The gray area is the “gain” over a random prediction.
 
 ```{r include=FALSE}
-x <- oj_cart$fit %>% collect_predictions() %>% yardstick::gain_curve(Purchase, .pred_CH)
+x <- oj_cart_fit %>% collect_predictions() %>% yardstick::gain_curve(Purchase, .pred_CH)
 ```
 
 `r sum(oj_test$Purchase == "CH")` of the `r nrow(oj_test)` consumers in the holdout testing set purchased CH.
 
 ```{r}
-oj_cart$fit %>%
+oj_cart_fit %>%
   collect_predictions() %>%
   yardstick::gain_curve(Purchase, .pred_CH)
 ```
 
-* The gain curve encountered `r x[2, ]$.n_events` CH purchasers (`r x[2, ]$.percent_found %>% comma(.1)`%) within the first `r x[2, ]$.n` observations (`r x[2, ]$.percent_tested %>% comma(.1)`%). 
+-   The gain curve encountered `r x[2, ]$.n_events` CH purchasers (`r x[2, ]$.percent_found %>% comma(.1)`%) within the first `r x[2, ]$.n` observations (`r x[2, ]$.percent_tested %>% comma(.1)`%).
 
-* It encountered all `r sum(oj_test$Purchase == "CH")` CH purchasers on the `r x[8, ]$.n`th observation (100%).
+-   It encountered all `r sum(oj_test$Purchase == "CH")` CH purchasers on the `r x[8, ]$.n`th observation (100%).
 
-* The bottom of the gray area is the outcome of a random model. Only half the CH purchasers would be observed within 50% of the observations. The top of the gray area is the outcome of the perfect model, the “wizard curve”. Half the CH purchasers would be observed in ~30% of the observations.
+-   The bottom of the gray area is the outcome of a random model. Only half the CH purchasers would be observed within 50% of the observations. The top of the gray area is the outcome of the perfect model, the “wizard curve”. Half the CH purchasers would be observed in \~30% of the observations.
 
 ```{r}
-oj_cart$fit %>%
+oj_cart_fit %>%
   collect_predictions() %>%
   yardstick::gain_curve(Purchase, .pred_CH) %>%
   autoplot() +
@@ -320,7 +370,7 @@ oj_cart$fit %>%
 
 ## Regression Tree
 
-A simple regression tree is built in a manner similar to a simple classification tree, and like the simple classification tree, it is rarely invoked on its own; the bagged, random forest, and gradient boosting methods build on this logic.  
+A simple regression tree is built in a manner similar to a simple classification tree, and like the simple classification tree, it is rarely invoked on its own; the bagged, random forest, and gradient boosting methods build on this logic.
 
 The first step is to build a full tree, then perform k-fold cross-validation to help select the optimal cost complexity (cp). The only difference here is the `set_Mode("regression")` call to produce a regression tree.
 
@@ -364,13 +414,13 @@ cs_cart$tune_grid %>%
   scale_x_log10()
 ```
 
-The best models in terms of RMSE was the tree depth of 8 and any cp < 5.6E-04.
+The best models in terms of RMSE was the tree depth of 8 and any cp \< 5.6E-04.
 
 ```{r}
 cs_cart$tune %>% show_best(metric = "rmse")
 ```
 
-Select the best model in terms of rmse and finalize the model. 
+Select the best model in terms of rmse and finalize the model.
 
 ```{r}
 cs_cart$best_tune <- select_best(cs_cart$tune_grid, metric = "rmse")
@@ -385,7 +435,7 @@ cs_cart$fit <-
   last_fit(cs_split)
 ```
 
-Here is the tree. The output starts with the root node. The predicted sales at the root is the mean sales in the testing data set is `r cs_cart$fit %>% extract_workflow() %>% pluck("fit", "fit", "fit", "frame") %>% filter(var == "ShelveLoc") %>% head(1) %>% pull(yval) %>% comma(.01)` (values are \$000s). The deviance at the root is the SSE, `r cs_cart$fit %>% extract_workflow() %>% pluck("fit", "fit", "fit", "frame") %>% filter(var == "ShelveLoc") %>% head(1) %>% pull(dev) %>% comma(1)`. The first split is at `ShelveLoc` = [Bad, Medium] vs Good.
+Here is the tree. The output starts with the root node. The predicted sales at the root is the mean sales in the testing data set is `r cs_cart$fit %>% extract_workflow() %>% pluck("fit", "fit", "fit", "frame") %>% filter(var == "ShelveLoc") %>% head(1) %>% pull(yval) %>% comma(.01)` (values are \$000s). The deviance at the root is the SSE, `r cs_cart$fit %>% extract_workflow() %>% pluck("fit", "fit", "fit", "frame") %>% filter(var == "ShelveLoc") %>% head(1) %>% pull(dev) %>% comma(1)`. The first split is at `ShelveLoc` = \[Bad, Medium\] vs Good.
 
 ```{r}
 cs_cart$fit %>% extract_workflow()
@@ -409,7 +459,7 @@ cs_cart$fit %>%
   vip::vip()
 ```
 
-### Measuring Performance {-}
+### Measuring Performance {.unnumbered}
 
 `collect_metrics()` returns the RMSE, $RMSE = \sqrt{(1/2) \sum{(actual - pred)^2}})$ and the model $R^2$. The RMSE of `r cs_cart$fit %>% collect_metrics() %>% filter(.metric == "rmse") %>% pull(.estimate) %>% comma(.01)` in the test data set is pretty good considering the standard deviation of `Sales` is `r comma(sd(cs_test$Sales), .01)`.
 
@@ -417,7 +467,7 @@ cs_cart$fit %>%
 cs_cart$fit %>% collect_metrics()
 ```
 
-Here is a predicted vs actual plot. 
+Here is a predicted vs actual plot.
 
 ```{r}
 cs_cart$fit %>% 
@@ -435,11 +485,11 @@ The tree nodes do a decent job of binning the observations. The predictions vs a
 
 One drawback of decision trees is that they are high-variance estimators. A small number of additional training observations can dramatically alter the prediction performance of a learned tree.
 
-Bootstrap aggregation, or *bagging*, is a general-purpose procedure for reducing the variance of a statistical learning method.  The algorithm constructs *B* regression trees using *B* bootstrapped training sets, and averages the resulting predictions. These trees are grown deep, and are not pruned. Hence each individual tree has high variance, but low bias. Averaging the *B* trees reduces the variance.  The predicted value for an observation is the mode (classification) or mean (regression) of the trees. *B* usually equals ~25.
+Bootstrap aggregation, or *bagging*, is a general-purpose procedure for reducing the variance of a statistical learning method. The algorithm constructs *B* regression trees using *B* bootstrapped training sets, and averages the resulting predictions. These trees are grown deep, and are not pruned. Hence each individual tree has high variance, but low bias. Averaging the *B* trees reduces the variance. The predicted value for an observation is the mode (classification) or mean (regression) of the trees. *B* usually equals \~25.
 
 To test the model accuracy, the out-of-bag observations are predicted from the models. For a training set of size *n*, each tree is composed of $\sim (1 - e^{-1})n = .632n$ unique observations in-bag and $.368n$ out-of-bag. For each tree in the ensemble, bagging makes predictions on the tree's out-of-bag observations. I think (*see* page 197 of [@Kuhn2016]) bagging measures the performance (RMSE, Accuracy, ROC, etc.) of each tree in the ensemble and averages them to produce an overall performance estimate. (This makes no sense to me. If each tree has poor performance, then the average performance of many trees will still be poor. An ensemble of *B* trees will produce $\sim .368 B$ predictions per unique observation. Seems like you should take the mean/mode of each observation's prediction as the final prediction. Then you have *n* predictions to compare to *n* actuals, and you assess performance on that.)
 
-The downside to bagging is that there is no single tree with a set of rules to interpret. It becomes unclear which variables are more important than others. 
+The downside to bagging is that there is no single tree with a set of rules to interpret. It becomes unclear which variables are more important than others.
 
 The next section explains how bagged trees are a special case of random forests.
 
@@ -487,7 +537,7 @@ oj_bag$tune_grid %>%
   scale_x_log10()
 ```
 
-The best models in terms of accuracy and ROC was the tree depth of 4 and any cp <= 3.16e-06.
+The best models in terms of accuracy and ROC was the tree depth of 4 and any cp \<= 3.16e-06.
 
 ```{r}
 oj_bag$tune %>% show_best(metric = "accuracy")
@@ -548,7 +598,7 @@ oj_bag$fit %>%
   labs(title = "OJ Bagged Trees ROC Curve")
 ```
 
-The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. 
+The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value.
 
 ```{r}
 oj_bag$fit %>%
@@ -604,13 +654,13 @@ cs_bag$tune_grid %>%
   scale_x_log10()
 ```
 
-The best models in terms of RMSE was the tree depth of 8 and any cp < 5.6E-04.
+The best models in terms of RMSE was the tree depth of 8 and any cp \< 5.6E-04.
 
 ```{r}
 cs_bag$tune %>% show_best(metric = "rmse")
 ```
 
-Select the best model in terms of rmse and finalize the model. 
+Select the best model in terms of rmse and finalize the model.
 
 ```{r}
 cs_bag$best_tune <- select_best(cs_bag$tune_grid, metric = "rmse")
@@ -625,13 +675,13 @@ cs_bag$fit <-
   last_fit(cs_split)
 ```
 
-`collect_metrics()` returns the RMSE, $RMSE = \sqrt{(1/2) \sum{(actual - pred)^2}})$ and the model $R^2$. The RMSE of ` cs_bag$fit %>% collect_metrics() %>% filter(.metric == "rmse") %>% pull(.estimate) %>% comma(.01)` in the test data set is pretty good considering the standard deviation of `Sales` is ` comma(sd(cs_test$Sales), .01)`.
+`collect_metrics()` returns the RMSE, $RMSE = \sqrt{(1/2) \sum{(actual - pred)^2}})$ and the model $R^2$. The RMSE of `cs_bag$fit %>% collect_metrics() %>% filter(.metric == "rmse") %>% pull(.estimate) %>% comma(.01)` in the test data set is pretty good considering the standard deviation of `Sales` is `comma(sd(cs_test$Sales), .01)`.
 
 ```{r}
 cs_bag$fit %>% collect_metrics()
 ```
 
-Here is a predicted vs actual plot. 
+Here is a predicted vs actual plot.
 
 ```{r}
 cs_bag$fit %>% 
@@ -645,7 +695,7 @@ cs_bag$fit %>%
 
 ## Random Forests
 
-Random forests improve bagged trees by way of a small tweak that de-correlates the trees.  As in bagging, the algorithm builds a number of decision trees on bootstrapped training samples. But when building these decision trees, each time a split in a tree is considered, a random sample of *mtry* predictors is chosen as split candidates from the full set of *p* predictors.  A fresh sample of *mtry* predictors is taken at each split.  Typically $mtry \sim \sqrt{p}$.  Bagged trees are thus a special case of random forests where *mtry = p*.
+Random forests improve bagged trees by way of a small tweak that de-correlates the trees. As in bagging, the algorithm builds a number of decision trees on bootstrapped training samples. But when building these decision trees, each time a split in a tree is considered, a random sample of *mtry* predictors is chosen as split candidates from the full set of *p* predictors. A fresh sample of *mtry* predictors is taken at each split. Typically $mtry \sim \sqrt{p}$. Bagged trees are thus a special case of random forests where *mtry = p*.
 
 #### Random Forest Classification Tree
 
@@ -750,7 +800,7 @@ oj_rf$fit %>%
   labs(title = "OJ Random Forest ROC Curve")
 ```
 
-The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. 
+The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value.
 
 ```{r}
 oj_rf$fit %>%
@@ -810,7 +860,7 @@ The best models in terms of RMSE was 2000 tree with at least 2 data points per n
 cs_rf$tune %>% show_best(metric = "rmse")
 ```
 
-Select the best model in terms of rmse and finalize the model. 
+Select the best model in terms of rmse and finalize the model.
 
 ```{r}
 cs_rf$best_tune <- select_best(cs_rf$tune_grid, metric = "rmse")
@@ -831,7 +881,7 @@ cs_rf$fit <-
 cs_rf$fit %>% collect_metrics()
 ```
 
-Here is a predicted vs actual plot. 
+Here is a predicted vs actual plot.
 
 ```{r}
 cs_rf$fit %>% 
@@ -962,7 +1012,7 @@ oj_xgb$fit %>%
   labs(title = "OJ XGBoost ROC Curve")
 ```
 
-The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. 
+The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value.
 
 ```{r}
 oj_xgb$fit %>%
@@ -1022,7 +1072,7 @@ The best models in terms of RMSE was 500 trees with at least 21 data points per 
 cs_xgb$tune %>% show_best(metric = "rmse")
 ```
 
-Select the best model in terms of rmse and finalize the model. 
+Select the best model in terms of rmse and finalize the model.
 
 ```{r}
 cs_xgb$best_tune <- select_best(cs_xgb$tune_grid, metric = "rmse")
@@ -1043,7 +1093,7 @@ cs_xgb$fit <-
 cs_xgb$fit %>% collect_metrics()
 ```
 
-Here is a predicted vs actual plot. 
+Here is a predicted vs actual plot.
 
 ```{r}
 cs_xgb$fit %>% 
@@ -1054,4 +1104,3 @@ cs_xgb$fit %>%
    geom_abline(intercept = 0, slope = 1, linetype = 2) +
    labs(title = "Carseats Random Forest, Predicted vs Actual")
 ```
-
