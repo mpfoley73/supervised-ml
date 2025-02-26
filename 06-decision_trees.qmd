@@ -6,6 +6,8 @@ library(tidymodels)
 library(tictoc)
 library(rpart.plot)  # better formatted plots than the ones in rpart
 library(baguette)
+library(ggiraph)
+library(glue)
 
 tidymodels_prefer()
 
@@ -240,125 +242,116 @@ The confusion matrix calculates the model performance on the testing dataset.
 ```{r}
 #| code-fold: false
 
-oj_cart_conf_mtrx <-
+oj_cart_cm <-
   oj_cart_fit |>
   collect_predictions() |>
   conf_mat(truth = Purchase, estimate = .pred_class)
 
-summary(oj_cart_conf_mtrx)
+plot(oj_cart_cm$table, main = "Classification Tree Confusion Matrix")
 ```
 
-These measures come directly from the confusion matrix. The first value (CH) is considered a "positive" result and the second (MM) "negative". The metrics are usually expressed in terms of true and false positives and negatives.
+Several measures come directly from the confusion matrix. The first value (CH) is considered a "positive" (P) result and the second (MM) "negative" (N). The metrics are usually expressed in terms of true and false positives and negatives (TP, FP, TN, FN).
 
 ```{r}
 #| code-fold: false
 
-oj_cart_conf_mtrx
+oj_cart_cm
+
+summary(oj_cart_cm)
 ```
 
 | Metric | Desc   | Formula | Calculation |
 |--------|:-------|:------- |:------------|
-| **Accuracy** | Correct predictions percent. | $\frac{TP + FP}{total}$ | $\frac{117+67}{215}=.856$ |
-| **Sensitivity**, <br>**Recall** | Proportion of positives identified. | $\frac{TP}{TP + FN}$ | $\frac{117}{117+114}=.893$ |
+| **Accuracy** | Correct predictions percent. | $\frac{TP + TN}{total}$ | $\frac{117+67}{215}=.856$ |
+| **Cohen's Kappa** | Accuracy vs a "random system" | $\kappa = \frac{\text{Acc} - RA}{1-RA}$ where $RA = \frac{AN \cdot PN + AP \cdot PP}{total^2}$ | $\frac{.856 - .527}{1-.527} = .695$ |
+| **Sensitivity**, <br>**Recall** | Proportion of positives identified. | $\frac{TP}{TP + FN}$ | $\frac{117}{117+14}=.893$ |
 | **Specificity** | Proportion of negatives identified.   | $\frac{TN}{TN + FP}$ | $\frac{67}{67 + 17}=.798$ |
 | **Positive Predictive Value**, <br>**Precision** | Proportion of positive predictions that are correct. | $\frac{TP}{TP + FP}$ | $\frac{117}{117 + 17}=.873$ |
 | **Negative Predictive Value** | Proportion of negative predictions that are correct.   | $\frac{TN}{TN + FN}$ | $\frac{67}{67 + 14}=.827$ |
 | **F1-Score** | Harmonic mean of precision and recall.   | $2 \times \frac{\text{prec} \times \text{recall}} {\text{prec} + \text{recall}}$| $2 \times \frac{0.873 \times 0.893} {0.873 + 0.893} = .883$ |
 
 <br>
-You can bound the accuracy with a 95% CI using the binomial test.
+Which metric is appropriate? 
+
+- **Accuracy** is a natural starting point in cases like this where you aren't more concerned about identifying one outcome more than the other. However, be cautious when the dataset is imbalanced. The model accuracy was `r comma(summary(oj_cart_cm)[1, ]$.estimate, .001)`, but you could have achieved `r (sum(oj_cart_cm$table[1, ]) / sum(oj_cart_cm$table)) |> comma(.001)` just by predicting "CH" every time.
+
+- When the prevalence is not ~50%, use **Cohen's Kappa**. It compares the model accuracy to the accuracy of a random system. $\kappa = \frac{\text{Acc} - RA}{1-RA}$ where $RA = \frac{\text{AN} \cdot \text{PN} + \text{AP} \cdot \text{PP}}{\text{Tot}^2}$ is the hypothetical probability of a chance agreement.
+
+- If you want to minimize false alarms, e.g., in a spam detector, maximize **precision**.
+
+- Medical testing should balance catching positives (maximize **sensitivity**/**recall**) and false alarms (maximize **precision**). The **F1 score** gives you that balance.
+
+- If there is a presumption of a negative outcome, like in criminal trial, where false positives are more costly than false negatives, maximize **specificity**.
+
+Cohen's kappa was rather involved. Here is its calculation.
 
 ```{r}
-binom.test(
-  x = oj_cart_conf_mtrx$table %>% diag() %>% sum(), 
-  n = oj_cart_conf_mtrx$table %>% sum()
-)
+#| collapse: true
+
+AN <- sum(oj_cart_cm$table[, 2])
+PN <- sum(oj_cart_cm$table[2, ])
+AP <- sum(oj_cart_cm$table[, 1])
+PP <- sum(oj_cart_cm$table[1, ])
+
+true_preds <- sum(diag(oj_cart_cm$table))
+total_preds <- sum(oj_cart_cm$table)
+acc <- true_preds / total_preds
+
+(ra <- (AN*PN + AP*PP) / (total_preds)^2)
+
+(kap <- (acc - ra) / (1 - ra))
 ```
 
-The detection prevalence (aka, no information rate (NIR)) statistic is the class rate for the largest class. In this case CH is the largest class, so NIR = 133/213 = 0.6186. The binomial test for NIR is the probability of that the model accuracy is significantly better than the NIR (i.e., significantly better than just always guessing CH).
+If you use a metric that is a simple proportion, you can bound it with a 95% CI using the binomial test. For example, the accuracy was 184/215=.856. You can use these values in `binom.test()`. You might add a benchmark probability for comparison. The NIR (no information rate) statistic is the class rate for the larger class. It is the accuracy you would achieve by just guessing the more common outcome every time. Here, CH is the larger class, so NIR = 131/215 = 0.609. Comparing the accuracy to the NIR, this model is certainly superior to a naive guess.
 
 ```{r}
-binom.test(
-  x = oj_cart_conf_mtrx$table["CH", ] %>% sum(), 
-  n = oj_cart_conf_mtrx$table %>% sum(),
-  p = sum(oj_cart_conf_mtrx$table[, "CH"]) / sum(oj_cart_conf_mtrx$table),
-  alternative = "greater"
-)
-binom.test(x = 116 + 67, n = sum(oj_cart_conf_mtrx$table), 
-           p = (116+17)/sum(oj_cart_conf_mtrx$table), 
-           alternative = "greater")
-```
-
-The accuracy statistic indicates the model predicts `r summary(oj_cart_conf_mtrx) %>% filter(.metric == "accuracy") %>% pull(.estimate) %>% percent(.1)` of the observations correctly. That's good, but less impressive when you consider the prevalence of CH is `r (sum(oj_cart_conf_mtrx$table[1, ]) / sum(oj_cart_conf_mtrx$table)) %>% percent(.1)` - you could achieve that accuracy just by predicting CH every time. A measure that controls for the prevalence is Cohen's kappa statistic. The kappa statistic is explained [here](https://standardwisdom.com/softwarejournal/2011/12/confusion-matrix-another-single-value-metric-kappa-statistic/). It compares the accuracy to the accuracy of a "random system". It is defined as
-
-$$\kappa = \frac{\text{Accuracy} - RA}{1-RA}$$
-
-where
-
-$$RA = \frac{\text{ActFalse} \times \text{PredFalse} + \text{ActTrue} \times \text{PredTrue}}{\text{Total} \times \text{Total}}$$
-
-is the hypothetical probability of a chance agreement.
-
-The kappa statistic varies from 0 to 1 where 0 means accurate predictions occur merely by chance, and 1 means the predictions are in perfect agreement with the observations. In this case, a kappa statistic of 0.7064 is "substantial". See chart [here](https://www.statisticshowto.datasciencecentral.com/cohens-kappa-statistic/).
-
-You can remind yourself what the other confusion matrix measures are from the documentation. Visuals are almost always helpful. Here is a plot of the confusion matrix.
-
-```{r}
-oj_cart_fit %>% 
-  collect_predictions() %>% 
-  select(Purchase, .pred_class) %>%
-  plot(
-    main = "Simple Classification: Predicted vs. Actual",
-    xlab = "Actual",
-    ylab = "Predicted"
-  )
+nir <- sum(oj_cart_cm$table[, 1]) / sum(oj_cart_cm$table)
+binom.test(x = true_preds, n = total_preds, p = nir, alternative = "greater")
 ```
 
 #### ROC Curve {.unnumbered}
 
-The ROC (receiver operating characteristics) curve [@Fawcett2005] is another measure of accuracy. The ROC curve is a plot of the true positive rate (TPR, sensitivity) versus the false positive rate (FPR, 1 - specificity) for a set of thresholds. By default, the threshold for predicting the default classification is 0.50, but it could be any threshold. `precrec::evalmod()` calculates the confusion matrix values from the model using the holdout data set. The AUC on the holdout set is `r oj_cart_fit %>% collect_predictions() %>% yardstick::roc_auc(Purchase, .pred_CH) %>% pull(.estimate) %>% comma(.001)`. `pRoc::plot.roc()`, `plotROC::geom_roc()`, and `yardstick::roc_curve()` are options for plotting a ROC curve.
+The ROC (receiver operating characteristics) curve [@Fawcett2005] is another way to measure model performance. The ROC curve is a plot of the true positive rate (TPR, sensitivity) versus the false positive rate (FPR, 1 - specificity) for a set of thresholds. By default, the threshold for predicting the default classification is 0.50, but it could be any threshold. `yardstick::roc_curve` calculates the ROC curve and `roc_auc()` calculates the area under the curve. Generally, you are looking for a curve the at hugs the upper left corner of the grid. If you are looking for a balance between true- and false positives, you might use the plot to identify a probability threshold different from .5.
 
 ```{r}
-oj_cart_fit %>%
-  collect_predictions() %>%
-  yardstick::roc_curve(Purchase, .pred_CH) %>%
-  autoplot() +
-  labs(title = "OJ CART ROC Curve")
+#| code-fold: true
+
+p <-
+  oj_cart_fit |>
+  collect_predictions() |>
+  yardstick::roc_curve(Purchase, .pred_CH) |>
+  mutate(tt = glue("Threshold: {comma(.threshold, .001)}\n",
+                   "Specificity: {comma(specificity, .001)}\n",
+                   "Sensitivity: {comma(sensitivity, .001)}\n")) |>
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) +
+  geom_line() +
+  geom_point_interactive(aes(tooltip = tt)) +
+  labs(title = "Classification Tree ROC Curve")
+
+girafe(ggobj = p)
 ```
 
 A few points on the ROC space are helpful for understanding how to use it.
 
--   The lower left point (0, 0) is the result of *always* predicting "negative" or in this case "MM" if "CH" is taken as the default class. No false positives, but no true positives either.
--   The upper right point (1, 1) is the result of *always* predicting "positive" ("CH" here). You catch all true positives, but miss all the true negatives.
--   The upper left point (0, 1) is the result of perfect accuracy.
--   The lower right point (1, 0) is the result of perfect imbecility. You made the exact wrong prediction every time.
--   The 45 degree diagonal is the result of randomly guessing positive (CH) X percent of the time. If you guess positive 90% of the time and the prevalence is 50%, your TPR will be 90% and your FPR will also be 90%, etc.
+-   The upper right point (1, 1) is the result of *always* predicting "positive" (CH). You identify all the positives (sensitivity = 1), but miss all the negatives (specificity = 0).
+-   The lower left point (0, 0) is the opposite, the result of *always* predicting "negative" (MM).
+-   The upper left point (0, 1) is perfect accuracy.
+-   The lower right point (1, 0) is perfect imbecility, the wrong prediction every time.
+-   The 45 degree diagonal is the result of randomly guessing positive (CH) X percent of the time.
 
-The goal is for all nodes to bunch up in the upper left.
-
-Points to the left of the diagonal with a low TPR can be thought of as "conservative" predictors - they only make positive (CH) predictions with strong evidence. Points to the left of the diagonal with a high TPR can be thought of as "liberal" predictors - they make positive (CH) predictions with weak evidence.
-
-#### Gain Curve
-
-The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. The “wizard” curve is the gain curve when the data is sorted by the true outcome. If the model’s gain curve is close to the wizard curve, then the model predicted the response variable well. The gray area is the “gain” over a random prediction.
-
-```{r include=FALSE}
-x <- oj_cart_fit %>% collect_predictions() %>% yardstick::gain_curve(Purchase, .pred_CH)
-```
-
-`r sum(oj_test$Purchase == "CH")` of the `r nrow(oj_test)` consumers in the holdout testing set purchased CH.
+The goal is for all nodes to bunch up in the upper left. Points to the left of the diagonal with a low TPR can be thought of as "conservative" predictors - they only make positive (CH) predictions with strong evidence. Points to the left of the diagonal with a high TPR can be thought of as "liberal" predictors - they make positive (CH) predictions with weak evidence. A single value to characterize the ROC curve is the area under the curve. It can range from 0 - 1.
 
 ```{r}
-oj_cart_fit %>%
-  collect_predictions() %>%
-  yardstick::gain_curve(Purchase, .pred_CH)
+oj_cart_fit |> 
+  collect_predictions() |>
+  yardstick::roc_auc(Purchase, .pred_CH) |>
+  pull(.estimate)
 ```
 
--   The gain curve encountered `r x[2, ]$.n_events` CH purchasers (`r x[2, ]$.percent_found %>% comma(.1)`%) within the first `r x[2, ]$.n` observations (`r x[2, ]$.percent_tested %>% comma(.1)`%).
+#### Gain Curve {.unnumbered}
 
--   It encountered all `r sum(oj_test$Purchase == "CH")` CH purchasers on the `r x[8, ]$.n`th observation (100%).
+The gain curve plots the cumulative summed true outcome versus the fraction of items seen when sorted by the predicted value. The “wizard” curve is the gain curve when the data is sorted by the true outcome. If the model’s gain curve is close to the wizard curve, then the model predicted the response variable well. The gray area is the “gain” over a random prediction. 
 
--   The bottom of the gray area is the outcome of a random model. Only half the CH purchasers would be observed within 50% of the observations. The top of the gray area is the outcome of the perfect model, the “wizard curve”. Half the CH purchasers would be observed in \~30% of the observations.
 
 ```{r}
 oj_cart_fit %>%
@@ -367,6 +360,18 @@ oj_cart_fit %>%
   autoplot() +
   labs(title = "OJ CART Gain Curve")
 ```
+
+```{r include=FALSE}
+x <- oj_cart_fit %>% collect_predictions() %>% yardstick::gain_curve(Purchase, .pred_CH)
+```
+
+`r sum(oj_test$Purchase == "CH")` of the `r nrow(oj_test)` consumers in the holdout testing set purchased CH.
+
+-   The gain curve encountered `r x[2, ]$.n_events` CH purchasers (`r x[2, ]$.percent_found %>% comma(.1)`%) within the first `r x[2, ]$.n` observations (`r x[2, ]$.percent_tested %>% comma(.1)`%).
+
+-   It encountered all `r sum(oj_test$Purchase == "CH")` CH purchasers on the `r x[8, ]$.n`th observation (100%).
+
+-   The bottom of the gray area is the outcome of a random model. Only half the CH purchasers would be observed within 50% of the observations. The top of the gray area is the outcome of the perfect model, the “wizard curve”. Half the CH purchasers would be observed in \~30% of the observations.
 
 ## Regression Tree
 
