@@ -2,6 +2,8 @@ project:
   type: book
   output-dir: docs
 
+favicon: favicon.ico
+
 book:
   title: "Supervised Machine Learning"
   author: "Michael Foley"
