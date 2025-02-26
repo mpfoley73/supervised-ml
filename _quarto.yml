@@ -2,13 +2,12 @@ project:
   type: book
   output-dir: docs
 
-favicon: favicon.ico
-
 book:
   title: "Supervised Machine Learning"
   author: "Michael Foley"
   date: today
   cover-image: cover.png
+  favicon: favicon.ico
   chapters:
     - index.qmd
     - 01-linear_regression.qmd

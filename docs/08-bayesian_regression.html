@@ -66,6 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta name="quarto:offset" content="./">
 <link href="./09-emmeans.html" rel="next">
 <link href="./07-support_vector_machines.html" rel="prev">
+<link href="./favicon.ico" rel="icon">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -267,8 +268,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 9.8e-05 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.98 seconds.
+Chain 1: Gradient evaluation took 5.8e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.58 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -285,15 +286,15 @@ Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 0.044 seconds (Warm-up)
-Chain 1:                0.059 seconds (Sampling)
-Chain 1:                0.103 seconds (Total)
+Chain 1:  Elapsed Time: 0.067 seconds (Warm-up)
+Chain 1:                0.082 seconds (Sampling)
+Chain 1:                0.149 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
 Chain 2: 
-Chain 2: Gradient evaluation took 1.1e-05 seconds
-Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+Chain 2: Gradient evaluation took 1.2e-05 seconds
+Chain 2: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
 Chain 2: Adjust your expectations accordingly!
 Chain 2: 
 Chain 2: 
@@ -310,15 +311,15 @@ Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 0.047 seconds (Warm-up)
-Chain 2:                0.056 seconds (Sampling)
-Chain 2:                0.103 seconds (Total)
+Chain 2:  Elapsed Time: 0.049 seconds (Warm-up)
+Chain 2:                0.061 seconds (Sampling)
+Chain 2:                0.11 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 1.1e-05 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
+Chain 3: Gradient evaluation took 1.3e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.13 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -335,15 +336,15 @@ Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 0.048 seconds (Warm-up)
-Chain 3:                0.06 seconds (Sampling)
-Chain 3:                0.108 seconds (Total)
+Chain 3:  Elapsed Time: 0.051 seconds (Warm-up)
+Chain 3:                0.065 seconds (Sampling)
+Chain 3:                0.116 seconds (Total)
 Chain 3: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
 Chain 4: 
-Chain 4: Gradient evaluation took 1.2e-05 seconds
-Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
+Chain 4: Gradient evaluation took 1.3e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.13 seconds.
 Chain 4: Adjust your expectations accordingly!
 Chain 4: 
 Chain 4: 
@@ -360,9 +361,9 @@ Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 4: 
-Chain 4:  Elapsed Time: 0.059 seconds (Warm-up)
-Chain 4:                0.073 seconds (Sampling)
-Chain 4:                0.132 seconds (Total)
+Chain 4:  Elapsed Time: 0.047 seconds (Warm-up)
+Chain 4:                0.058 seconds (Sampling)
+Chain 4:                0.105 seconds (Total)
 Chain 4: </code></pre>
 </div>
 <details open="" class="code-fold">
@@ -385,7 +386,7 @@ Model Info:
 
 Estimates:
               mean   sd   10%   50%   90%
-(Intercept) 25.9    6.0 18.2  25.9  33.6 
+(Intercept) 25.8    6.0 18.0  25.7  33.6 
 mom_iq       0.6    0.1  0.5   0.6   0.7 
 sigma       18.3    0.6 17.5  18.3  19.1 
 
@@ -397,11 +398,11 @@ The mean_ppd is the sample average posterior predictive distribution of the outc
 
 MCMC diagnostics
               mcse Rhat n_eff
-(Intercept)   0.1  1.0  4098 
-mom_iq        0.0  1.0  4093 
-sigma         0.0  1.0  3972 
-mean_PPD      0.0  1.0  3659 
-log-posterior 0.0  1.0  1966 
+(Intercept)   0.1  1.0  3785 
+mom_iq        0.0  1.0  3783 
+sigma         0.0  1.0  3821 
+mean_PPD      0.0  1.0  3628 
+log-posterior 0.0  1.0  1931 
 
 For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure of effective sample size, and Rhat is the potential scale reduction factor on split chains (at convergence Rhat=1).</code></pre>
 </div>
@@ -413,8 +414,8 @@ For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure
 <pre><code># A tibble: 2 × 3
   term        estimate std.error
   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
-1 (Intercept)   25.9      6.00  
-2 mom_iq         0.609    0.0596</code></pre>
+1 (Intercept)   25.7      6.02  
+2 mom_iq         0.610    0.0597</code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Show the code</summary>
@@ -422,9 +423,9 @@ For each parameter, mcse is Monte Carlo standard error, n_eff is a crude measure
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>                    5%        95%
-(Intercept) 15.9076405 35.8096606
-mom_iq       0.5123667  0.7077018
-sigma       17.3416781 19.3581018</code></pre>
+(Intercept) 15.9990644 35.7909355
+mom_iq       0.5120652  0.7074792
+sigma       17.2890977 19.3266815</code></pre>
 </div>
 </div>
 <p>By default, <strong>rstanarm</strong> priors are normal distributions with mean 0 and variance equal to a scaler multiple of the data variance.</p>
@@ -486,8 +487,8 @@ See help('prior_summary.stanreg') for more details</code></pre>
 <pre><code>
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 1).
 Chain 1: 
-Chain 1: Gradient evaluation took 1.5e-05 seconds
-Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.15 seconds.
+Chain 1: Gradient evaluation took 1.8e-05 seconds
+Chain 1: 1000 transitions using 10 leapfrog steps per transition would take 0.18 seconds.
 Chain 1: Adjust your expectations accordingly!
 Chain 1: 
 Chain 1: 
@@ -504,9 +505,9 @@ Chain 1: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 1: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 1: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 1: 
-Chain 1:  Elapsed Time: 0.046 seconds (Warm-up)
-Chain 1:                0.067 seconds (Sampling)
-Chain 1:                0.113 seconds (Total)
+Chain 1:  Elapsed Time: 0.05 seconds (Warm-up)
+Chain 1:                0.068 seconds (Sampling)
+Chain 1:                0.118 seconds (Total)
 Chain 1: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 2).
@@ -529,15 +530,15 @@ Chain 2: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 2: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 2: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 2: 
-Chain 2:  Elapsed Time: 0.052 seconds (Warm-up)
-Chain 2:                0.068 seconds (Sampling)
-Chain 2:                0.12 seconds (Total)
+Chain 2:  Elapsed Time: 0.053 seconds (Warm-up)
+Chain 2:                0.061 seconds (Sampling)
+Chain 2:                0.114 seconds (Total)
 Chain 2: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 3).
 Chain 3: 
-Chain 3: Gradient evaluation took 1.3e-05 seconds
-Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.13 seconds.
+Chain 3: Gradient evaluation took 1.1e-05 seconds
+Chain 3: 1000 transitions using 10 leapfrog steps per transition would take 0.11 seconds.
 Chain 3: Adjust your expectations accordingly!
 Chain 3: 
 Chain 3: 
@@ -554,15 +555,15 @@ Chain 3: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 3: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 3: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 3: 
-Chain 3:  Elapsed Time: 0.051 seconds (Warm-up)
-Chain 3:                0.071 seconds (Sampling)
-Chain 3:                0.122 seconds (Total)
+Chain 3:  Elapsed Time: 0.073 seconds (Warm-up)
+Chain 3:                0.058 seconds (Sampling)
+Chain 3:                0.131 seconds (Total)
 Chain 3: 
 
 SAMPLING FOR MODEL 'continuous' NOW (CHAIN 4).
 Chain 4: 
-Chain 4: Gradient evaluation took 1e-05 seconds
-Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.1 seconds.
+Chain 4: Gradient evaluation took 1.2e-05 seconds
+Chain 4: 1000 transitions using 10 leapfrog steps per transition would take 0.12 seconds.
 Chain 4: Adjust your expectations accordingly!
 Chain 4: 
 Chain 4: 
@@ -579,9 +580,9 @@ Chain 4: Iteration: 1600 / 2000 [ 80%]  (Sampling)
 Chain 4: Iteration: 1800 / 2000 [ 90%]  (Sampling)
 Chain 4: Iteration: 2000 / 2000 [100%]  (Sampling)
 Chain 4: 
-Chain 4:  Elapsed Time: 0.041 seconds (Warm-up)
-Chain 4:                0.069 seconds (Sampling)
-Chain 4:                0.11 seconds (Total)
+Chain 4:  Elapsed Time: 0.04 seconds (Warm-up)
+Chain 4:                0.054 seconds (Sampling)
+Chain 4:                0.094 seconds (Total)
 Chain 4: </code></pre>
 </div>
 </div>
@@ -602,7 +603,7 @@ Chain 4: </code></pre>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-0.09451 0.18493 0.20682 0.20694 0.22914 0.31866 </code></pre>
+0.09727 0.18469 0.20561 0.20717 0.23031 0.32374 </code></pre>
 </div>
 <details open="" class="code-fold">
 <summary>Show the code</summary>
@@ -610,7 +611,7 @@ Chain 4: </code></pre>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>     2.5%     97.5% 
-0.1448767 0.2693601 </code></pre>
+0.1440839 0.2734257 </code></pre>
 </div>
 </div>
 <p>Bayesian regression has other model fit statistics.</p>
@@ -624,7 +625,7 @@ Chain 4: </code></pre>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  67.44   78.81   84.78   86.12   92.75  111.21 </code></pre>
+  69.03   79.86   85.54   86.82   93.13  110.72 </code></pre>
 </div>
 </div>
 <p>Or produce a posterior predictive model check.</p>
@@ -682,12 +683,12 @@ Chain 4: </code></pre>
 Computed from 4000 by 434 log-likelihood matrix.
 
          Estimate   SE
-elpd_loo  -1878.9 14.9
-p_loo         2.9  0.3
-looic      3757.8 29.8
+elpd_loo  -1879.0 14.9
+p_loo         3.0  0.3
+looic      3757.9 29.8
 ------
 MCSE of elpd_loo is 0.0.
-MCSE and ESS estimates assume MCMC draws (r_eff in [0.7, 1.1]).
+MCSE and ESS estimates assume MCMC draws (r_eff in [0.8, 1.0]).
 
 All Pareto k estimates are good (k &lt; 0.7).
 See help('pareto-k-diagnostic') for details.</code></pre>
