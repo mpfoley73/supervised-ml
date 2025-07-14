@@ -1,187 +1,243 @@
-```{r include=FALSE}
+```{r}
+#| include: false
+
 library(tidyverse)
 library(tidymodels)
 library(gtsummary)
 library(janitor)
-library(emmeans)
-library(ggeffects)
-
-emm_pal <- c(fish = "#228B22", skim = "#A0522D", soy = "#6A5ACD", total = "#333333")
-
-set.seed(123)
 ```
 
 # Estimated Marginal Means {#EMMs}
 
-Estimated marginal means (EMMs) are the marginal means of the predicted values from a reference grid. Data set `pigs` is an observational study of the leucine concentration (`conc`) in 29 pigs whose diets differed in two attributes: `source` (fish, soy, milk) and protein `percent` (9, 12, 15, 18).
+Estimated marginal means (EMMs) are the mean predicted values for a specified combination of predictor values. Whereas ordinary marginal means are conditional means of the raw data, EMMs are conditional means of _modeled_ data. Use the `emmeans` package to calculate EMMs.
+
+```{r}
+library(emmeans)
+```
+
+Let's work with the `mtcars` dataset. Suppose you are interested in `mpg` as the outcome variable and are exploring differences in levels of factor variable, `cyl`. Your model will control for factor variable, `gear`, and continuous variable, `disp`. 
 
 ```{r}
 #| code-fold: false
-data(pigs, package = "emmeans")
 
-pigs <- pigs %>% mutate(percent = factor(percent))
+my_cars <- 
+  mtcars |>
+  mutate(across(c(cyl, gear), factor)) |>
+  select(mpg, cyl, gear, disp)
 ```
-
-A plot of the data shows concentration increases varies by source, and increases with protein percent.
 
 ```{r}
 #| code-fold: true
-bind_rows(
-  pigs |> summarize(.by = c(source, percent), M = mean(conc), n = n()),
-  pigs |> mutate(source = "total") |> 
-    summarize(.by = c(source, percent), M = mean(conc), n = n())
+
+gtsummary::tbl_summary(
+  my_cars,
+  by = cyl,
+  statistic = list(all_continuous() ~ "{mean}, {sd}"),
+  digits = all_continuous() ~ 1
 ) |>
-  ggplot(aes(x = percent, y = M, color = source)) +
-  geom_point(aes(size = n)) +
-  geom_line(aes(group = source), linewidth = 1) +
-  labs(
-    color = NULL, y = "Mean Concentration", size = "pigs",
-    title = "Leucine concentration by protein percent vs food source for 29 pigs."
-  ) +
-  scale_color_manual(values = emm_pal) +
-  theme(legend.position = "top", legend.justification = "left")
+  add_overall() |>
+  modify_header(label ~ "**Variable**") |>
+  modify_spanning_header(c("stat_1", "stat_2", "stat_3") ~ "**cyl**") |>
+  as_gt() |>
+  gt::tab_header(title = "Summary Statistics")
 ```
 
-This is an instance of Simpson's paradox: concentration increases with percent for each source, but _decreases_ at percent 18 when not grouping. The culprit is the over-weighted fish group (*n* = 3) at percent 18.
-
-## Ordinary and Estimated Marginal Means
-
-The "ordinary" marginal means (OMM) are just the conditional means of the data. The OMM monotonically increases until percent = 18.
+We'll fit two models to illustrate how emmeans work: an intercept-only model and the full model.
 
 ```{r}
 #| code-fold: false
-pigs |> summarize(.by = percent, OMM = mean(conc))
-```
 
-The _estimated_ marginal means are the means of a model's predicted values over some reference grid. Fit the inverse concentration (that's the best linear relationship).
-
-```{r}
-#| code-fold: false
-mdl <- 
+fit_intercept <- 
   linear_reg() |>
-  fit(inverse(conc) ~ ., data = pigs) |>
+  fit(mpg ~ 1, data = my_cars) |>
+  extract_fit_engine()
+
+fit_full <-
+  linear_reg() |>
+  fit(mpg ~ cyl + disp + gear, data = my_cars) |>
   extract_fit_engine()
 ```
 
-```{r include=FALSE, eval=FALSE}
-#| code-fold: true
-tbl_regression(mdl, estimate_fun = label_style_number(digits = 4))
-```
-
-The reference grid is a grid of the model predictor variables. For factor vars, there's a row for each level, and for continuous vars, there is a row for the mean. The manual way to calculate this is
-
-```{r}
-#| code-fold: false
-RG <- expand.grid(source = levels(pigs$source), percent = levels(pigs$percent))
-
-augment(mdl, newdata = RG) |>
-  summarize(.by = percent, EMM = 1 / mean(.fitted)) 
-```
-
-That's what `emmeans()` does by default. This is like a weighted average so that groups with many observations are underweighted.
-
-```{r}
-#| code-fold: false
-emmeans(mdl, "percent", type = "response")
-```
-
-## ggeffects
-
-The **ggeffects** package does a nice job working with EMMs.
-
-```{r}
-#| code-fold: false
-mdl_2 <- 
-  linear_reg() |> 
-  fit(1/conc ~ ., data = pigs) |>
-  extract_fit_engine() 
-
-predict_response(mdl_2, terms = "percent", margin = "marginalmeans")
-```
-
-You can pipe the responses right into **ggplot**.
-
 ```{r}
 #| code-fold: true
-predict_response(mdl_2, terms = c("percent", "source")) |>
-  ggplot(aes(x = x, y = predicted, color = group)) +
-  geom_point(size = 1.5) +
-  geom_line(aes(group = group), size = 1) +
-  labs(
-    title = "Marginal predicted values of leucine from regression model.",
-    y = "Marginal predicted concentration", x = "protein percent"
-  ) +
-  scale_color_manual(values = emm_pal) +
-  theme(legend.position = "top", legend.justification = "left")
+
+gt_intercept <-
+  tbl_regression(fit_intercept, intercept = TRUE, conf.int = FALSE) |>
+  gtsummary::add_significance_stars(hide_se = TRUE)
+
+gt_full <-
+  tbl_regression(fit_full, intercept = TRUE, conf.int = FALSE) |>
+  gtsummary::add_significance_stars(hide_se = TRUE)
+
+tbl_merge(
+  list(gt_intercept, gt_full),
+  tab_spanner = c("**Intercept**", "**Full Model**")
+) |>
+  as_gt() |>
+  gt::fmt_number(decimals = 3) |>
+  gt::tab_header(title = "Regression summary")
 ```
 
-## Nusisance Variables
-
-Suppose you have a model with several predictors and want to estimate the marginal means for a factor. Let's create a dataset to estimate the effect of sex on salary. By construction, salary is a function only of career level, but, 2/3 of entry-level employees are female, and only 2/5 of senior-level employees are female. Our EMM analysis should convey this. We'll throw in age just to have a continuous variable in model.
+Controlling for `disp` an `gear`, relative to reference level `cyl4`,  `cyl6` reduces expected `mpg` by 4.800 mpg while `cyl8` reduces it slightly more, but without statistical significance at the .05 level. One way to interpret the fit is by calculating the expected value at a set of predictor variable levels. You might fix `disp` at the dataset average, and take the combinations of levels in `cyl` and `gear`. That's nine combinations of predictors. 
 
 ```{r}
 #| code-fold: false
 
-set.seed(123)
-
-sal_dat <- tibble(
-  salary = c(rnorm(30, 30e3, 2e3), rnorm(15, 50e3, 3e3), rnorm(5, 100e3, 5e3)),
-  car_level = c(rep("Entry", 30), rep("Mid", 15), rep("Senior", 5)),
-  sex = c(rep("F",20), rep("M",10), rep("F",8), rep("M",7), rep("F",2), rep("M",3)),
-  age = c(rnorm(30, 25, 2), rnorm(15, 40, 2), rnorm(5, 55, 2))
+newdata <- expand.grid(
+  cyl = levels(my_cars$cyl), 
+  disp = mean(my_cars$disp),
+  gear = levels(my_cars$gear)
 )
 
-sal_fit <-
-  linear_reg() |>
-  fit(salary ~ car_level + sex + age, data = sal_dat) |>
-  extract_fit_engine()
-
-sal_fit |> tidy()
+(my_preds <- augment(fit_full, newdata = newdata))
 ```
 
-As designed, `sex` and `age` are insignificant while `car_level` is significant and a large. Let's calculate the EMMs for `sex`.
+The estimated marginal mean is the mean of `my_preds$.fitted`, `r comma(mean(my_preds$.fitted), .01)`. This prediction dataset (reference grid) is what `emmeans()` uses by default. `emmeans()` makes predictions across a _reference grid_, then averages the predictions by the `specs` setting. As bonus, you get the confidence interval around the expected value. Set `specs = "1"` to predict the mean over the grid.
 
 ```{r}
-(sal_emm_1 <- emmeans(sal_fit, specs = "sex"))
+#| code-fold: false
+
+emmeans(fit_full, specs = "1")
 ```
 
-`emmeans()` averaged the predicted values from the default reference grid. The grid is the combination of factor levels and means of continuous variables.
+You can see the reference grid or create a new one using `ref_grid()`.
 
 ```{r}
-ref_grid(sal_fit) |> tidy()
+#| code-fold: false
+
+ref_grid(fit_full)
 ```
 
-The EMM for `sex=F` (\$61,281) is the average of the three `sex=F` salaries in the reference grid. From here, you can use `contrast()` to say females get paid a premium of \$354 and men get paid \$354 less (although neither result is significant).
+Instead of averaging _over_ the levels of `cyl`, you can average _by_ each level.
+ 
+```{r}
+#| code-fold: false
+
+(emm_cyl <- emmeans(fit_full, specs = "cyl"))
+```
+
+## Level Comparisons
+
+### Pairwise
+
+Calculate EMM pairwise differences with `pairs()`.
 
 ```{r}
-emmeans::contrast(sal_emm_1)
+#| code-fold: false
+
+emmeans(fit_full, specs = "cyl") |>
+  pairs()
 ```
 
-\$354 more (less) than what though? Well, it's \$354 less than whatever predicted value you would have at any career level (at the average age). A nice reference point is the "mediod" employee - the employee who is a proportional mixture of all career levels and all sexes. Not the proportional mixture of the combinations (women are entry-level, men senior-level), but just the proportional mixture of all variables taken independently. The way to do that is by reducing "nuisance" factor levels into a single set. Instead of `car_levelEntry = [0,1]`, we let it, and each other level, have a continuous range, with the sum across levels adding to 1. The values could be equal, but far better for them to be prortional - .6 for entry-level, .3 for mid-level, and .1 for senior.
+Cohen's *d* effect size standardizes the differences by dividing by the model residual standard error. An effect size over .8 is large, .5 medium, and .2 small. The 95% CI crosses zero, so there may be no measurable effects here.
 
 ```{r}
-(nuis_grid <- ref_grid(sal_fit, nuisance = "car_level", wt.nuis = "proportional"))
+#| code-fold: false
+
+emmeans(fit_full, specs = "cyl") |> 
+  eff_size(sigma = sigma(fit_full), edf = df.residual(fit_full))
 ```
 
-Now let's see the EMMs and contrast.
+### One vs Whole
+
+Instead of comparing groups to each other, you might compare groups to the *whole* using a contrast. The default is to subtract the grand mean, the mean of the three EMMs, `r comma(mean(tidy(emm_cyl)$estimate), .001)`, from each EMM.
 
 ```{r}
-(sal_emm_2 <- emmeans(nuis_grid, specs = "sex"))
+#| code-fold: false
+
+emmeans(fit_full, specs = "cyl") |> 
+  contrast()
 ```
 
-Those are more realistic marginal means. The contrast is still the same.
+If group sizes are imbalanced, as they are here, subtract the *weighted* grand mean. The population sizes are `4` = 11, `6` = 7, `8` = 14, so the weighted grand mean is `r emm_cyl |> tidy() |> mutate(estimate = estimate * case_match(cyl, "4"~11/32, "6"~7/32, "8"~14/32)) |> pull(estimate) |> sum() |> comma(.01)`.
 
 ```{r}
-contrast(sal_emm_2)
+#| code-fold: false
+
+emmeans(fit_full, specs = "cyl") |> 
+  contrast(wts = NA)
 ```
 
-But now the reference point is the "mediod" employee.
+### One vs Others
+
+The contrast shows how each leave relates to the whole. That feels strange because each level biases the whole toward its value. Instead, you can create a contrast that shows how each level relates to the other levels. The estimates below are each EMM minus the average of the other EMMs. The EMM for `cyl=4` was `r comma(tidy(emm_cyl)$estimate[1], .001)`. The average of the other two EMMs was `mean c(18.2, 21.5)` = `r comma(mean(tidy(emm_cyl)$estimate[2:3]), .001)`.
 
 ```{r}
-emmeans(nuis_grid, specs = ~1)
+#| code-fold: false
+
+emmeans(fit_full, specs = "cyl") |> 
+  contrast("del.eff")
 ```
 
-Finally, how about this slick way to show EMMs? We'll show the reference point, then all factor levels. (Code below pretends .5 is a significant level, just so I can show the color contrast.)
+The expected `mpg` of a car with `cyl=4` is 4.83 mpg higher than the average expected value of the other `cyl` levels. You can uses a weighted average instead with `wts = NA`.
+
+## Nuisance Variables
+
+By "expected", we specifically mean the _average predicted value across the reference grid_. Our grid includes the mean `disp` and the three levels of `gear`.
+
+```{r}
+#| code-fold: false
+
+ref_grid(fit_full)
+```
+
+So the EMMs are averaging over 9 predictions:
+
+```{r}
+#| code-fold: false
+
+ref_grid(fit_full) |> tidy()
+```
+
+That's great except that `gear` is kind of a nuisance. It would be preferable to predict on the "average" `gear`, just like we predicted on the average `disp`. Well, you can! Recall that models one-hot encode factor variables, so you get `gear3 = 0|1`, `gear4 = 0|1`, and `gear5 = 0|1`. What if instead of three combinations you predicted on `gear3=1/3`, `gear4=1/3`, and `gear5=1/3`?
+
+```{r}
+#| code-fold: false
+
+(nuis_grid_0 <- ref_grid(fit_full, nuisance = "gear"))
+```
+
+Now we have just three predictions. Each estimate below uses the simple average of the three `gear` levels above.
+
+```{r}
+#| code-fold: false
+
+tidy(nuis_grid_0)
+```
+
+This is closer to the "typical" car, but we can do even better by weighting the levels proportionally to their frequency (`gear3=15/32`, `gear4=12/32`, and `gear5=5/32`).
+
+```{r}
+#| code-fold: false
+
+nuis_grid <- ref_grid(fit_full, nuisance = "gear", wt.nuis = "proportional")
+
+tidy(nuis_grid)
+```
+
+Now the one vs others contrast is more like the "average" car, varying only the number of cylinders. Recall, the default is to weight the other two EMMs equally, and `wts = NA` weights them by `cyl` count.
+
+```{r}
+#| code-fold: false
+
+emmeans(nuis_grid, specs = "cyl") |>
+  contrast("del.eff", wts = NA) |> 
+  tidy()
+```
+
+So the expected value of `cyl4` is 4.837 mpg greater than the weighted average of the other `cyl` levels.
+
+## Reporting EMM + Contrast
+
+Sometimes reporting model coefficients suffers from lack of context. The model fit coefficient for `cyl6` indicates it reduces the expected `mpg` by 4.800 relative to `cyl4`. That's less useful if you don't have a baseline `mpg` to compare 4.800 to. Instead, you might report that a 'representative' (mediod?) car, that is, a car with a proportional mix of all modeled car attributes, has an expected `mpg` of 20.091 (intercept-only model) and the effect of fixing `cyl = 4` is to increase this expected value by 3.174 to 23.265, and fixing `cyl = 6` decreases it 1.625 to 18.465. 
+
+```{r}
+#| code-fold: false
+
+emmeans(nuis_grid, specs = "cyl") |> contrast(wts = NA) |> tidy()
+```
+
+We can report this in a single row.
 
 ```{r}
 #| code-fold: true
@@ -194,8 +250,9 @@ contrast_color <- function(bg) {
 
 smry <- 
   bind_rows(
-    emmeans(sal_emm_2, specs = ~1) |> tidy() |> rename(contrast = `1`),
-    contrast(sal_emm_2) |> tidy()
+    ref_grid(fit_full, nuisance = c("cyl", "gear"), wt.nuis = "proportional") |> 
+      emmeans(specs = "1") |> tidy() |> rename(contrast = `1`),
+    emmeans(nuis_grid, specs = "cyl") |> contrast(wts = NA) |> tidy()
   ) |>
   select(contrast, estimate, adj.p.value) |>
   mutate(contrast = fct_relevel(contrast, "overall", after = 0)) |>
@@ -203,8 +260,8 @@ smry <-
   mutate(
     pct = estimate / first(estimate),
     bg = case_when(
-      adj.p.value < .50 & estimate < 0 ~ "firebrick",
-      adj.p.value < .50 & estimate > 0 ~ "dodgerblue",
+      adj.p.value < .05 & estimate < 0 ~ "firebrick",
+      adj.p.value < .05 & estimate > 0 ~ "dodgerblue",
       TRUE ~ "white"
     ),
     color = contrast_color(bg)
@@ -215,7 +272,7 @@ smry |>
   mutate(contrast = str_remove(contrast, " effect")) |>
   pivot_wider(names_from = contrast, values_from = estimate) |>
   gt::gt() |>
-  gt::fmt_currency(decimals = 0) |>
+  gt::fmt_number(decimals = 3) |>
   gt::tab_spanner("Effect", columns = 2:3) |>
   gt::tab_header(title = "Effect of gender on estimated marginal means.") |>
   gt::tab_options(heading.align = "left") |>
@@ -236,7 +293,6 @@ smry |>
     locations = gt::cells_body(columns = which(smry$color == "black"))
   )
 ```
-
 
 ## Learn More
 
