@@ -217,15 +217,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#level-comparisons" id="toc-level-comparisons" class="nav-link active" data-scroll-target="#level-comparisons"><span class="header-section-number">9.1</span> Level Comparisons</a>
+  <li><a href="#calculating-emms" id="toc-calculating-emms" class="nav-link active" data-scroll-target="#calculating-emms"><span class="header-section-number">9.1</span> Calculating EMMs</a></li>
+  <li><a href="#level-comparisons" id="toc-level-comparisons" class="nav-link" data-scroll-target="#level-comparisons"><span class="header-section-number">9.2</span> Level Comparisons</a>
   <ul>
-  <li><a href="#pairwise" id="toc-pairwise" class="nav-link" data-scroll-target="#pairwise"><span class="header-section-number">9.1.1</span> Pairwise</a></li>
-  <li><a href="#one-vs-whole" id="toc-one-vs-whole" class="nav-link" data-scroll-target="#one-vs-whole"><span class="header-section-number">9.1.2</span> One vs Whole</a></li>
-  <li><a href="#one-vs-others" id="toc-one-vs-others" class="nav-link" data-scroll-target="#one-vs-others"><span class="header-section-number">9.1.3</span> One vs Others</a></li>
+  <li><a href="#pairwise" id="toc-pairwise" class="nav-link" data-scroll-target="#pairwise">Pairwise</a></li>
+  <li><a href="#one-vs-whole" id="toc-one-vs-whole" class="nav-link" data-scroll-target="#one-vs-whole">One vs Whole</a></li>
+  <li><a href="#one-vs-others" id="toc-one-vs-others" class="nav-link" data-scroll-target="#one-vs-others"><span class="header-section-number">9.2.1</span> One vs Others</a></li>
   </ul></li>
-  <li><a href="#nuisance-variables" id="toc-nuisance-variables" class="nav-link" data-scroll-target="#nuisance-variables"><span class="header-section-number">9.2</span> Nuisance Variables</a></li>
-  <li><a href="#reporting-emm-contrast" id="toc-reporting-emm-contrast" class="nav-link" data-scroll-target="#reporting-emm-contrast"><span class="header-section-number">9.3</span> Reporting EMM + Contrast</a></li>
-  <li><a href="#learn-more" id="toc-learn-more" class="nav-link" data-scroll-target="#learn-more"><span class="header-section-number">9.4</span> Learn More</a></li>
+  <li><a href="#nuisance-variables" id="toc-nuisance-variables" class="nav-link" data-scroll-target="#nuisance-variables"><span class="header-section-number">9.3</span> Nuisance Variables</a></li>
+  <li><a href="#reporting-emm-contrast" id="toc-reporting-emm-contrast" class="nav-link" data-scroll-target="#reporting-emm-contrast"><span class="header-section-number">9.4</span> Reporting EMM + Contrast</a></li>
+  <li><a href="#learn-more" id="toc-learn-more" class="nav-link" data-scroll-target="#learn-more"><span class="header-section-number">9.5</span> Learn More</a></li>
   </ul>
 </nav>
     </div>
@@ -251,53 +252,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Estimated marginal means (EMMs) are the mean predicted values for a specified combination of predictor values. Whereas ordinary marginal means are conditional means of the raw data, EMMs are conditional means of <em>modeled</em> data. Use the <code>emmeans</code> package to calculate EMMs.</p>
+<p>I’m modeling the effect of the number of cylinders on vehicle fuel economy. I don’t think <code>cyl</code> should matter if you control for <code>disp</code> and <code>gear</code>. Take a look at this regression output. What do you think? The coefficient for <code>cyl=6</code> is -4.8 (<em>p</em> = .009), but <code>cyl=8</code> is indistinguishable from <code>cyl=4</code>.</p>
 <div class="cell">
-<details open="" class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p>Let’s work with the <code>mtcars</code> dataset. Suppose you are interested in <code>mpg</code> as the outcome variable and are exploring differences in levels of factor variable, <code>cyl</code>. Your model will control for factor variable, <code>gear</code>, and continuous variable, <code>disp</code>.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>my_cars <span class="ot">&lt;-</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  mtcars <span class="sc">|&gt;</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(cyl, gear), factor)) <span class="sc">|&gt;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(mpg, cyl, gear, disp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  my_cars,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> cyl,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">statistic =</span> <span class="fu">list</span>(<span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean}, {sd}"</span>),</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="dv">1</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_overall</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">modify_header</span>(label <span class="sc">~</span> <span class="st">"**Variable**"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">modify_spanning_header</span>(<span class="fu">c</span>(<span class="st">"stat_1"</span>, <span class="st">"stat_2"</span>, <span class="st">"stat_3"</span>) <span class="sc">~</span> <span class="st">"**cyl**"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Summary Statistics"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my_cars <span class="ot">&lt;-</span> mtcars <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(cyl, gear), factor))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>my_fit <span class="ot">&lt;-</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> disp <span class="sc">+</span> gear, <span class="at">data =</span> my_cars) <span class="sc">|&gt;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(my_fit, <span class="at">intercept =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="ypddtgnttl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ypddtgnttl table {
+<div id="vfqiqqrsla" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#vfqiqqrsla table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ypddtgnttl thead, #ypddtgnttl tbody, #ypddtgnttl tfoot, #ypddtgnttl tr, #ypddtgnttl td, #ypddtgnttl th {
+#vfqiqqrsla thead, #vfqiqqrsla tbody, #vfqiqqrsla tfoot, #vfqiqqrsla tr, #vfqiqqrsla td, #vfqiqqrsla th {
   border-style: none;
 }
 
-#ypddtgnttl p {
+#vfqiqqrsla p {
   margin: 0;
   padding: 0;
 }
 
-#ypddtgnttl .gt_table {
+#vfqiqqrsla .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -323,12 +305,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#ypddtgnttl .gt_caption {
+#vfqiqqrsla .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ypddtgnttl .gt_title {
+#vfqiqqrsla .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -340,7 +322,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#ypddtgnttl .gt_subtitle {
+#vfqiqqrsla .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -352,7 +334,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#ypddtgnttl .gt_heading {
+#vfqiqqrsla .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -364,13 +346,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ypddtgnttl .gt_bottom_border {
+#vfqiqqrsla .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ypddtgnttl .gt_col_headings {
+#vfqiqqrsla .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -385,7 +367,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#ypddtgnttl .gt_col_heading {
+#vfqiqqrsla .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -405,7 +387,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#ypddtgnttl .gt_column_spanner_outer {
+#vfqiqqrsla .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -417,15 +399,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#ypddtgnttl .gt_column_spanner_outer:first-child {
+#vfqiqqrsla .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ypddtgnttl .gt_column_spanner_outer:last-child {
+#vfqiqqrsla .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ypddtgnttl .gt_column_spanner {
+#vfqiqqrsla .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -437,11 +419,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#ypddtgnttl .gt_spanner_row {
+#vfqiqqrsla .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ypddtgnttl .gt_group_heading {
+#vfqiqqrsla .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -467,7 +449,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#ypddtgnttl .gt_empty_group_heading {
+#vfqiqqrsla .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -482,15 +464,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#ypddtgnttl .gt_from_md > :first-child {
+#vfqiqqrsla .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ypddtgnttl .gt_from_md > :last-child {
+#vfqiqqrsla .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ypddtgnttl .gt_row {
+#vfqiqqrsla .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -509,7 +491,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#ypddtgnttl .gt_stub {
+#vfqiqqrsla .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -522,576 +504,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#ypddtgnttl .gt_stub_row_group {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-  vertical-align: top;
-}
-
-#ypddtgnttl .gt_row_group_first td {
-  border-top-width: 2px;
-}
-
-#ypddtgnttl .gt_row_group_first th {
-  border-top-width: 2px;
-}
-
-#ypddtgnttl .gt_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#ypddtgnttl .gt_first_summary_row {
-  border-top-style: solid;
-  border-top-color: #D3D3D3;
-}
-
-#ypddtgnttl .gt_first_summary_row.thick {
-  border-top-width: 2px;
-}
-
-#ypddtgnttl .gt_last_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#ypddtgnttl .gt_grand_summary_row {
-  color: #333333;
-  background-color: #FFFFFF;
-  text-transform: inherit;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#ypddtgnttl .gt_first_grand_summary_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-style: double;
-  border-top-width: 6px;
-  border-top-color: #D3D3D3;
-}
-
-#ypddtgnttl .gt_last_grand_summary_row_top {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-style: double;
-  border-bottom-width: 6px;
-  border-bottom-color: #D3D3D3;
-}
-
-#ypddtgnttl .gt_striped {
-  background-color: rgba(128, 128, 128, 0.05);
-}
-
-#ypddtgnttl .gt_table_body {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#ypddtgnttl .gt_footnotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#ypddtgnttl .gt_footnote {
-  margin: 0px;
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#ypddtgnttl .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#ypddtgnttl .gt_sourcenote {
-  font-size: 90%;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#ypddtgnttl .gt_left {
-  text-align: left;
-}
-
-#ypddtgnttl .gt_center {
-  text-align: center;
-}
-
-#ypddtgnttl .gt_right {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
-#ypddtgnttl .gt_font_normal {
-  font-weight: normal;
-}
-
-#ypddtgnttl .gt_font_bold {
-  font-weight: bold;
-}
-
-#ypddtgnttl .gt_font_italic {
-  font-style: italic;
-}
-
-#ypddtgnttl .gt_super {
-  font-size: 65%;
-}
-
-#ypddtgnttl .gt_footnote_marks {
-  font-size: 75%;
-  vertical-align: 0.4em;
-  position: initial;
-}
-
-#ypddtgnttl .gt_asterisk {
-  font-size: 100%;
-  vertical-align: 0;
-}
-
-#ypddtgnttl .gt_indent_1 {
-  text-indent: 5px;
-}
-
-#ypddtgnttl .gt_indent_2 {
-  text-indent: 10px;
-}
-
-#ypddtgnttl .gt_indent_3 {
-  text-indent: 15px;
-}
-
-#ypddtgnttl .gt_indent_4 {
-  text-indent: 20px;
-}
-
-#ypddtgnttl .gt_indent_5 {
-  text-indent: 25px;
-}
-
-#ypddtgnttl .katex-display {
-  display: inline-flex !important;
-  margin-bottom: 0.75em !important;
-}
-
-#ypddtgnttl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
-  height: 0px !important;
-}
-</style>
-
-<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
-<colgroup>
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
-<col style="width: 20%">
-</colgroup>
-<thead>
-<tr class="gt_heading header">
-<th colspan="5" class="gt_heading gt_title gt_font_normal gt_bottom_border">Summary Statistics</th>
-</tr>
-<tr class="gt_col_headings gt_spanner_row even">
-<th rowspan="2" id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Variable</strong></th>
-<th rowspan="2" id="stat_0" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>Overall</strong><br>
-N = 32<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
-<th colspan="3" id="level 1; stat_1" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
-<strong>cyl</strong>
-</div></th>
-</tr>
-<tr class="gt_col_headings header">
-<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>4</strong><br>
-N = 11<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
-<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>6</strong><br>
-N = 7<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
-<th id="stat_3" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>8</strong><br>
-N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
-</tr>
-</thead>
-<tbody class="gt_table_body">
-<tr class="odd">
-<td class="gt_row gt_left" headers="label">mpg</td>
-<td class="gt_row gt_center" headers="stat_0">20.1, 6.0</td>
-<td class="gt_row gt_center" headers="stat_1">26.7, 4.5</td>
-<td class="gt_row gt_center" headers="stat_2">19.7, 1.5</td>
-<td class="gt_row gt_center" headers="stat_3">15.1, 2.6</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="label">gear</td>
-<td class="gt_row gt_center" headers="stat_0"><br>
-</td>
-<td class="gt_row gt_center" headers="stat_1"><br>
-</td>
-<td class="gt_row gt_center" headers="stat_2"><br>
-</td>
-<td class="gt_row gt_center" headers="stat_3"><br>
-</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;3</td>
-<td class="gt_row gt_center" headers="stat_0">15 (47%)</td>
-<td class="gt_row gt_center" headers="stat_1">1 (9.1%)</td>
-<td class="gt_row gt_center" headers="stat_2">2 (29%)</td>
-<td class="gt_row gt_center" headers="stat_3">12 (86%)</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;4</td>
-<td class="gt_row gt_center" headers="stat_0">12 (38%)</td>
-<td class="gt_row gt_center" headers="stat_1">8 (73%)</td>
-<td class="gt_row gt_center" headers="stat_2">4 (57%)</td>
-<td class="gt_row gt_center" headers="stat_3">0 (0%)</td>
-</tr>
-<tr class="odd">
-<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;5</td>
-<td class="gt_row gt_center" headers="stat_0">5 (16%)</td>
-<td class="gt_row gt_center" headers="stat_1">2 (18%)</td>
-<td class="gt_row gt_center" headers="stat_2">1 (14%)</td>
-<td class="gt_row gt_center" headers="stat_3">2 (14%)</td>
-</tr>
-<tr class="even">
-<td class="gt_row gt_left" headers="label">disp</td>
-<td class="gt_row gt_center" headers="stat_0">230.7, 123.9</td>
-<td class="gt_row gt_center" headers="stat_1">105.1, 26.9</td>
-<td class="gt_row gt_center" headers="stat_2">183.3, 41.6</td>
-<td class="gt_row gt_center" headers="stat_3">353.1, 67.8</td>
-</tr>
-</tbody><tfoot class="gt_footnotes">
-<tr class="odd">
-<td colspan="5" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> Mean, SD; n (%)</td>
-</tr>
-</tfoot>
-
-</table>
-
-</div>
-</div>
-</div>
-<p>We’ll fit two models to illustrate how emmeans work: an intercept-only model and the full model.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fit_intercept <span class="ot">&lt;-</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mpg <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> my_cars) <span class="sc">|&gt;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>fit_full <span class="ot">&lt;-</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> disp <span class="sc">+</span> gear, <span class="at">data =</span> my_cars) <span class="sc">|&gt;</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gt_intercept <span class="ot">&lt;-</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl_regression</span>(fit_intercept, <span class="at">intercept =</span> <span class="cn">TRUE</span>, <span class="at">conf.int =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">add_significance_stars</span>(<span class="at">hide_se =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>gt_full <span class="ot">&lt;-</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl_regression</span>(fit_full, <span class="at">intercept =</span> <span class="cn">TRUE</span>, <span class="at">conf.int =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">add_significance_stars</span>(<span class="at">hide_se =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_merge</span>(</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(gt_intercept, gt_full),</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">tab_spanner =</span> <span class="fu">c</span>(<span class="st">"**Intercept**"</span>, <span class="st">"**Full Model**"</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">fmt_number</span>(<span class="at">decimals =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Regression summary"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div id="vtxvtdvdvt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#vtxvtdvdvt table {
-  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#vtxvtdvdvt thead, #vtxvtdvdvt tbody, #vtxvtdvdvt tfoot, #vtxvtdvdvt tr, #vtxvtdvdvt td, #vtxvtdvdvt th {
-  border-style: none;
-}
-
-#vtxvtdvdvt p {
-  margin: 0;
-  padding: 0;
-}
-
-#vtxvtdvdvt .gt_table {
-  display: table;
-  border-collapse: collapse;
-  line-height: normal;
-  margin-left: auto;
-  margin-right: auto;
-  color: #333333;
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  background-color: #FFFFFF;
-  width: auto;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #A8A8A8;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #A8A8A8;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-}
-
-#vtxvtdvdvt .gt_caption {
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-#vtxvtdvdvt .gt_title {
-  color: #333333;
-  font-size: 125%;
-  font-weight: initial;
-  padding-top: 4px;
-  padding-bottom: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-bottom-color: #FFFFFF;
-  border-bottom-width: 0;
-}
-
-#vtxvtdvdvt .gt_subtitle {
-  color: #333333;
-  font-size: 85%;
-  font-weight: initial;
-  padding-top: 3px;
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  border-top-color: #FFFFFF;
-  border-top-width: 0;
-}
-
-#vtxvtdvdvt .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#vtxvtdvdvt .gt_bottom_border {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-}
-
-#vtxvtdvdvt .gt_col_headings {
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#vtxvtdvdvt .gt_col_heading {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 6px;
-  padding-left: 5px;
-  padding-right: 5px;
-  overflow-x: hidden;
-}
-
-#vtxvtdvdvt .gt_column_spanner_outer {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: normal;
-  text-transform: inherit;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-
-#vtxvtdvdvt .gt_column_spanner_outer:first-child {
-  padding-left: 0;
-}
-
-#vtxvtdvdvt .gt_column_spanner_outer:last-child {
-  padding-right: 0;
-}
-
-#vtxvtdvdvt .gt_column_spanner {
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: bottom;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  overflow-x: hidden;
-  display: inline-block;
-  width: 100%;
-}
-
-#vtxvtdvdvt .gt_spanner_row {
-  border-bottom-style: hidden;
-}
-
-#vtxvtdvdvt .gt_group_heading {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  text-align: left;
-}
-
-#vtxvtdvdvt .gt_empty_group_heading {
-  padding: 0.5px;
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  border-top-style: solid;
-  border-top-width: 2px;
-  border-top-color: #D3D3D3;
-  border-bottom-style: solid;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  vertical-align: middle;
-}
-
-#vtxvtdvdvt .gt_from_md > :first-child {
-  margin-top: 0;
-}
-
-#vtxvtdvdvt .gt_from_md > :last-child {
-  margin-bottom: 0;
-}
-
-#vtxvtdvdvt .gt_row {
-  padding-top: 8px;
-  padding-bottom: 8px;
-  padding-left: 5px;
-  padding-right: 5px;
-  margin: 10px;
-  border-top-style: solid;
-  border-top-width: 1px;
-  border-top-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-  vertical-align: middle;
-  overflow-x: hidden;
-}
-
-#vtxvtdvdvt .gt_stub {
-  color: #333333;
-  background-color: #FFFFFF;
-  font-size: 100%;
-  font-weight: initial;
-  text-transform: inherit;
-  border-right-style: solid;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#vtxvtdvdvt .gt_stub_row_group {
+#vfqiqqrsla .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1105,15 +518,15 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   vertical-align: top;
 }
 
-#vtxvtdvdvt .gt_row_group_first td {
+#vfqiqqrsla .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#vtxvtdvdvt .gt_row_group_first th {
+#vfqiqqrsla .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#vtxvtdvdvt .gt_summary_row {
+#vfqiqqrsla .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1123,16 +536,16 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   padding-right: 5px;
 }
 
-#vtxvtdvdvt .gt_first_summary_row {
+#vfqiqqrsla .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#vtxvtdvdvt .gt_first_summary_row.thick {
+#vfqiqqrsla .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#vtxvtdvdvt .gt_last_summary_row {
+#vfqiqqrsla .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1142,7 +555,7 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   border-bottom-color: #D3D3D3;
 }
 
-#vtxvtdvdvt .gt_grand_summary_row {
+#vfqiqqrsla .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1152,7 +565,7 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   padding-right: 5px;
 }
 
-#vtxvtdvdvt .gt_first_grand_summary_row {
+#vfqiqqrsla .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1162,7 +575,7 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   border-top-color: #D3D3D3;
 }
 
-#vtxvtdvdvt .gt_last_grand_summary_row_top {
+#vfqiqqrsla .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1172,11 +585,11 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   border-bottom-color: #D3D3D3;
 }
 
-#vtxvtdvdvt .gt_striped {
+#vfqiqqrsla .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#vtxvtdvdvt .gt_table_body {
+#vfqiqqrsla .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1185,7 +598,7 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   border-bottom-color: #D3D3D3;
 }
 
-#vtxvtdvdvt .gt_footnotes {
+#vfqiqqrsla .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1199,7 +612,7 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   border-right-color: #D3D3D3;
 }
 
-#vtxvtdvdvt .gt_footnote {
+#vfqiqqrsla .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1208,7 +621,7 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   padding-right: 5px;
 }
 
-#vtxvtdvdvt .gt_sourcenotes {
+#vfqiqqrsla .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1222,7 +635,7 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   border-right-color: #D3D3D3;
 }
 
-#vtxvtdvdvt .gt_sourcenote {
+#vfqiqqrsla .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1230,165 +643,163 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
   padding-right: 5px;
 }
 
-#vtxvtdvdvt .gt_left {
+#vfqiqqrsla .gt_left {
   text-align: left;
 }
 
-#vtxvtdvdvt .gt_center {
+#vfqiqqrsla .gt_center {
   text-align: center;
 }
 
-#vtxvtdvdvt .gt_right {
+#vfqiqqrsla .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#vtxvtdvdvt .gt_font_normal {
+#vfqiqqrsla .gt_font_normal {
   font-weight: normal;
 }
 
-#vtxvtdvdvt .gt_font_bold {
+#vfqiqqrsla .gt_font_bold {
   font-weight: bold;
 }
 
-#vtxvtdvdvt .gt_font_italic {
+#vfqiqqrsla .gt_font_italic {
   font-style: italic;
 }
 
-#vtxvtdvdvt .gt_super {
+#vfqiqqrsla .gt_super {
   font-size: 65%;
 }
 
-#vtxvtdvdvt .gt_footnote_marks {
+#vfqiqqrsla .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#vtxvtdvdvt .gt_asterisk {
+#vfqiqqrsla .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#vtxvtdvdvt .gt_indent_1 {
+#vfqiqqrsla .gt_indent_1 {
   text-indent: 5px;
 }
 
-#vtxvtdvdvt .gt_indent_2 {
+#vfqiqqrsla .gt_indent_2 {
   text-indent: 10px;
 }
 
-#vtxvtdvdvt .gt_indent_3 {
+#vfqiqqrsla .gt_indent_3 {
   text-indent: 15px;
 }
 
-#vtxvtdvdvt .gt_indent_4 {
+#vfqiqqrsla .gt_indent_4 {
   text-indent: 20px;
 }
 
-#vtxvtdvdvt .gt_indent_5 {
+#vfqiqqrsla .gt_indent_5 {
   text-indent: 25px;
 }
 
-#vtxvtdvdvt .katex-display {
+#vfqiqqrsla .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#vtxvtdvdvt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#vfqiqqrsla div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
 <table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
 </colgroup>
 <thead>
-<tr class="gt_heading header">
-<th colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border">Regression summary</th>
-</tr>
-<tr class="gt_col_headings gt_spanner_row even">
-<th rowspan="2" id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
-<th id="level 1; estimate_1" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="col"><div class="gt_column_spanner">
-<strong>Intercept</strong>
-</div></th>
-<th id="level 1; estimate_2" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="col"><div class="gt_column_spanner">
-<strong>Full Model</strong>
-</div></th>
-</tr>
 <tr class="gt_col_headings header">
-<th id="estimate_1" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>Beta</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
-<th id="estimate_2" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>Beta</strong><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="estimate" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>Beta</strong></th>
+<th id="conf.low" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>95% CI</strong></th>
+<th id="p.value" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>p-value</strong></th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr class="odd">
 <td class="gt_row gt_left" headers="label">(Intercept)</td>
-<td class="gt_row gt_center" headers="estimate_1">20.091***</td>
-<td class="gt_row gt_center" headers="estimate_2">29.411***</td>
+<td class="gt_row gt_center" headers="estimate">29</td>
+<td class="gt_row gt_center" headers="conf.low">24, 34</td>
+<td class="gt_row gt_center" headers="p.value">&lt;0.001</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="label">cyl</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
+<td class="gt_row gt_center" headers="estimate"><br>
 </td>
-<td class="gt_row gt_center" headers="estimate_2"><br>
+<td class="gt_row gt_center" headers="conf.low"><br>
+</td>
+<td class="gt_row gt_center" headers="p.value"><br>
 </td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;4</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
+<td class="gt_row gt_center" headers="estimate">—</td>
+<td class="gt_row gt_center" headers="conf.low">—</td>
+<td class="gt_row gt_center" headers="p.value"><br>
 </td>
-<td class="gt_row gt_center" headers="estimate_2">—</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;6</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
-</td>
-<td class="gt_row gt_center" headers="estimate_2">−4.800**</td>
+<td class="gt_row gt_center" headers="estimate">-4.8</td>
+<td class="gt_row gt_center" headers="conf.low">-8.3, -1.3</td>
+<td class="gt_row gt_center" headers="p.value">0.009</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;8</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
-</td>
-<td class="gt_row gt_center" headers="estimate_2">−4.856</td>
+<td class="gt_row gt_center" headers="estimate">-4.9</td>
+<td class="gt_row gt_center" headers="conf.low">-11, 1.4</td>
+<td class="gt_row gt_center" headers="p.value">0.12</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="label">disp</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
-</td>
-<td class="gt_row gt_center" headers="estimate_2">−0.027*</td>
+<td class="gt_row gt_center" headers="estimate">-0.03</td>
+<td class="gt_row gt_center" headers="conf.low">-0.05, 0.00</td>
+<td class="gt_row gt_center" headers="p.value">0.029</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="label">gear</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
+<td class="gt_row gt_center" headers="estimate"><br>
 </td>
-<td class="gt_row gt_center" headers="estimate_2"><br>
+<td class="gt_row gt_center" headers="conf.low"><br>
+</td>
+<td class="gt_row gt_center" headers="p.value"><br>
 </td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;3</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
+<td class="gt_row gt_center" headers="estimate">—</td>
+<td class="gt_row gt_center" headers="conf.low">—</td>
+<td class="gt_row gt_center" headers="p.value"><br>
 </td>
-<td class="gt_row gt_center" headers="estimate_2">—</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;4</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
-</td>
-<td class="gt_row gt_center" headers="estimate_2">0.032</td>
+<td class="gt_row gt_center" headers="estimate">0.03</td>
+<td class="gt_row gt_center" headers="conf.low">-3.8, 3.9</td>
+<td class="gt_row gt_center" headers="p.value">&gt;0.9</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;5</td>
-<td class="gt_row gt_center" headers="estimate_1"><br>
-</td>
-<td class="gt_row gt_center" headers="estimate_2">0.319</td>
+<td class="gt_row gt_center" headers="estimate">0.32</td>
+<td class="gt_row gt_center" headers="conf.low">-3.4, 4.0</td>
+<td class="gt_row gt_center" headers="p.value">0.9</td>
 </tr>
-</tbody><tfoot class="gt_footnotes">
+</tbody><tfoot class="gt_sourcenotes">
 <tr class="odd">
-<td colspan="3" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> <em>p&lt;0.05; <strong>p&lt;0.01; </strong></em>p&lt;0.001</td>
+<td colspan="4" class="gt_sourcenote">Abbreviation: CI = Confidence Interval</td>
 </tr>
 </tfoot>
 
@@ -1397,15 +808,23 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
 </div>
 </div>
 </div>
-<p>Controlling for <code>disp</code> an <code>gear</code>, relative to reference level <code>cyl4</code>, <code>cyl6</code> reduces expected <code>mpg</code> by 4.800 mpg while <code>cyl8</code> reduces it slightly more, but without statistical significance at the .05 level. One way to interpret the fit is by calculating the expected value at a set of predictor variable levels. You might fix <code>disp</code> at the dataset average, and take the combinations of levels in <code>cyl</code> and <code>gear</code>. That’s nine combinations of predictors.</p>
+<p>The problem with this regression is that it holds <code>cyl=4</code> as the standard for comparison. That’s more aggressive than what I’m after. I want to know if any of the <code>cyl</code> levels stand out relative to the whole, not whether any two particular levels differ. In this case, at least <code>cyl=4</code> and <code>cyl=6</code> differed. If <code>cyl8</code> was the reference, none of the <em>p</em>-values would be significant.</p>
+<p>I think I have a better way: report contrasts from the <em>estimated marginal means</em> (EMMs).</p>
+<section id="calculating-emms" class="level2" data-number="9.1">
+<h2 data-number="9.1" class="anchored" data-anchor-id="calculating-emms"><span class="header-section-number">9.1</span> Calculating EMMs</h2>
+<p>Estimated marginal means (EMMs) are the mean predicted values over supplies set of predictor values. Whereas ordinary marginal means are conditional means of the raw data, EMMs are conditional means of <em>modeled</em> data.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">cyl =</span> <span class="fu">levels</span>(my_cars<span class="sc">$</span>cyl), </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">disp =</span> <span class="fu">mean</span>(my_cars<span class="sc">$</span>disp),</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">gear =</span> <span class="fu">levels</span>(my_cars<span class="sc">$</span>gear)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>(my_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_full, <span class="at">newdata =</span> newdata))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>One way to get at the impact of <code>cyl</code> is by calculating the expected <code>mpg</code> by <code>cyl</code>, holding the other predictors fixed at some realistic value. You might set <code>disp</code> to the dataset average. For factors like <code>gear</code> you can make a prediction for each level. That’s nine combinations of predictors.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>newdata <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">cyl =</span> <span class="fu">levels</span>(my_cars<span class="sc">$</span>cyl), </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">disp =</span> <span class="fu">mean</span>(my_cars<span class="sc">$</span>disp),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">gear =</span> <span class="fu">levels</span>(my_cars<span class="sc">$</span>gear)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>(my_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(my_fit, <span class="at">newdata =</span> newdata))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 9 × 4
   cyl    disp gear  .fitted
@@ -1421,9 +840,9 @@ N = 14<span class="gt_footnote_marks" style="white-space:nowrap;font-style:itali
 9 8      231. 5        18.7</code></pre>
 </div>
 </div>
-<p>The estimated marginal mean is the mean of <code>my_preds$.fitted</code>, 20.10. This prediction dataset (reference grid) is what <code>emmeans()</code> uses by default. <code>emmeans()</code> makes predictions across a <em>reference grid</em>, then averages the predictions by the <code>specs</code> setting. As bonus, you get the confidence interval around the expected value. Set <code>specs = "1"</code> to predict the mean over the grid.</p>
+<p>This predictor dataset is called a <em>reference grid</em>. <code>emmeans()</code> creates a reference grid, makes predictions, then averages them by the <code>specs</code> argument. <code>specs = "1"</code> averages over the whole grid, <code>mean(my_preds$.fitted)</code> = 20.1.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(my_fit, <span class="at">specs =</span> <span class="st">"1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> 1       emmean    SE df lower.CL upper.CL
  overall   20.1 0.665 26     18.7     21.5
@@ -1432,37 +851,29 @@ Results are averaged over the levels of: cyl, gear
 Confidence level used: 0.95 </code></pre>
 </div>
 </div>
-<p>You can see the reference grid or create a new one using <code>ref_grid()</code>.</p>
+<p>I’m interested in <code>cyl</code>. <code>specs = "cyl"</code> will average across the three <code>gear</code> levels. Specifying <code>weights = "proportional"</code> will weight EMMs by the number of rows in the original data for each level of <code>cyl</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(fit_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>'emmGrid' object with variables:
-    cyl = 4, 6, 8
-    disp = 230.72
-    gear = 3, 4, 5</code></pre>
-</div>
-</div>
-<p>Instead of averaging <em>over</em> the levels of <code>cyl</code>, you can average <em>by</em> each level.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(emm_cyl <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>(emm_cyl <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(my_fit, <span class="at">specs =</span> <span class="st">"cyl"</span>, <span class="at">weights =</span> <span class="st">"proportional"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> cyl emmean   SE df lower.CL upper.CL
- 4     23.3 1.73 26     19.8     26.9
- 6     18.5 1.32 26     15.8     21.2
- 8     18.5 1.62 26     15.1     21.8
+ 4     23.3 1.69 26     19.8     26.7
+ 6     18.5 1.29 26     15.8     21.1
+ 8     18.4 1.61 26     15.1     21.7
 
 Results are averaged over the levels of: gear 
 Confidence level used: 0.95 </code></pre>
 </div>
 </div>
-<section id="level-comparisons" class="level2" data-number="9.1">
-<h2 data-number="9.1" class="anchored" data-anchor-id="level-comparisons"><span class="header-section-number">9.1</span> Level Comparisons</h2>
-<section id="pairwise" class="level3" data-number="9.1.1">
-<h3 data-number="9.1.1" class="anchored" data-anchor-id="pairwise"><span class="header-section-number">9.1.1</span> Pairwise</h3>
-<p>Calculate EMM pairwise differences with <code>pairs()</code>.</p>
+<p>What does this get us? The expected <code>mpg</code> for a car with 4 cylinders is 23.3. That’s 5 mpg greater than the other two. The SEs are pretty large though, so I can’t conclude fuel economy varies by <code>cyl</code>. For that, I need a contrast.</p>
+</section>
+<section id="level-comparisons" class="level2" data-number="9.2">
+<h2 data-number="9.2" class="anchored" data-anchor-id="level-comparisons"><span class="header-section-number">9.2</span> Level Comparisons</h2>
+<p>There’s a multitude of ways to analyze EMMs. You can compare them to each other, to the overall mean, to a single level, and so many other ways in the <code>contrast</code> documentation that I don’t understand.</p>
+<section id="pairwise" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="pairwise">Pairwise</h3>
+<p>Let’s start with pairwise comparisons. This is definitely <em>not</em> how I want to compare <code>cyl</code> levels, but it’s a useful introduction.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pairs</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pairs</span>(emm_cyl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> contrast    estimate   SE df t.ratio p.value
  cyl4 - cyl6   4.7998 1.71 26   2.801  0.0248
@@ -1473,10 +884,10 @@ Results are averaged over the levels of: gear
 P value adjustment: tukey method for comparing a family of 3 estimates </code></pre>
 </div>
 </div>
-<p>Cohen’s <em>d</em> effect size standardizes the differences by dividing by the model residual standard error. An effect size over .8 is large, .5 medium, and .2 small. The 95% CI crosses zero, so there may be no measurable effects here.</p>
+<p>The EMM of <code>cyl4</code> is 4.7998 mpg greater than <code>cyl6</code> and statistically significant (<em>p</em> = .0248). <code>cyl4 - cyl8</code> is large, but not significant. This is what the regression output was saying, but <code>pairs()</code> gives me <code>cyl6 - cyl8</code> too.</p>
+<p>A more general way to report paired differences is with Cohen’s <em>d</em> effect size. It standardizes the differences by dividing by the model residual standard error. An effect size &gt;.8 is large, &gt;.5 medium, and &gt;.2 small.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">eff_size</span>(<span class="at">sigma =</span> <span class="fu">sigma</span>(fit_full), <span class="at">edf =</span> <span class="fu">df.residual</span>(fit_full))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">eff_size</span>(emm_cyl, <span class="at">sigma =</span> <span class="fu">sigma</span>(my_fit), <span class="at">edf =</span> <span class="fu">df.residual</span>(my_fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> contrast    effect.size    SE df lower.CL upper.CL
  cyl4 - cyl6      1.5693 0.601 26    0.334     2.80
@@ -1488,13 +899,13 @@ sigma used for effect sizes: 3.059
 Confidence level used: 0.95 </code></pre>
 </div>
 </div>
+<p>But again, I’m interested in identifying <code>cyl</code> levels that stand out from the rest, not ferreting out two levels that differ from each other.</p>
 </section>
-<section id="one-vs-whole" class="level3" data-number="9.1.2">
-<h3 data-number="9.1.2" class="anchored" data-anchor-id="one-vs-whole"><span class="header-section-number">9.1.2</span> One vs Whole</h3>
-<p>Instead of comparing groups to each other, you might compare groups to the <em>whole</em> using a contrast. The default is to subtract the grand mean, the mean of the three EMMs, 20.102, from each EMM.</p>
+<section id="one-vs-whole" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="one-vs-whole">One vs Whole</h3>
+<p>Instead of comparing <code>cyl</code> levels to each other, I’ll compare them to the <em>whole</em> using a contrast. The default contrast subtracts the grand mean, the mean of the three EMMs, 20.046, from each EMM.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast</span>(emm_cyl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> contrast    estimate    SE df t.ratio p.value
  cyl4 effect     3.22 1.450 26   2.225  0.1049
@@ -1505,10 +916,9 @@ Results are averaged over the levels of: gear
 P value adjustment: fdr method for 3 tests </code></pre>
 </div>
 </div>
-<p>If group sizes are imbalanced, as they are here, subtract the <em>weighted</em> grand mean. The population sizes are <code>4</code> = 11, <code>6</code> = 7, <code>8</code> = 14, so the weighted grand mean is 20.15.</p>
+<p>If group sizes are imbalanced, as they are here, subtract the <em>weighted</em> grand mean. The population sizes are <code>cyl4</code> = 11, <code>cyl6</code> = 7, and <code>cyl8</code> = 14, so the weighted grand mean is 20.09.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="at">wts =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast</span>(emm_cyl, <span class="at">wts =</span> <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> contrast    estimate   SE df t.ratio p.value
  cyl4 effect     3.17 1.60 26   1.984  0.1736
@@ -1519,31 +929,31 @@ Results are averaged over the levels of: gear
 P value adjustment: fdr method for 3 tests </code></pre>
 </div>
 </div>
+<p>Now we’re talking. Instead of subtracting the grand mean of the EMMs, it’s subtracting the simple mean of the underlying data. Controlling for other variables, cars with <code>cyl = 4</code> are predicted to have an <code>mpg</code> 3.17 higher, cals with <code>cyl = 6</code> 1.63 lower. <em>None of these effects are statistically significant.</em></p>
 </section>
-<section id="one-vs-others" class="level3" data-number="9.1.3">
-<h3 data-number="9.1.3" class="anchored" data-anchor-id="one-vs-others"><span class="header-section-number">9.1.3</span> One vs Others</h3>
-<p>The contrast shows how each leave relates to the whole. That feels strange because each level biases the whole toward its value. Instead, you can create a contrast that shows how each level relates to the other levels. The estimates below are each EMM minus the average of the other EMMs. The EMM for <code>cyl=4</code> was 23.320. The average of the other two EMMs was <code>mean c(18.2, 21.5)</code> = 18.492.</p>
+<section id="one-vs-others" class="level3" data-number="9.2.1">
+<h3 data-number="9.2.1" class="anchored" data-anchor-id="one-vs-others"><span class="header-section-number">9.2.1</span> One vs Others</h3>
+<p>The default contrast shows how each level relates to the whole, but it feels like double counting since each level also contributes to the whole. Maybe <code>cyl4</code> would be statistically different if it wasn’t included in the whole. You can do this with <code>method = "del.eff"</code>!</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"del.eff"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast</span>(emm_cyl, <span class="at">wts =</span> <span class="cn">NA</span>, <span class="at">method =</span> <span class="st">"del.eff"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> contrast    estimate   SE df t.ratio p.value
- cyl4 effect     4.83 2.17 26   2.225  0.1049
- cyl6 effect    -2.37 1.42 26  -1.666  0.1615
- cyl8 effect    -2.46 2.62 26  -0.938  0.3571
+ cyl4 effect     4.84 2.44 26   1.984  0.1736
+ cyl6 effect    -2.08 1.49 26  -1.392  0.2634
+ cyl8 effect    -2.99 2.70 26  -1.107  0.2785
 
 Results are averaged over the levels of: gear 
 P value adjustment: fdr method for 3 tests </code></pre>
 </div>
 </div>
-<p>The expected <code>mpg</code> of a car with <code>cyl=4</code> is 4.83 mpg higher than the average expected value of the other <code>cyl</code> levels. You can uses a weighted average instead with <code>wts = NA</code>.</p>
+<p>Yep, a much larger effect. Note however that the <em>p</em>-values are unchanged. The contrast is just not large enough, given the sample size, to be distinguishable from zero.</p>
 </section>
 </section>
-<section id="nuisance-variables" class="level2" data-number="9.2">
-<h2 data-number="9.2" class="anchored" data-anchor-id="nuisance-variables"><span class="header-section-number">9.2</span> Nuisance Variables</h2>
-<p>By “expected”, we specifically mean the <em>average predicted value across the reference grid</em>. Our grid includes the mean <code>disp</code> and the three levels of <code>gear</code>.</p>
+<section id="nuisance-variables" class="level2" data-number="9.3">
+<h2 data-number="9.3" class="anchored" data-anchor-id="nuisance-variables"><span class="header-section-number">9.3</span> Nuisance Variables</h2>
+<p><code>gear</code> has been a bit of a nuisance so far. It is an important part of the model, but after that it was just something to proportionally average over. In fact, controlling variables can become crippling if there are enough of them because the reference grid is composed of all combinations of variable levels.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(fit_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(my_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>'emmGrid' object with variables:
     cyl = 4, 6, 8
@@ -1551,27 +961,9 @@ P value adjustment: fdr method for 3 tests </code></pre>
     gear = 3, 4, 5</code></pre>
 </div>
 </div>
-<p>So the EMMs are averaging over 9 predictions:</p>
+<p>It would be preferable to predict on the “average” <code>gear</code>, just like we predicted on the average <code>disp</code>. Well, you can! Models one-hot encode factor variables, so you get <code>gear3 = 0|1</code>, <code>gear4 = 0|1</code>, and <code>gear5 = 0|1</code>. What if instead of three combinations you predicted on <code>gear3=1/3</code>, <code>gear4=1/3</code>, and <code>gear5=1/3</code>?</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(fit_full) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 8
-  cyl    disp gear  estimate std.error    df statistic  p.value
-  &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 4      231. 3         23.2      2.00    26     11.6  8.38e-12
-2 6      231. 3         18.4      1.65    26     11.2  2.07e-11
-3 8      231. 3         18.3      1.73    26     10.6  5.89e-11
-4 4      231. 4         23.2      1.83    26     12.7  1.23e-12
-5 6      231. 4         18.4      1.52    26     12.1  3.38e-12
-6 8      231. 4         18.4      2.09    26      8.79 2.92e- 9
-7 4      231. 5         23.5      2.21    26     10.7  5.58e-11
-8 6      231. 5         18.7      1.87    26     10.0  2.10e-10
-9 8      231. 5         18.7      1.96    26      9.54 5.55e-10</code></pre>
-</div>
-</div>
-<p>That’s great except that <code>gear</code> is kind of a nuisance. It would be preferable to predict on the “average” <code>gear</code>, just like we predicted on the average <code>disp</code>. Well, you can! Recall that models one-hot encode factor variables, so you get <code>gear3 = 0|1</code>, <code>gear4 = 0|1</code>, and <code>gear5 = 0|1</code>. What if instead of three combinations you predicted on <code>gear3=1/3</code>, <code>gear4=1/3</code>, and <code>gear5=1/3</code>?</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>(nuis_grid_0 <span class="ot">&lt;-</span> <span class="fu">ref_grid</span>(fit_full, <span class="at">nuisance =</span> <span class="st">"gear"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(my_fit, <span class="at">nuisance =</span> <span class="st">"gear"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>'emmGrid' object with variables:
     cyl = 4, 6, 8
@@ -1580,23 +972,11 @@ Nuisance factors that have been collapsed by averaging:
     gear(3)</code></pre>
 </div>
 </div>
-<p>Now we have just three predictions. Each estimate below uses the simple average of the three <code>gear</code> levels above.</p>
+<p>Now we’ll have just three predictions. This is closer to the “typical” car, but we can do even better by weighting the levels proportionally to their frequency (<code>gear3=15/32</code>, <code>gear4=12/32</code>, and <code>gear5=5/32</code>).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(nuis_grid_0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 7
-  cyl    disp estimate std.error    df statistic  p.value
-  &lt;chr&gt; &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 4      231.     23.3      1.73    26      13.5 2.90e-13
-2 6      231.     18.5      1.32    26      14.0 1.31e-13
-3 8      231.     18.5      1.62    26      11.4 1.36e-11</code></pre>
-</div>
-</div>
-<p>This is closer to the “typical” car, but we can do even better by weighting the levels proportionally to their frequency (<code>gear3=15/32</code>, <code>gear4=12/32</code>, and <code>gear5=5/32</code>).</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>nuis_grid <span class="ot">&lt;-</span> <span class="fu">ref_grid</span>(fit_full, <span class="at">nuisance =</span> <span class="st">"gear"</span>, <span class="at">wt.nuis =</span> <span class="st">"proportional"</span>)</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(nuis_grid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>nuis_grid <span class="ot">&lt;-</span> <span class="fu">ref_grid</span>(my_fit, <span class="at">nuisance =</span> <span class="st">"gear"</span>, <span class="at">wt.nuis =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(nuis_grid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 7
   cyl    disp estimate std.error    df statistic  p.value
@@ -1606,11 +986,11 @@ Nuisance factors that have been collapsed by averaging:
 3 8      231.     18.4      1.61    26      11.4 1.26e-11</code></pre>
 </div>
 </div>
-<p>Now the one vs others contrast is more like the “average” car, varying only the number of cylinders. Recall, the default is to weight the other two EMMs equally, and <code>wts = NA</code> weights them by <code>cyl</code> count.</p>
+<p>Now the one vs others contrast is more like the “average” car, varying only the number of cylinders. Recall that the default is to weight the other two EMMs equally, so <code>wts = NA</code> weights them by <code>cyl</code> count.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"del.eff"</span>, <span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"del.eff"</span>, <span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 8
   term  contrast    null.value estimate std.error    df statistic adj.p.value
@@ -1620,13 +1000,13 @@ Nuisance factors that have been collapsed by averaging:
 3 cyl   cyl8 effect          0    -2.99      2.70    26     -1.11       0.279</code></pre>
 </div>
 </div>
-<p>So the expected value of <code>cyl4</code> is 4.837 mpg greater than the weighted average of the other <code>cyl</code> levels.</p>
+<p>The expected value of <code>cyl4</code> is 4.837 mpg greater than the weighted average of the other <code>cyl</code> levels. Let’s report this!</p>
 </section>
-<section id="reporting-emm-contrast" class="level2" data-number="9.3">
-<h2 data-number="9.3" class="anchored" data-anchor-id="reporting-emm-contrast"><span class="header-section-number">9.3</span> Reporting EMM + Contrast</h2>
-<p>Sometimes reporting model coefficients suffers from lack of context. The model fit coefficient for <code>cyl6</code> indicates it reduces the expected <code>mpg</code> by 4.800 relative to <code>cyl4</code>. That’s less useful if you don’t have a baseline <code>mpg</code> to compare 4.800 to. Instead, you might report that a ‘representative’ (mediod?) car, that is, a car with a proportional mix of all modeled car attributes, has an expected <code>mpg</code> of 20.091 (intercept-only model) and the effect of fixing <code>cyl = 4</code> is to increase this expected value by 3.174 to 23.265, and fixing <code>cyl = 6</code> decreases it 1.625 to 18.465.</p>
+<section id="reporting-emm-contrast" class="level2" data-number="9.4">
+<h2 data-number="9.4" class="anchored" data-anchor-id="reporting-emm-contrast"><span class="header-section-number">9.4</span> Reporting EMM + Contrast</h2>
+<p>Sometimes reporting model coefficients suffers from lack of context. The model fit coefficient for <code>cyl6</code> indicates it reduces the expected <code>mpg</code> by 4.800 relative to <code>cyl4</code>. Instead, I will report that a ‘representative’ car, a car with a proportional mix of all modeled car attributes, has an expected <code>mpg</code> of 20.091 (intercept-only model) and the effect of fixing <code>cyl = 4</code> is to increase this expected value by 3.174 to 23.265, and fixing <code>cyl = 6</code> decreases it 1.625 to 18.465.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> <span class="fu">contrast</span>(<span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> <span class="fu">contrast</span>(<span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 8
   term  contrast    null.value estimate std.error    df statistic adj.p.value
@@ -1638,77 +1018,66 @@ Nuisance factors that have been collapsed by averaging:
 </div>
 <p>We can report this in a single row.</p>
 <div class="cell">
-<details class="code-fold">
+<details open="" class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>contrast_color <span class="ot">&lt;-</span> <span class="cf">function</span>(bg) {</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">if_else</span>(colorspace<span class="sc">::</span><span class="fu">contrast_ratio</span>(bg, <span class="st">"black"</span>) <span class="sc">&gt;</span> </span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>            colorspace<span class="sc">::</span><span class="fu">contrast_ratio</span>(bg, <span class="st">"white"</span>),</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>          <span class="st">"black"</span>, <span class="st">"white"</span>)</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>smry <span class="ot">&lt;-</span> </span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ref_grid</span>(fit_full, <span class="at">nuisance =</span> <span class="fu">c</span>(<span class="st">"cyl"</span>, <span class="st">"gear"</span>), <span class="at">wt.nuis =</span> <span class="st">"proportional"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">emmeans</span>(<span class="at">specs =</span> <span class="st">"1"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>() <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">contrast =</span> <span class="st">`</span><span class="at">1</span><span class="st">`</span>),</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> <span class="fu">contrast</span>(<span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(contrast, estimate, adj.p.value) <span class="sc">|&gt;</span></span>
-<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">contrast =</span> <span class="fu">fct_relevel</span>(contrast, <span class="st">"overall"</span>, <span class="at">after =</span> <span class="dv">0</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(contrast) <span class="sc">|&gt;</span></span>
-<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct =</span> estimate <span class="sc">/</span> <span class="fu">first</span>(estimate),</span>
-<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">bg =</span> <span class="fu">case_when</span>(</span>
-<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>      adj.p.value <span class="sc">&lt;</span> .<span class="dv">05</span> <span class="sc">&amp;</span> estimate <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"firebrick"</span>,</span>
-<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>      adj.p.value <span class="sc">&lt;</span> .<span class="dv">05</span> <span class="sc">&amp;</span> estimate <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"dodgerblue"</span>,</span>
-<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"white"</span></span>
-<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">contrast_color</span>(bg)</span>
-<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>smry <span class="sc">|&gt;</span></span>
-<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(contrast, estimate) <span class="sc">|&gt;</span></span>
-<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">contrast =</span> <span class="fu">str_remove</span>(contrast, <span class="st">" effect"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> contrast, <span class="at">values_from =</span> estimate) <span class="sc">|&gt;</span></span>
-<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">fmt_number</span>(<span class="at">decimals =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_spanner</span>(<span class="st">"Effect"</span>, <span class="at">columns =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Effect of gender on estimated marginal means."</span>) <span class="sc">|&gt;</span></span>
-<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_options</span>(<span class="at">heading.align =</span> <span class="st">"left"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_fill</span>(<span class="st">"firebrick"</span>),</span>
-<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>(<span class="at">columns =</span> <span class="fu">which</span>(smry<span class="sc">$</span>bg <span class="sc">==</span> <span class="st">"firebrick"</span>))</span>
-<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_fill</span>(<span class="st">"dodgerblue"</span>),</span>
-<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>(<span class="at">columns =</span> <span class="fu">which</span>(smry<span class="sc">$</span>bg <span class="sc">==</span> <span class="st">"dodgerblue"</span>))</span>
-<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_text</span>(<span class="st">"white"</span>),</span>
-<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>(<span class="at">columns =</span> <span class="fu">which</span>(smry<span class="sc">$</span>color <span class="sc">==</span> <span class="st">"white"</span>))</span>
-<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_text</span>(<span class="st">"black"</span>),</span>
-<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>(<span class="at">columns =</span> <span class="fu">which</span>(smry<span class="sc">$</span>color <span class="sc">==</span> <span class="st">"black"</span>))</span>
-<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>final_fit <span class="ot">&lt;-</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> disp <span class="sc">+</span> gear, <span class="at">data =</span> my_cars) <span class="sc">|&gt;</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>nuis_grid <span class="ot">&lt;-</span> <span class="fu">ref_grid</span>(final_fit, <span class="at">nuisance =</span> <span class="st">"gear"</span>, <span class="at">wt.nuis =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>cyl_emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>cyl_contrast <span class="ot">&lt;-</span> <span class="fu">contrast</span>(cyl_emm, <span class="at">wts =</span> <span class="cn">NA</span>)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>intercept_emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"1"</span>, <span class="at">weights =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">EMM =</span> <span class="fu">tidy</span>(cyl_emm),</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Effect =</span> <span class="fu">tidy</span>(cyl_contrast) <span class="sc">|&gt;</span> </span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cyl =</span> <span class="fu">str_sub</span>(contrast, <span class="dv">4</span>, <span class="dv">4</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">p.value =</span> adj.p.value),</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"measure"</span></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(measure, cyl, estimate, p.value) <span class="sc">|&gt;</span></span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> measure, <span class="at">values_from =</span> <span class="fu">c</span>(estimate, p.value)) <span class="sc">|&gt;</span></span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="fu">tidy</span>(intercept_emm) <span class="sc">|&gt;</span></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">cyl =</span> <span class="st">"Intercept"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="at">estimate_EMM =</span> estimate)) <span class="sc">|&gt;</span></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(cyl, estimate_EMM, p.value_EMM, estimate_Effect, p.value_Effect) <span class="sc">|&gt;</span></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cyl =</span> <span class="fu">fct_relevel</span>(cyl, <span class="st">"Intercept"</span>, <span class="at">after =</span> <span class="dv">0</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(cyl) <span class="sc">|&gt;</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">cols_label</span>(</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate_EMM =</span> <span class="st">"Estimate"</span>,</span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">p.value_EMM =</span> <span class="st">"p-value"</span>,</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate_Effect =</span> <span class="st">"Estimate"</span>,</span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">p.value_Effect =</span> <span class="st">"p-value"</span></span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_spanner</span>(<span class="st">"EMM"</span>, <span class="fu">c</span>(estimate_EMM, p.value_EMM)) <span class="sc">|&gt;</span></span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_spanner</span>(<span class="st">"Effect"</span>, <span class="fu">c</span>(estimate_Effect, p.value_Effect)) <span class="sc">|&gt;</span></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">fmt_number</span>(<span class="fu">c</span>(estimate_EMM, estimate_Effect), <span class="at">decimals =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">fmt_number</span>(<span class="fu">c</span>(p.value_EMM, p.value_Effect), <span class="at">decimals =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="cfgfiddycb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#cfgfiddycb table {
+<div id="lgjlbxohqj" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#lgjlbxohqj table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#cfgfiddycb thead, #cfgfiddycb tbody, #cfgfiddycb tfoot, #cfgfiddycb tr, #cfgfiddycb td, #cfgfiddycb th {
+#lgjlbxohqj thead, #lgjlbxohqj tbody, #lgjlbxohqj tfoot, #lgjlbxohqj tr, #lgjlbxohqj td, #lgjlbxohqj th {
   border-style: none;
 }
 
-#cfgfiddycb p {
+#lgjlbxohqj p {
   margin: 0;
   padding: 0;
 }
 
-#cfgfiddycb .gt_table {
+#lgjlbxohqj .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1734,12 +1103,12 @@ Nuisance factors that have been collapsed by averaging:
   border-left-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_caption {
+#lgjlbxohqj .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#cfgfiddycb .gt_title {
+#lgjlbxohqj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1751,7 +1120,7 @@ Nuisance factors that have been collapsed by averaging:
   border-bottom-width: 0;
 }
 
-#cfgfiddycb .gt_subtitle {
+#lgjlbxohqj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1763,9 +1132,9 @@ Nuisance factors that have been collapsed by averaging:
   border-top-width: 0;
 }
 
-#cfgfiddycb .gt_heading {
+#lgjlbxohqj .gt_heading {
   background-color: #FFFFFF;
-  text-align: left;
+  text-align: center;
   border-bottom-color: #FFFFFF;
   border-left-style: none;
   border-left-width: 1px;
@@ -1775,13 +1144,13 @@ Nuisance factors that have been collapsed by averaging:
   border-right-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_bottom_border {
+#lgjlbxohqj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_col_headings {
+#lgjlbxohqj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1796,7 +1165,7 @@ Nuisance factors that have been collapsed by averaging:
   border-right-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_col_heading {
+#lgjlbxohqj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1816,7 +1185,7 @@ Nuisance factors that have been collapsed by averaging:
   overflow-x: hidden;
 }
 
-#cfgfiddycb .gt_column_spanner_outer {
+#lgjlbxohqj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1828,15 +1197,15 @@ Nuisance factors that have been collapsed by averaging:
   padding-right: 4px;
 }
 
-#cfgfiddycb .gt_column_spanner_outer:first-child {
+#lgjlbxohqj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#cfgfiddycb .gt_column_spanner_outer:last-child {
+#lgjlbxohqj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#cfgfiddycb .gt_column_spanner {
+#lgjlbxohqj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1848,11 +1217,11 @@ Nuisance factors that have been collapsed by averaging:
   width: 100%;
 }
 
-#cfgfiddycb .gt_spanner_row {
+#lgjlbxohqj .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#cfgfiddycb .gt_group_heading {
+#lgjlbxohqj .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1878,7 +1247,7 @@ Nuisance factors that have been collapsed by averaging:
   text-align: left;
 }
 
-#cfgfiddycb .gt_empty_group_heading {
+#lgjlbxohqj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1893,15 +1262,15 @@ Nuisance factors that have been collapsed by averaging:
   vertical-align: middle;
 }
 
-#cfgfiddycb .gt_from_md > :first-child {
+#lgjlbxohqj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#cfgfiddycb .gt_from_md > :last-child {
+#lgjlbxohqj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#cfgfiddycb .gt_row {
+#lgjlbxohqj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1920,7 +1289,7 @@ Nuisance factors that have been collapsed by averaging:
   overflow-x: hidden;
 }
 
-#cfgfiddycb .gt_stub {
+#lgjlbxohqj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1933,7 +1302,7 @@ Nuisance factors that have been collapsed by averaging:
   padding-right: 5px;
 }
 
-#cfgfiddycb .gt_stub_row_group {
+#lgjlbxohqj .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1947,15 +1316,15 @@ Nuisance factors that have been collapsed by averaging:
   vertical-align: top;
 }
 
-#cfgfiddycb .gt_row_group_first td {
+#lgjlbxohqj .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#cfgfiddycb .gt_row_group_first th {
+#lgjlbxohqj .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#cfgfiddycb .gt_summary_row {
+#lgjlbxohqj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1965,16 +1334,16 @@ Nuisance factors that have been collapsed by averaging:
   padding-right: 5px;
 }
 
-#cfgfiddycb .gt_first_summary_row {
+#lgjlbxohqj .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_first_summary_row.thick {
+#lgjlbxohqj .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#cfgfiddycb .gt_last_summary_row {
+#lgjlbxohqj .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1984,7 +1353,7 @@ Nuisance factors that have been collapsed by averaging:
   border-bottom-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_grand_summary_row {
+#lgjlbxohqj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1994,7 +1363,7 @@ Nuisance factors that have been collapsed by averaging:
   padding-right: 5px;
 }
 
-#cfgfiddycb .gt_first_grand_summary_row {
+#lgjlbxohqj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2004,7 +1373,7 @@ Nuisance factors that have been collapsed by averaging:
   border-top-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_last_grand_summary_row_top {
+#lgjlbxohqj .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -2014,11 +1383,11 @@ Nuisance factors that have been collapsed by averaging:
   border-bottom-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_striped {
+#lgjlbxohqj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#cfgfiddycb .gt_table_body {
+#lgjlbxohqj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -2027,7 +1396,7 @@ Nuisance factors that have been collapsed by averaging:
   border-bottom-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_footnotes {
+#lgjlbxohqj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2041,7 +1410,7 @@ Nuisance factors that have been collapsed by averaging:
   border-right-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_footnote {
+#lgjlbxohqj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -2050,7 +1419,7 @@ Nuisance factors that have been collapsed by averaging:
   padding-right: 5px;
 }
 
-#cfgfiddycb .gt_sourcenotes {
+#lgjlbxohqj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -2064,7 +1433,7 @@ Nuisance factors that have been collapsed by averaging:
   border-right-color: #D3D3D3;
 }
 
-#cfgfiddycb .gt_sourcenote {
+#lgjlbxohqj .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -2072,105 +1441,129 @@ Nuisance factors that have been collapsed by averaging:
   padding-right: 5px;
 }
 
-#cfgfiddycb .gt_left {
+#lgjlbxohqj .gt_left {
   text-align: left;
 }
 
-#cfgfiddycb .gt_center {
+#lgjlbxohqj .gt_center {
   text-align: center;
 }
 
-#cfgfiddycb .gt_right {
+#lgjlbxohqj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#cfgfiddycb .gt_font_normal {
+#lgjlbxohqj .gt_font_normal {
   font-weight: normal;
 }
 
-#cfgfiddycb .gt_font_bold {
+#lgjlbxohqj .gt_font_bold {
   font-weight: bold;
 }
 
-#cfgfiddycb .gt_font_italic {
+#lgjlbxohqj .gt_font_italic {
   font-style: italic;
 }
 
-#cfgfiddycb .gt_super {
+#lgjlbxohqj .gt_super {
   font-size: 65%;
 }
 
-#cfgfiddycb .gt_footnote_marks {
+#lgjlbxohqj .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#cfgfiddycb .gt_asterisk {
+#lgjlbxohqj .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#cfgfiddycb .gt_indent_1 {
+#lgjlbxohqj .gt_indent_1 {
   text-indent: 5px;
 }
 
-#cfgfiddycb .gt_indent_2 {
+#lgjlbxohqj .gt_indent_2 {
   text-indent: 10px;
 }
 
-#cfgfiddycb .gt_indent_3 {
+#lgjlbxohqj .gt_indent_3 {
   text-indent: 15px;
 }
 
-#cfgfiddycb .gt_indent_4 {
+#lgjlbxohqj .gt_indent_4 {
   text-indent: 20px;
 }
 
-#cfgfiddycb .gt_indent_5 {
+#lgjlbxohqj .gt_indent_5 {
   text-indent: 25px;
 }
 
-#cfgfiddycb .katex-display {
+#lgjlbxohqj .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#cfgfiddycb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#lgjlbxohqj div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
 
 <table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
 </colgroup>
 <thead>
-<tr class="gt_heading header">
-<th colspan="4" class="gt_heading gt_title gt_font_normal gt_bottom_border">Effect of gender on estimated marginal means.</th>
-</tr>
-<tr class="gt_col_headings gt_spanner_row even">
-<th rowspan="2" id="overall" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">overall</th>
+<tr class="gt_col_headings gt_spanner_row header">
+<th rowspan="2" id="cyl" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col">cyl</th>
+<th colspan="2" id="EMM" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
+EMM
+</div></th>
 <th colspan="2" id="Effect" class="gt_center gt_columns_top_border gt_column_spanner_outer" data-quarto-table-cell-role="th" scope="colgroup"><div class="gt_column_spanner">
 Effect
 </div></th>
-<th rowspan="2" id="cyl8" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">cyl8</th>
 </tr>
-<tr class="gt_col_headings header">
-<th id="cyl4" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">cyl4</th>
-<th id="cyl6" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">cyl6</th>
+<tr class="gt_col_headings even">
+<th id="estimate_EMM" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Estimate</th>
+<th id="p.value_EMM" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
+<th id="estimate_Effect" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">Estimate</th>
+<th id="p.value_Effect" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">p-value</th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr class="odd">
-<td class="gt_row gt_right" headers="overall" style="color: #000000">20.091</td>
-<td class="gt_row gt_right" headers="cyl4" style="color: #000000">3.174</td>
-<td class="gt_row gt_right" headers="cyl6" style="color: #000000">−1.625</td>
-<td class="gt_row gt_right" headers="cyl8" style="color: #000000">−1.681</td>
+<td class="gt_row gt_center" headers="cyl">Intercept</td>
+<td class="gt_row gt_right" headers="estimate_EMM">20.09</td>
+<td class="gt_row gt_right" headers="p.value_EMM">NA</td>
+<td class="gt_row gt_right" headers="estimate_Effect">NA</td>
+<td class="gt_row gt_right" headers="p.value_Effect">NA</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="cyl">4</td>
+<td class="gt_row gt_right" headers="estimate_EMM">23.27</td>
+<td class="gt_row gt_right" headers="p.value_EMM">0.000</td>
+<td class="gt_row gt_right" headers="estimate_Effect">3.17</td>
+<td class="gt_row gt_right" headers="p.value_Effect">0.174</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_center" headers="cyl">6</td>
+<td class="gt_row gt_right" headers="estimate_EMM">18.47</td>
+<td class="gt_row gt_right" headers="p.value_EMM">0.000</td>
+<td class="gt_row gt_right" headers="estimate_Effect">−1.63</td>
+<td class="gt_row gt_right" headers="p.value_Effect">0.263</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_center" headers="cyl">8</td>
+<td class="gt_row gt_right" headers="estimate_EMM">18.41</td>
+<td class="gt_row gt_right" headers="p.value_EMM">0.000</td>
+<td class="gt_row gt_right" headers="estimate_Effect">−1.68</td>
+<td class="gt_row gt_right" headers="p.value_Effect">0.279</td>
 </tr>
 </tbody>
 </table>
@@ -2179,8 +1572,8 @@ Effect
 </div>
 </div>
 </section>
-<section id="learn-more" class="level2" data-number="9.4">
-<h2 data-number="9.4" class="anchored" data-anchor-id="learn-more"><span class="header-section-number">9.4</span> Learn More</h2>
+<section id="learn-more" class="level2" data-number="9.5">
+<h2 data-number="9.5" class="anchored" data-anchor-id="learn-more"><span class="header-section-number">9.5</span> Learn More</h2>
 <p>This <a href="https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/">Very statisticious</a> blog post is helpful. I also worked through the <strong>emmeans</strong> vignettes on <a href="https://cran.r-project.org/web/packages/emmeans/">CRAN</a> and <strong>ggeffects</strong> on <a href="https://strengejacke.github.io/ggeffects/index.html">GitHub</a>.</p>
 
 
@@ -2669,305 +2062,232 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb39" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="in">#| include: false</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidymodels)</span></span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="in">library(gtsummary)</span></span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="in">library(janitor)</span></span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="fu"># Estimated Marginal Means {#EMMs}</span></span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>Estimated marginal means (EMMs) are the mean predicted values for a specified combination of predictor values. Whereas ordinary marginal means are conditional means of the raw data, EMMs are conditional means of _modeled_ data. Use the <span class="in">`emmeans`</span> package to calculate EMMs.</span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a>Let's work with the <span class="in">`mtcars`</span> dataset. Suppose you are interested in <span class="in">`mpg`</span> as the outcome variable and are exploring differences in levels of factor variable, <span class="in">`cyl`</span>. Your model will control for factor variable, <span class="in">`gear`</span>, and continuous variable, <span class="in">`disp`</span>. </span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-24"><a href="#cb39-24" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-25"><a href="#cb39-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-26"><a href="#cb39-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-27"><a href="#cb39-27" aria-hidden="true" tabindex="-1"></a>my_cars <span class="ot">&lt;-</span> </span>
-<span id="cb39-28"><a href="#cb39-28" aria-hidden="true" tabindex="-1"></a>  mtcars <span class="sc">|&gt;</span></span>
-<span id="cb39-29"><a href="#cb39-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(cyl, gear), factor)) <span class="sc">|&gt;</span></span>
-<span id="cb39-30"><a href="#cb39-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(mpg, cyl, gear, disp)</span>
-<span id="cb39-31"><a href="#cb39-31" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-32"><a href="#cb39-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-35"><a href="#cb39-35" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-36"><a href="#cb39-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb39-37"><a href="#cb39-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-38"><a href="#cb39-38" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(</span>
-<span id="cb39-39"><a href="#cb39-39" aria-hidden="true" tabindex="-1"></a>  my_cars,</span>
-<span id="cb39-40"><a href="#cb39-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> cyl,</span>
-<span id="cb39-41"><a href="#cb39-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">statistic =</span> <span class="fu">list</span>(<span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean}, {sd}"</span>),</span>
-<span id="cb39-42"><a href="#cb39-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="dv">1</span></span>
-<span id="cb39-43"><a href="#cb39-43" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb39-44"><a href="#cb39-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_overall</span>() <span class="sc">|&gt;</span></span>
-<span id="cb39-45"><a href="#cb39-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">modify_header</span>(label <span class="sc">~</span> <span class="st">"**Variable**"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-46"><a href="#cb39-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">modify_spanning_header</span>(<span class="fu">c</span>(<span class="st">"stat_1"</span>, <span class="st">"stat_2"</span>, <span class="st">"stat_3"</span>) <span class="sc">~</span> <span class="st">"**cyl**"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-47"><a href="#cb39-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb39-48"><a href="#cb39-48" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Summary Statistics"</span>)</span>
-<span id="cb39-49"><a href="#cb39-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-50"><a href="#cb39-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-51"><a href="#cb39-51" aria-hidden="true" tabindex="-1"></a>We'll fit two models to illustrate how emmeans work: an intercept-only model and the full model.</span>
-<span id="cb39-52"><a href="#cb39-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-55"><a href="#cb39-55" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-56"><a href="#cb39-56" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-57"><a href="#cb39-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-58"><a href="#cb39-58" aria-hidden="true" tabindex="-1"></a>fit_intercept <span class="ot">&lt;-</span> </span>
-<span id="cb39-59"><a href="#cb39-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb39-60"><a href="#cb39-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mpg <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> my_cars) <span class="sc">|&gt;</span></span>
-<span id="cb39-61"><a href="#cb39-61" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span>
-<span id="cb39-62"><a href="#cb39-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-63"><a href="#cb39-63" aria-hidden="true" tabindex="-1"></a>fit_full <span class="ot">&lt;-</span></span>
-<span id="cb39-64"><a href="#cb39-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb39-65"><a href="#cb39-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> disp <span class="sc">+</span> gear, <span class="at">data =</span> my_cars) <span class="sc">|&gt;</span></span>
-<span id="cb39-66"><a href="#cb39-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span>
-<span id="cb39-67"><a href="#cb39-67" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-68"><a href="#cb39-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-71"><a href="#cb39-71" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-72"><a href="#cb39-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb39-73"><a href="#cb39-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-74"><a href="#cb39-74" aria-hidden="true" tabindex="-1"></a>gt_intercept <span class="ot">&lt;-</span></span>
-<span id="cb39-75"><a href="#cb39-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl_regression</span>(fit_intercept, <span class="at">intercept =</span> <span class="cn">TRUE</span>, <span class="at">conf.int =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-76"><a href="#cb39-76" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">add_significance_stars</span>(<span class="at">hide_se =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb39-77"><a href="#cb39-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-78"><a href="#cb39-78" aria-hidden="true" tabindex="-1"></a>gt_full <span class="ot">&lt;-</span></span>
-<span id="cb39-79"><a href="#cb39-79" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl_regression</span>(fit_full, <span class="at">intercept =</span> <span class="cn">TRUE</span>, <span class="at">conf.int =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-80"><a href="#cb39-80" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">add_significance_stars</span>(<span class="at">hide_se =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb39-81"><a href="#cb39-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-82"><a href="#cb39-82" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_merge</span>(</span>
-<span id="cb39-83"><a href="#cb39-83" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(gt_intercept, gt_full),</span>
-<span id="cb39-84"><a href="#cb39-84" aria-hidden="true" tabindex="-1"></a>  <span class="at">tab_spanner =</span> <span class="fu">c</span>(<span class="st">"**Intercept**"</span>, <span class="st">"**Full Model**"</span>)</span>
-<span id="cb39-85"><a href="#cb39-85" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb39-86"><a href="#cb39-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb39-87"><a href="#cb39-87" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">fmt_number</span>(<span class="at">decimals =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-88"><a href="#cb39-88" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Regression summary"</span>)</span>
-<span id="cb39-89"><a href="#cb39-89" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-90"><a href="#cb39-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-91"><a href="#cb39-91" aria-hidden="true" tabindex="-1"></a>Controlling for <span class="in">`disp`</span> an <span class="in">`gear`</span>, relative to reference level <span class="in">`cyl4`</span>,  <span class="in">`cyl6`</span> reduces expected <span class="in">`mpg`</span> by 4.800 mpg while <span class="in">`cyl8`</span> reduces it slightly more, but without statistical significance at the .05 level. One way to interpret the fit is by calculating the expected value at a set of predictor variable levels. You might fix <span class="in">`disp`</span> at the dataset average, and take the combinations of levels in <span class="in">`cyl`</span> and <span class="in">`gear`</span>. That's nine combinations of predictors. </span>
-<span id="cb39-92"><a href="#cb39-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-95"><a href="#cb39-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-96"><a href="#cb39-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-97"><a href="#cb39-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-98"><a href="#cb39-98" aria-hidden="true" tabindex="-1"></a>newdata <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
-<span id="cb39-99"><a href="#cb39-99" aria-hidden="true" tabindex="-1"></a>  <span class="at">cyl =</span> <span class="fu">levels</span>(my_cars<span class="sc">$</span>cyl), </span>
-<span id="cb39-100"><a href="#cb39-100" aria-hidden="true" tabindex="-1"></a>  <span class="at">disp =</span> <span class="fu">mean</span>(my_cars<span class="sc">$</span>disp),</span>
-<span id="cb39-101"><a href="#cb39-101" aria-hidden="true" tabindex="-1"></a>  <span class="at">gear =</span> <span class="fu">levels</span>(my_cars<span class="sc">$</span>gear)</span>
-<span id="cb39-102"><a href="#cb39-102" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb39-103"><a href="#cb39-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-104"><a href="#cb39-104" aria-hidden="true" tabindex="-1"></a>(my_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(fit_full, <span class="at">newdata =</span> newdata))</span>
-<span id="cb39-105"><a href="#cb39-105" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-106"><a href="#cb39-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-107"><a href="#cb39-107" aria-hidden="true" tabindex="-1"></a>The estimated marginal mean is the mean of <span class="in">`my_preds$.fitted`</span>, <span class="in">`r comma(mean(my_preds$.fitted), .01)`</span>. This prediction dataset (reference grid) is what <span class="in">`emmeans()`</span> uses by default. <span class="in">`emmeans()`</span> makes predictions across a _reference grid_, then averages the predictions by the <span class="in">`specs`</span> setting. As bonus, you get the confidence interval around the expected value. Set <span class="in">`specs = "1"`</span> to predict the mean over the grid.</span>
-<span id="cb39-108"><a href="#cb39-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-111"><a href="#cb39-111" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-112"><a href="#cb39-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-113"><a href="#cb39-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-114"><a href="#cb39-114" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"1"</span>)</span>
-<span id="cb39-115"><a href="#cb39-115" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-116"><a href="#cb39-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-117"><a href="#cb39-117" aria-hidden="true" tabindex="-1"></a>You can see the reference grid or create a new one using <span class="in">`ref_grid()`</span>.</span>
-<span id="cb39-118"><a href="#cb39-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-121"><a href="#cb39-121" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-122"><a href="#cb39-122" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-123"><a href="#cb39-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-124"><a href="#cb39-124" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(fit_full)</span>
-<span id="cb39-125"><a href="#cb39-125" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-126"><a href="#cb39-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-127"><a href="#cb39-127" aria-hidden="true" tabindex="-1"></a>Instead of averaging _over_ the levels of `cyl`, you can average _by_ each level.</span>
-<span id="cb39-128"><a href="#cb39-128" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb39-131"><a href="#cb39-131" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-132"><a href="#cb39-132" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-133"><a href="#cb39-133" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-134"><a href="#cb39-134" aria-hidden="true" tabindex="-1"></a>(emm_cyl <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>))</span>
-<span id="cb39-135"><a href="#cb39-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-136"><a href="#cb39-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-137"><a href="#cb39-137" aria-hidden="true" tabindex="-1"></a><span class="fu">## Level Comparisons</span></span>
-<span id="cb39-138"><a href="#cb39-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-139"><a href="#cb39-139" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pairwise</span></span>
-<span id="cb39-140"><a href="#cb39-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-141"><a href="#cb39-141" aria-hidden="true" tabindex="-1"></a>Calculate EMM pairwise differences with <span class="in">`pairs()`</span>.</span>
-<span id="cb39-142"><a href="#cb39-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-145"><a href="#cb39-145" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-146"><a href="#cb39-146" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-147"><a href="#cb39-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-148"><a href="#cb39-148" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-149"><a href="#cb39-149" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pairs</span>()</span>
-<span id="cb39-150"><a href="#cb39-150" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-151"><a href="#cb39-151" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-152"><a href="#cb39-152" aria-hidden="true" tabindex="-1"></a>Cohen's *d* effect size standardizes the differences by dividing by the model residual standard error. An effect size over .8 is large, .5 medium, and .2 small. The 95% CI crosses zero, so there may be no measurable effects here.</span>
-<span id="cb39-153"><a href="#cb39-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-156"><a href="#cb39-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-157"><a href="#cb39-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-158"><a href="#cb39-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-159"><a href="#cb39-159" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb39-160"><a href="#cb39-160" aria-hidden="true" tabindex="-1"></a>  <span class="fu">eff_size</span>(<span class="at">sigma =</span> <span class="fu">sigma</span>(fit_full), <span class="at">edf =</span> <span class="fu">df.residual</span>(fit_full))</span>
-<span id="cb39-161"><a href="#cb39-161" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-162"><a href="#cb39-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-163"><a href="#cb39-163" aria-hidden="true" tabindex="-1"></a><span class="fu">### One vs Whole</span></span>
-<span id="cb39-164"><a href="#cb39-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-165"><a href="#cb39-165" aria-hidden="true" tabindex="-1"></a>Instead of comparing groups to each other, you might compare groups to the *whole* using a contrast. The default is to subtract the grand mean, the mean of the three EMMs, <span class="in">`r comma(mean(tidy(emm_cyl)$estimate), .001)`</span>, from each EMM.</span>
-<span id="cb39-166"><a href="#cb39-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-169"><a href="#cb39-169" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-170"><a href="#cb39-170" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-171"><a href="#cb39-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-172"><a href="#cb39-172" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb39-173"><a href="#cb39-173" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>()</span>
-<span id="cb39-174"><a href="#cb39-174" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-175"><a href="#cb39-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-176"><a href="#cb39-176" aria-hidden="true" tabindex="-1"></a>If group sizes are imbalanced, as they are here, subtract the *weighted* grand mean. The population sizes are <span class="in">`4`</span> = 11, <span class="in">`6`</span> = 7, <span class="in">`8`</span> = 14, so the weighted grand mean is <span class="in">`r emm_cyl |&gt; tidy() |&gt; mutate(estimate = estimate * case_match(cyl, "4"~11/32, "6"~7/32, "8"~14/32)) |&gt; pull(estimate) |&gt; sum() |&gt; comma(.01)`</span>.</span>
-<span id="cb39-177"><a href="#cb39-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-180"><a href="#cb39-180" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-181"><a href="#cb39-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-182"><a href="#cb39-182" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-183"><a href="#cb39-183" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb39-184"><a href="#cb39-184" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="at">wts =</span> <span class="cn">NA</span>)</span>
-<span id="cb39-185"><a href="#cb39-185" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-186"><a href="#cb39-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-187"><a href="#cb39-187" aria-hidden="true" tabindex="-1"></a><span class="fu">### One vs Others</span></span>
-<span id="cb39-188"><a href="#cb39-188" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-189"><a href="#cb39-189" aria-hidden="true" tabindex="-1"></a>The contrast shows how each leave relates to the whole. That feels strange because each level biases the whole toward its value. Instead, you can create a contrast that shows how each level relates to the other levels. The estimates below are each EMM minus the average of the other EMMs. The EMM for <span class="in">`cyl=4`</span> was <span class="in">`r comma(tidy(emm_cyl)$estimate[1], .001)`</span>. The average of the other two EMMs was <span class="in">`mean c(18.2, 21.5)`</span> = <span class="in">`r comma(mean(tidy(emm_cyl)$estimate[2:3]), .001)`</span>.</span>
-<span id="cb39-190"><a href="#cb39-190" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-193"><a href="#cb39-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-194"><a href="#cb39-194" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-195"><a href="#cb39-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-196"><a href="#cb39-196" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_full, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb39-197"><a href="#cb39-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"del.eff"</span>)</span>
-<span id="cb39-198"><a href="#cb39-198" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-199"><a href="#cb39-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-200"><a href="#cb39-200" aria-hidden="true" tabindex="-1"></a>The expected <span class="in">`mpg`</span> of a car with <span class="in">`cyl=4`</span> is 4.83 mpg higher than the average expected value of the other <span class="in">`cyl`</span> levels. You can uses a weighted average instead with <span class="in">`wts = NA`</span>.</span>
-<span id="cb39-201"><a href="#cb39-201" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-202"><a href="#cb39-202" aria-hidden="true" tabindex="-1"></a><span class="fu">## Nuisance Variables</span></span>
-<span id="cb39-203"><a href="#cb39-203" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-204"><a href="#cb39-204" aria-hidden="true" tabindex="-1"></a>By "expected", we specifically mean the _average predicted value across the reference grid_. Our grid includes the mean <span class="in">`disp`</span> and the three levels of <span class="in">`gear`</span>.</span>
-<span id="cb39-205"><a href="#cb39-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-208"><a href="#cb39-208" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-209"><a href="#cb39-209" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-210"><a href="#cb39-210" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-211"><a href="#cb39-211" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(fit_full)</span>
-<span id="cb39-212"><a href="#cb39-212" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-213"><a href="#cb39-213" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-214"><a href="#cb39-214" aria-hidden="true" tabindex="-1"></a>So the EMMs are averaging over 9 predictions:</span>
-<span id="cb39-215"><a href="#cb39-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-218"><a href="#cb39-218" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-219"><a href="#cb39-219" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-220"><a href="#cb39-220" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-221"><a href="#cb39-221" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(fit_full) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span>
-<span id="cb39-222"><a href="#cb39-222" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-223"><a href="#cb39-223" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-224"><a href="#cb39-224" aria-hidden="true" tabindex="-1"></a>That's great except that <span class="in">`gear`</span> is kind of a nuisance. It would be preferable to predict on the "average" <span class="in">`gear`</span>, just like we predicted on the average <span class="in">`disp`</span>. Well, you can! Recall that models one-hot encode factor variables, so you get <span class="in">`gear3 = 0|1`</span>, <span class="in">`gear4 = 0|1`</span>, and <span class="in">`gear5 = 0|1`</span>. What if instead of three combinations you predicted on <span class="in">`gear3=1/3`</span>, <span class="in">`gear4=1/3`</span>, and <span class="in">`gear5=1/3`</span>?</span>
-<span id="cb39-225"><a href="#cb39-225" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-228"><a href="#cb39-228" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-229"><a href="#cb39-229" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-230"><a href="#cb39-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-231"><a href="#cb39-231" aria-hidden="true" tabindex="-1"></a>(nuis_grid_0 <span class="ot">&lt;-</span> <span class="fu">ref_grid</span>(fit_full, <span class="at">nuisance =</span> <span class="st">"gear"</span>))</span>
-<span id="cb39-232"><a href="#cb39-232" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-233"><a href="#cb39-233" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-234"><a href="#cb39-234" aria-hidden="true" tabindex="-1"></a>Now we have just three predictions. Each estimate below uses the simple average of the three <span class="in">`gear`</span> levels above.</span>
-<span id="cb39-235"><a href="#cb39-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-238"><a href="#cb39-238" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-239"><a href="#cb39-239" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-240"><a href="#cb39-240" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-241"><a href="#cb39-241" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(nuis_grid_0)</span>
-<span id="cb39-242"><a href="#cb39-242" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-243"><a href="#cb39-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-244"><a href="#cb39-244" aria-hidden="true" tabindex="-1"></a>This is closer to the "typical" car, but we can do even better by weighting the levels proportionally to their frequency (<span class="in">`gear3=15/32`</span>, <span class="in">`gear4=12/32`</span>, and <span class="in">`gear5=5/32`</span>).</span>
-<span id="cb39-245"><a href="#cb39-245" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-248"><a href="#cb39-248" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-249"><a href="#cb39-249" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-250"><a href="#cb39-250" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-251"><a href="#cb39-251" aria-hidden="true" tabindex="-1"></a>nuis_grid <span class="ot">&lt;-</span> <span class="fu">ref_grid</span>(fit_full, <span class="at">nuisance =</span> <span class="st">"gear"</span>, <span class="at">wt.nuis =</span> <span class="st">"proportional"</span>)</span>
-<span id="cb39-252"><a href="#cb39-252" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-253"><a href="#cb39-253" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(nuis_grid)</span>
-<span id="cb39-254"><a href="#cb39-254" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-255"><a href="#cb39-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-256"><a href="#cb39-256" aria-hidden="true" tabindex="-1"></a>Now the one vs others contrast is more like the "average" car, varying only the number of cylinders. Recall, the default is to weight the other two EMMs equally, and <span class="in">`wts = NA`</span> weights them by <span class="in">`cyl`</span> count.</span>
-<span id="cb39-257"><a href="#cb39-257" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-260"><a href="#cb39-260" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-261"><a href="#cb39-261" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-262"><a href="#cb39-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-263"><a href="#cb39-263" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-264"><a href="#cb39-264" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"del.eff"</span>, <span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb39-265"><a href="#cb39-265" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span>
-<span id="cb39-266"><a href="#cb39-266" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-267"><a href="#cb39-267" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-268"><a href="#cb39-268" aria-hidden="true" tabindex="-1"></a>So the expected value of <span class="in">`cyl4`</span> is 4.837 mpg greater than the weighted average of the other <span class="in">`cyl`</span> levels.</span>
-<span id="cb39-269"><a href="#cb39-269" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-270"><a href="#cb39-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reporting EMM + Contrast</span></span>
-<span id="cb39-271"><a href="#cb39-271" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-272"><a href="#cb39-272" aria-hidden="true" tabindex="-1"></a>Sometimes reporting model coefficients suffers from lack of context. The model fit coefficient for <span class="in">`cyl6`</span> indicates it reduces the expected <span class="in">`mpg`</span> by 4.800 relative to <span class="in">`cyl4`</span>. That's less useful if you don't have a baseline <span class="in">`mpg`</span> to compare 4.800 to. Instead, you might report that a 'representative' (mediod?) car, that is, a car with a proportional mix of all modeled car attributes, has an expected <span class="in">`mpg`</span> of 20.091 (intercept-only model) and the effect of fixing <span class="in">`cyl = 4`</span> is to increase this expected value by 3.174 to 23.265, and fixing <span class="in">`cyl = 6`</span> decreases it 1.625 to 18.465. </span>
-<span id="cb39-273"><a href="#cb39-273" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-276"><a href="#cb39-276" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-277"><a href="#cb39-277" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb39-278"><a href="#cb39-278" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-279"><a href="#cb39-279" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> <span class="fu">contrast</span>(<span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span>
-<span id="cb39-280"><a href="#cb39-280" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-281"><a href="#cb39-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-282"><a href="#cb39-282" aria-hidden="true" tabindex="-1"></a>We can report this in a single row.</span>
-<span id="cb39-283"><a href="#cb39-283" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-286"><a href="#cb39-286" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb39-287"><a href="#cb39-287" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb39-288"><a href="#cb39-288" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-289"><a href="#cb39-289" aria-hidden="true" tabindex="-1"></a>contrast_color <span class="ot">&lt;-</span> <span class="cf">function</span>(bg) {</span>
-<span id="cb39-290"><a href="#cb39-290" aria-hidden="true" tabindex="-1"></a>  <span class="fu">if_else</span>(colorspace<span class="sc">::</span><span class="fu">contrast_ratio</span>(bg, <span class="st">"black"</span>) <span class="sc">&gt;</span> </span>
-<span id="cb39-291"><a href="#cb39-291" aria-hidden="true" tabindex="-1"></a>            colorspace<span class="sc">::</span><span class="fu">contrast_ratio</span>(bg, <span class="st">"white"</span>),</span>
-<span id="cb39-292"><a href="#cb39-292" aria-hidden="true" tabindex="-1"></a>          <span class="st">"black"</span>, <span class="st">"white"</span>)</span>
-<span id="cb39-293"><a href="#cb39-293" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb39-294"><a href="#cb39-294" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-295"><a href="#cb39-295" aria-hidden="true" tabindex="-1"></a>smry <span class="ot">&lt;-</span> </span>
-<span id="cb39-296"><a href="#cb39-296" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb39-297"><a href="#cb39-297" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ref_grid</span>(fit_full, <span class="at">nuisance =</span> <span class="fu">c</span>(<span class="st">"cyl"</span>, <span class="st">"gear"</span>), <span class="at">wt.nuis =</span> <span class="st">"proportional"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb39-298"><a href="#cb39-298" aria-hidden="true" tabindex="-1"></a>      <span class="fu">emmeans</span>(<span class="at">specs =</span> <span class="st">"1"</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>() <span class="sc">|&gt;</span> <span class="fu">rename</span>(<span class="at">contrast =</span> <span class="st">`</span><span class="at">1</span><span class="st">`</span>),</span>
-<span id="cb39-299"><a href="#cb39-299" aria-hidden="true" tabindex="-1"></a>    <span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> <span class="fu">contrast</span>(<span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span>
-<span id="cb39-300"><a href="#cb39-300" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb39-301"><a href="#cb39-301" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(contrast, estimate, adj.p.value) <span class="sc">|&gt;</span></span>
-<span id="cb39-302"><a href="#cb39-302" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">contrast =</span> <span class="fu">fct_relevel</span>(contrast, <span class="st">"overall"</span>, <span class="at">after =</span> <span class="dv">0</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb39-303"><a href="#cb39-303" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(contrast) <span class="sc">|&gt;</span></span>
-<span id="cb39-304"><a href="#cb39-304" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb39-305"><a href="#cb39-305" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct =</span> estimate <span class="sc">/</span> <span class="fu">first</span>(estimate),</span>
-<span id="cb39-306"><a href="#cb39-306" aria-hidden="true" tabindex="-1"></a>    <span class="at">bg =</span> <span class="fu">case_when</span>(</span>
-<span id="cb39-307"><a href="#cb39-307" aria-hidden="true" tabindex="-1"></a>      adj.p.value <span class="sc">&lt;</span> .<span class="dv">05</span> <span class="sc">&amp;</span> estimate <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"firebrick"</span>,</span>
-<span id="cb39-308"><a href="#cb39-308" aria-hidden="true" tabindex="-1"></a>      adj.p.value <span class="sc">&lt;</span> .<span class="dv">05</span> <span class="sc">&amp;</span> estimate <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"dodgerblue"</span>,</span>
-<span id="cb39-309"><a href="#cb39-309" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"white"</span></span>
-<span id="cb39-310"><a href="#cb39-310" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb39-311"><a href="#cb39-311" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="fu">contrast_color</span>(bg)</span>
-<span id="cb39-312"><a href="#cb39-312" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb39-313"><a href="#cb39-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-314"><a href="#cb39-314" aria-hidden="true" tabindex="-1"></a>smry <span class="sc">|&gt;</span></span>
-<span id="cb39-315"><a href="#cb39-315" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(contrast, estimate) <span class="sc">|&gt;</span></span>
-<span id="cb39-316"><a href="#cb39-316" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">contrast =</span> <span class="fu">str_remove</span>(contrast, <span class="st">" effect"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb39-317"><a href="#cb39-317" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> contrast, <span class="at">values_from =</span> estimate) <span class="sc">|&gt;</span></span>
-<span id="cb39-318"><a href="#cb39-318" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
-<span id="cb39-319"><a href="#cb39-319" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">fmt_number</span>(<span class="at">decimals =</span> <span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-320"><a href="#cb39-320" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_spanner</span>(<span class="st">"Effect"</span>, <span class="at">columns =</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-321"><a href="#cb39-321" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"Effect of gender on estimated marginal means."</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-322"><a href="#cb39-322" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_options</span>(<span class="at">heading.align =</span> <span class="st">"left"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb39-323"><a href="#cb39-323" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<span id="cb39-324"><a href="#cb39-324" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_fill</span>(<span class="st">"firebrick"</span>),</span>
-<span id="cb39-325"><a href="#cb39-325" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>(<span class="at">columns =</span> <span class="fu">which</span>(smry<span class="sc">$</span>bg <span class="sc">==</span> <span class="st">"firebrick"</span>))</span>
-<span id="cb39-326"><a href="#cb39-326" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb39-327"><a href="#cb39-327" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<span id="cb39-328"><a href="#cb39-328" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_fill</span>(<span class="st">"dodgerblue"</span>),</span>
-<span id="cb39-329"><a href="#cb39-329" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>(<span class="at">columns =</span> <span class="fu">which</span>(smry<span class="sc">$</span>bg <span class="sc">==</span> <span class="st">"dodgerblue"</span>))</span>
-<span id="cb39-330"><a href="#cb39-330" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb39-331"><a href="#cb39-331" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<span id="cb39-332"><a href="#cb39-332" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_text</span>(<span class="st">"white"</span>),</span>
-<span id="cb39-333"><a href="#cb39-333" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>(<span class="at">columns =</span> <span class="fu">which</span>(smry<span class="sc">$</span>color <span class="sc">==</span> <span class="st">"white"</span>))</span>
-<span id="cb39-334"><a href="#cb39-334" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb39-335"><a href="#cb39-335" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_style</span>(</span>
-<span id="cb39-336"><a href="#cb39-336" aria-hidden="true" tabindex="-1"></a>    <span class="at">style =</span> gt<span class="sc">::</span><span class="fu">cell_text</span>(<span class="st">"black"</span>),</span>
-<span id="cb39-337"><a href="#cb39-337" aria-hidden="true" tabindex="-1"></a>    <span class="at">locations =</span> gt<span class="sc">::</span><span class="fu">cells_body</span>(<span class="at">columns =</span> <span class="fu">which</span>(smry<span class="sc">$</span>color <span class="sc">==</span> <span class="st">"black"</span>))</span>
-<span id="cb39-338"><a href="#cb39-338" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb39-339"><a href="#cb39-339" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb39-340"><a href="#cb39-340" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-341"><a href="#cb39-341" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learn More</span></span>
-<span id="cb39-342"><a href="#cb39-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-343"><a href="#cb39-343" aria-hidden="true" tabindex="-1"></a>This <span class="co">[</span><span class="ot">Very statisticious</span><span class="co">](https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/)</span> blog post is helpful. I also worked through the **emmeans** vignettes on [CRAN](https://cran.r-project.org/web/packages/emmeans/) and **ggeffects** on <span class="co">[</span><span class="ot">GitHub</span><span class="co">](https://strengejacke.github.io/ggeffects/index.html)</span>.</span>
+<div class="sourceCode" id="cb30" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="in">#| include: false</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidymodels)</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="in">library(gtsummary)</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="fu"># Estimated Marginal Means {#EMMs}</span></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>I'm modeling the effect of the number of cylinders on vehicle fuel economy. I don't think <span class="in">`cyl`</span> should matter if you control for <span class="in">`disp`</span> and <span class="in">`gear`</span>. Take a look at this regression output. What do you think? The coefficient for <span class="in">`cyl=6`</span> is -4.8 (*p* = .009), but <span class="in">`cyl=8`</span> is indistinguishable from <span class="in">`cyl=4`</span>.</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>my_cars <span class="ot">&lt;-</span> mtcars <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(cyl, gear), factor))</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>my_fit <span class="ot">&lt;-</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> disp <span class="sc">+</span> gear, <span class="at">data =</span> my_cars) <span class="sc">|&gt;</span></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(my_fit, <span class="at">intercept =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-27"><a href="#cb30-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-28"><a href="#cb30-28" aria-hidden="true" tabindex="-1"></a>The problem with this regression is that it holds <span class="in">`cyl=4`</span> as the standard for comparison. That's more aggressive than what I'm after. I want to know if any of the <span class="in">`cyl`</span> levels stand out relative to the whole, not whether any two particular levels differ. In this case, at least <span class="in">`cyl=4`</span> and <span class="in">`cyl=6`</span> differed. If <span class="in">`cyl8`</span> was the reference, none of the *p*-values would be significant.</span>
+<span id="cb30-29"><a href="#cb30-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-30"><a href="#cb30-30" aria-hidden="true" tabindex="-1"></a>I think I have a better way: report contrasts from the *estimated marginal means* (EMMs).</span>
+<span id="cb30-31"><a href="#cb30-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-32"><a href="#cb30-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Calculating EMMs</span></span>
+<span id="cb30-33"><a href="#cb30-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-34"><a href="#cb30-34" aria-hidden="true" tabindex="-1"></a>Estimated marginal means (EMMs) are the mean predicted values over supplies set of predictor values. Whereas ordinary marginal means are conditional means of the raw data, EMMs are conditional means of _modeled_ data.</span>
+<span id="cb30-35"><a href="#cb30-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-38"><a href="#cb30-38" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-39"><a href="#cb30-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-40"><a href="#cb30-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-41"><a href="#cb30-41" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
+<span id="cb30-42"><a href="#cb30-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-43"><a href="#cb30-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-44"><a href="#cb30-44" aria-hidden="true" tabindex="-1"></a>One way to get at the impact of <span class="in">`cyl`</span> is by calculating the expected <span class="in">`mpg`</span> by <span class="in">`cyl`</span>, holding the other predictors fixed at some realistic value. You might set <span class="in">`disp`</span> to the dataset average. For factors like <span class="in">`gear`</span> you can make a prediction for each level. That's nine combinations of predictors. </span>
+<span id="cb30-45"><a href="#cb30-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-48"><a href="#cb30-48" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-49"><a href="#cb30-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-50"><a href="#cb30-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-51"><a href="#cb30-51" aria-hidden="true" tabindex="-1"></a>newdata <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(</span>
+<span id="cb30-52"><a href="#cb30-52" aria-hidden="true" tabindex="-1"></a>  <span class="at">cyl =</span> <span class="fu">levels</span>(my_cars<span class="sc">$</span>cyl), </span>
+<span id="cb30-53"><a href="#cb30-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">disp =</span> <span class="fu">mean</span>(my_cars<span class="sc">$</span>disp),</span>
+<span id="cb30-54"><a href="#cb30-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">gear =</span> <span class="fu">levels</span>(my_cars<span class="sc">$</span>gear)</span>
+<span id="cb30-55"><a href="#cb30-55" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-56"><a href="#cb30-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-57"><a href="#cb30-57" aria-hidden="true" tabindex="-1"></a>(my_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(my_fit, <span class="at">newdata =</span> newdata))</span>
+<span id="cb30-58"><a href="#cb30-58" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-59"><a href="#cb30-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-60"><a href="#cb30-60" aria-hidden="true" tabindex="-1"></a>This predictor dataset is called a _reference grid_. <span class="in">`emmeans()`</span> creates a reference grid, makes predictions, then averages them by the <span class="in">`specs`</span> argument. <span class="in">`specs = "1"`</span> averages over the whole grid, <span class="in">`mean(my_preds$.fitted)`</span> = <span class="in">`r comma(mean(my_preds$.fitted), .1)`</span>.</span>
+<span id="cb30-61"><a href="#cb30-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-64"><a href="#cb30-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-65"><a href="#cb30-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-66"><a href="#cb30-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-67"><a href="#cb30-67" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(my_fit, <span class="at">specs =</span> <span class="st">"1"</span>)</span>
+<span id="cb30-68"><a href="#cb30-68" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-69"><a href="#cb30-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-70"><a href="#cb30-70" aria-hidden="true" tabindex="-1"></a>I'm interested in <span class="in">`cyl`</span>. <span class="in">`specs = "cyl"`</span> will average across the three <span class="in">`gear`</span> levels. Specifying <span class="in">`weights = "proportional"`</span> will weight EMMs by the number of rows in the original data for each level of <span class="in">`cyl`</span>.</span>
+<span id="cb30-71"><a href="#cb30-71" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb30-74"><a href="#cb30-74" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-75"><a href="#cb30-75" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-76"><a href="#cb30-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-77"><a href="#cb30-77" aria-hidden="true" tabindex="-1"></a>(emm_cyl <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(my_fit, <span class="at">specs =</span> <span class="st">"cyl"</span>, <span class="at">weights =</span> <span class="st">"proportional"</span>))</span>
+<span id="cb30-78"><a href="#cb30-78" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-79"><a href="#cb30-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-80"><a href="#cb30-80" aria-hidden="true" tabindex="-1"></a>What does this get us? The expected <span class="in">`mpg`</span> for a car with 4 cylinders is 23.3. That's 5 mpg greater than the other two. The SEs are pretty large though, so I can't conclude fuel economy varies by <span class="in">`cyl`</span>. For that, I need a contrast.</span>
+<span id="cb30-81"><a href="#cb30-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-82"><a href="#cb30-82" aria-hidden="true" tabindex="-1"></a><span class="fu">## Level Comparisons</span></span>
+<span id="cb30-83"><a href="#cb30-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-84"><a href="#cb30-84" aria-hidden="true" tabindex="-1"></a>There's a multitude of ways to analyze EMMs. You can compare them to each other, to the overall mean, to a single level, and so many other ways in the <span class="in">`contrast`</span> documentation that I don't understand.</span>
+<span id="cb30-85"><a href="#cb30-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-86"><a href="#cb30-86" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pairwise {-}</span></span>
+<span id="cb30-87"><a href="#cb30-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-88"><a href="#cb30-88" aria-hidden="true" tabindex="-1"></a>Let's start with pairwise comparisons. This is definitely _not_ how I want to compare <span class="in">`cyl`</span> levels, but it's a useful introduction.</span>
+<span id="cb30-89"><a href="#cb30-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-92"><a href="#cb30-92" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-93"><a href="#cb30-93" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-94"><a href="#cb30-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-95"><a href="#cb30-95" aria-hidden="true" tabindex="-1"></a><span class="fu">pairs</span>(emm_cyl)</span>
+<span id="cb30-96"><a href="#cb30-96" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-97"><a href="#cb30-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-98"><a href="#cb30-98" aria-hidden="true" tabindex="-1"></a>The EMM of <span class="in">`cyl4`</span> is 4.7998 mpg greater than <span class="in">`cyl6`</span> and statistically significant (*p* = .0248). <span class="in">`cyl4 - cyl8`</span> is large, but not significant. This is what the regression output was saying, but <span class="in">`pairs()`</span> gives me <span class="in">`cyl6 - cyl8`</span> too.</span>
+<span id="cb30-99"><a href="#cb30-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-100"><a href="#cb30-100" aria-hidden="true" tabindex="-1"></a>A more general way to report paired differences is with Cohen's *d* effect size. It standardizes the differences by dividing by the model residual standard error. An effect size &gt;.8 is large, &gt;.5 medium, and &gt;.2 small.</span>
+<span id="cb30-101"><a href="#cb30-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-104"><a href="#cb30-104" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-105"><a href="#cb30-105" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-106"><a href="#cb30-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-107"><a href="#cb30-107" aria-hidden="true" tabindex="-1"></a><span class="fu">eff_size</span>(emm_cyl, <span class="at">sigma =</span> <span class="fu">sigma</span>(my_fit), <span class="at">edf =</span> <span class="fu">df.residual</span>(my_fit))</span>
+<span id="cb30-108"><a href="#cb30-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-109"><a href="#cb30-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-110"><a href="#cb30-110" aria-hidden="true" tabindex="-1"></a>But again, I'm interested in identifying <span class="in">`cyl`</span> levels that stand out from the rest, not ferreting out two levels that differ from each other.</span>
+<span id="cb30-111"><a href="#cb30-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-112"><a href="#cb30-112" aria-hidden="true" tabindex="-1"></a><span class="fu">### One vs Whole {-}</span></span>
+<span id="cb30-113"><a href="#cb30-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-114"><a href="#cb30-114" aria-hidden="true" tabindex="-1"></a>Instead of comparing <span class="in">`cyl`</span> levels to each other, I'll compare them to the *whole* using a contrast. The default contrast subtracts the grand mean, the mean of the three EMMs, <span class="in">`r comma(mean(tidy(emm_cyl)$estimate), .001)`</span>, from each EMM.</span>
+<span id="cb30-115"><a href="#cb30-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-118"><a href="#cb30-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-119"><a href="#cb30-119" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-120"><a href="#cb30-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-121"><a href="#cb30-121" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast</span>(emm_cyl)</span>
+<span id="cb30-122"><a href="#cb30-122" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-123"><a href="#cb30-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-124"><a href="#cb30-124" aria-hidden="true" tabindex="-1"></a>If group sizes are imbalanced, as they are here, subtract the *weighted* grand mean. The population sizes are <span class="in">`cyl4`</span> = 11, <span class="in">`cyl6`</span> = 7, and <span class="in">`cyl8`</span> = 14, so the weighted grand mean is <span class="in">`r emm_cyl |&gt; tidy() |&gt; mutate(estimate = estimate * case_match(cyl, "4"~11/32, "6"~7/32, "8"~14/32)) |&gt; pull(estimate) |&gt; sum() |&gt; comma(.01)`</span>.</span>
+<span id="cb30-125"><a href="#cb30-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-128"><a href="#cb30-128" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-129"><a href="#cb30-129" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-130"><a href="#cb30-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-131"><a href="#cb30-131" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast</span>(emm_cyl, <span class="at">wts =</span> <span class="cn">NA</span>)</span>
+<span id="cb30-132"><a href="#cb30-132" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-133"><a href="#cb30-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-134"><a href="#cb30-134" aria-hidden="true" tabindex="-1"></a>Now we're talking. Instead of subtracting the grand mean of the EMMs, it's subtracting the simple mean of the underlying data. Controlling for other variables, cars with <span class="in">`cyl = 4`</span> are predicted to have an <span class="in">`mpg`</span> 3.17 higher, cals with <span class="in">`cyl = 6`</span> 1.63 lower. *None of these effects are statistically significant.*</span>
+<span id="cb30-135"><a href="#cb30-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-136"><a href="#cb30-136" aria-hidden="true" tabindex="-1"></a><span class="fu">### One vs Others</span></span>
+<span id="cb30-137"><a href="#cb30-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-138"><a href="#cb30-138" aria-hidden="true" tabindex="-1"></a>The default contrast shows how each level relates to the whole, but it feels like double counting since each level also contributes to the whole. Maybe <span class="in">`cyl4`</span> would be statistically different if it wasn't included in the whole. You can do this with <span class="in">`method = "del.eff"`</span>!</span>
+<span id="cb30-139"><a href="#cb30-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-142"><a href="#cb30-142" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-143"><a href="#cb30-143" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-144"><a href="#cb30-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-145"><a href="#cb30-145" aria-hidden="true" tabindex="-1"></a><span class="fu">contrast</span>(emm_cyl, <span class="at">wts =</span> <span class="cn">NA</span>, <span class="at">method =</span> <span class="st">"del.eff"</span>)</span>
+<span id="cb30-146"><a href="#cb30-146" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-147"><a href="#cb30-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-148"><a href="#cb30-148" aria-hidden="true" tabindex="-1"></a>Yep, a much larger effect. Note however that the *p*-values are unchanged. The contrast is just not large enough, given the sample size, to be distinguishable from zero.</span>
+<span id="cb30-149"><a href="#cb30-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-150"><a href="#cb30-150" aria-hidden="true" tabindex="-1"></a><span class="fu">## Nuisance Variables</span></span>
+<span id="cb30-151"><a href="#cb30-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-152"><a href="#cb30-152" aria-hidden="true" tabindex="-1"></a><span class="in">`gear`</span> has been a bit of a nuisance so far. It is an important part of the model, but after that it was just something to proportionally average over. In fact, controlling variables can become crippling if there are enough of them because the reference grid is composed of all combinations of variable levels.</span>
+<span id="cb30-153"><a href="#cb30-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-156"><a href="#cb30-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-157"><a href="#cb30-157" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-158"><a href="#cb30-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-159"><a href="#cb30-159" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(my_fit)</span>
+<span id="cb30-160"><a href="#cb30-160" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-161"><a href="#cb30-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-162"><a href="#cb30-162" aria-hidden="true" tabindex="-1"></a>It would be preferable to predict on the "average" <span class="in">`gear`</span>, just like we predicted on the average <span class="in">`disp`</span>. Well, you can! Models one-hot encode factor variables, so you get <span class="in">`gear3 = 0|1`</span>, <span class="in">`gear4 = 0|1`</span>, and <span class="in">`gear5 = 0|1`</span>. What if instead of three combinations you predicted on <span class="in">`gear3=1/3`</span>, <span class="in">`gear4=1/3`</span>, and <span class="in">`gear5=1/3`</span>?</span>
+<span id="cb30-163"><a href="#cb30-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-166"><a href="#cb30-166" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-167"><a href="#cb30-167" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-168"><a href="#cb30-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-169"><a href="#cb30-169" aria-hidden="true" tabindex="-1"></a><span class="fu">ref_grid</span>(my_fit, <span class="at">nuisance =</span> <span class="st">"gear"</span>)</span>
+<span id="cb30-170"><a href="#cb30-170" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-171"><a href="#cb30-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-172"><a href="#cb30-172" aria-hidden="true" tabindex="-1"></a>Now we'll have just three predictions. This is closer to the "typical" car, but we can do even better by weighting the levels proportionally to their frequency (<span class="in">`gear3=15/32`</span>, <span class="in">`gear4=12/32`</span>, and <span class="in">`gear5=5/32`</span>).</span>
+<span id="cb30-173"><a href="#cb30-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-176"><a href="#cb30-176" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-177"><a href="#cb30-177" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-178"><a href="#cb30-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-179"><a href="#cb30-179" aria-hidden="true" tabindex="-1"></a>nuis_grid <span class="ot">&lt;-</span> <span class="fu">ref_grid</span>(my_fit, <span class="at">nuisance =</span> <span class="st">"gear"</span>, <span class="at">wt.nuis =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb30-180"><a href="#cb30-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-181"><a href="#cb30-181" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(nuis_grid)</span>
+<span id="cb30-182"><a href="#cb30-182" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-183"><a href="#cb30-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-184"><a href="#cb30-184" aria-hidden="true" tabindex="-1"></a>Now the one vs others contrast is more like the "average" car, varying only the number of cylinders. Recall that the default is to weight the other two EMMs equally, so <span class="in">`wts = NA`</span> weights them by <span class="in">`cyl`</span> count.</span>
+<span id="cb30-185"><a href="#cb30-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-188"><a href="#cb30-188" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-189"><a href="#cb30-189" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-190"><a href="#cb30-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-191"><a href="#cb30-191" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-192"><a href="#cb30-192" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"del.eff"</span>, <span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb30-193"><a href="#cb30-193" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span>
+<span id="cb30-194"><a href="#cb30-194" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-195"><a href="#cb30-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-196"><a href="#cb30-196" aria-hidden="true" tabindex="-1"></a>The expected value of <span class="in">`cyl4`</span> is 4.837 mpg greater than the weighted average of the other <span class="in">`cyl`</span> levels. Let's report this!</span>
+<span id="cb30-197"><a href="#cb30-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-198"><a href="#cb30-198" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reporting EMM + Contrast</span></span>
+<span id="cb30-199"><a href="#cb30-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-200"><a href="#cb30-200" aria-hidden="true" tabindex="-1"></a>Sometimes reporting model coefficients suffers from lack of context. The model fit coefficient for <span class="in">`cyl6`</span> indicates it reduces the expected <span class="in">`mpg`</span> by 4.800 relative to <span class="in">`cyl4`</span>. Instead, I will report that a 'representative' car, a car with a proportional mix of all modeled car attributes, has an expected <span class="in">`mpg`</span> of 20.091 (intercept-only model) and the effect of fixing <span class="in">`cyl = 4`</span> is to increase this expected value by 3.174 to 23.265, and fixing <span class="in">`cyl = 6`</span> decreases it 1.625 to 18.465. </span>
+<span id="cb30-201"><a href="#cb30-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-204"><a href="#cb30-204" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-205"><a href="#cb30-205" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb30-206"><a href="#cb30-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-207"><a href="#cb30-207" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) <span class="sc">|&gt;</span> <span class="fu">contrast</span>(<span class="at">wts =</span> <span class="cn">NA</span>) <span class="sc">|&gt;</span> <span class="fu">tidy</span>()</span>
+<span id="cb30-208"><a href="#cb30-208" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-209"><a href="#cb30-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-210"><a href="#cb30-210" aria-hidden="true" tabindex="-1"></a>We can report this in a single row.</span>
+<span id="cb30-211"><a href="#cb30-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-214"><a href="#cb30-214" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb30-215"><a href="#cb30-215" aria-hidden="true" tabindex="-1"></a>final_fit <span class="ot">&lt;-</span> </span>
+<span id="cb30-216"><a href="#cb30-216" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb30-217"><a href="#cb30-217" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(mpg <span class="sc">~</span> cyl <span class="sc">+</span> disp <span class="sc">+</span> gear, <span class="at">data =</span> my_cars) <span class="sc">|&gt;</span></span>
+<span id="cb30-218"><a href="#cb30-218" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>()</span>
+<span id="cb30-219"><a href="#cb30-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-220"><a href="#cb30-220" aria-hidden="true" tabindex="-1"></a>nuis_grid <span class="ot">&lt;-</span> <span class="fu">ref_grid</span>(final_fit, <span class="at">nuisance =</span> <span class="st">"gear"</span>, <span class="at">wt.nuis =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb30-221"><a href="#cb30-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-222"><a href="#cb30-222" aria-hidden="true" tabindex="-1"></a>cyl_emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"cyl"</span>) </span>
+<span id="cb30-223"><a href="#cb30-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-224"><a href="#cb30-224" aria-hidden="true" tabindex="-1"></a>cyl_contrast <span class="ot">&lt;-</span> <span class="fu">contrast</span>(cyl_emm, <span class="at">wts =</span> <span class="cn">NA</span>)</span>
+<span id="cb30-225"><a href="#cb30-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-226"><a href="#cb30-226" aria-hidden="true" tabindex="-1"></a>intercept_emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(nuis_grid, <span class="at">specs =</span> <span class="st">"1"</span>, <span class="at">weights =</span> <span class="st">"proportional"</span>)</span>
+<span id="cb30-227"><a href="#cb30-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-228"><a href="#cb30-228" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb30-229"><a href="#cb30-229" aria-hidden="true" tabindex="-1"></a>  <span class="at">EMM =</span> <span class="fu">tidy</span>(cyl_emm),</span>
+<span id="cb30-230"><a href="#cb30-230" aria-hidden="true" tabindex="-1"></a>  <span class="at">Effect =</span> <span class="fu">tidy</span>(cyl_contrast) <span class="sc">|&gt;</span> </span>
+<span id="cb30-231"><a href="#cb30-231" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">cyl =</span> <span class="fu">str_sub</span>(contrast, <span class="dv">4</span>, <span class="dv">4</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb30-232"><a href="#cb30-232" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="at">p.value =</span> adj.p.value),</span>
+<span id="cb30-233"><a href="#cb30-233" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"measure"</span></span>
+<span id="cb30-234"><a href="#cb30-234" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb30-235"><a href="#cb30-235" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(measure, cyl, estimate, p.value) <span class="sc">|&gt;</span></span>
+<span id="cb30-236"><a href="#cb30-236" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> measure, <span class="at">values_from =</span> <span class="fu">c</span>(estimate, p.value)) <span class="sc">|&gt;</span></span>
+<span id="cb30-237"><a href="#cb30-237" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(<span class="fu">tidy</span>(intercept_emm) <span class="sc">|&gt;</span></span>
+<span id="cb30-238"><a href="#cb30-238" aria-hidden="true" tabindex="-1"></a>              <span class="fu">mutate</span>(<span class="at">cyl =</span> <span class="st">"Intercept"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb30-239"><a href="#cb30-239" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rename</span>(<span class="at">estimate_EMM =</span> estimate)) <span class="sc">|&gt;</span></span>
+<span id="cb30-240"><a href="#cb30-240" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(cyl, estimate_EMM, p.value_EMM, estimate_Effect, p.value_Effect) <span class="sc">|&gt;</span></span>
+<span id="cb30-241"><a href="#cb30-241" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cyl =</span> <span class="fu">fct_relevel</span>(cyl, <span class="st">"Intercept"</span>, <span class="at">after =</span> <span class="dv">0</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb30-242"><a href="#cb30-242" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(cyl) <span class="sc">|&gt;</span></span>
+<span id="cb30-243"><a href="#cb30-243" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb30-244"><a href="#cb30-244" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">cols_label</span>(</span>
+<span id="cb30-245"><a href="#cb30-245" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate_EMM =</span> <span class="st">"Estimate"</span>,</span>
+<span id="cb30-246"><a href="#cb30-246" aria-hidden="true" tabindex="-1"></a>    <span class="at">p.value_EMM =</span> <span class="st">"p-value"</span>,</span>
+<span id="cb30-247"><a href="#cb30-247" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate_Effect =</span> <span class="st">"Estimate"</span>,</span>
+<span id="cb30-248"><a href="#cb30-248" aria-hidden="true" tabindex="-1"></a>    <span class="at">p.value_Effect =</span> <span class="st">"p-value"</span></span>
+<span id="cb30-249"><a href="#cb30-249" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb30-250"><a href="#cb30-250" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_spanner</span>(<span class="st">"EMM"</span>, <span class="fu">c</span>(estimate_EMM, p.value_EMM)) <span class="sc">|&gt;</span></span>
+<span id="cb30-251"><a href="#cb30-251" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_spanner</span>(<span class="st">"Effect"</span>, <span class="fu">c</span>(estimate_Effect, p.value_Effect)) <span class="sc">|&gt;</span></span>
+<span id="cb30-252"><a href="#cb30-252" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">fmt_number</span>(<span class="fu">c</span>(estimate_EMM, estimate_Effect), <span class="at">decimals =</span> <span class="dv">2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-253"><a href="#cb30-253" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">fmt_number</span>(<span class="fu">c</span>(p.value_EMM, p.value_Effect), <span class="at">decimals =</span> <span class="dv">3</span>)</span>
+<span id="cb30-254"><a href="#cb30-254" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb30-255"><a href="#cb30-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-256"><a href="#cb30-256" aria-hidden="true" tabindex="-1"></a><span class="fu">## Learn More</span></span>
+<span id="cb30-257"><a href="#cb30-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-258"><a href="#cb30-258" aria-hidden="true" tabindex="-1"></a>This <span class="co">[</span><span class="ot">Very statisticious</span><span class="co">](https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/)</span> blog post is helpful. I also worked through the **emmeans** vignettes on [CRAN](https://cran.r-project.org/web/packages/emmeans/) and **ggeffects** on <span class="co">[</span><span class="ot">GitHub</span><span class="co">](https://strengejacke.github.io/ggeffects/index.html)</span>.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -4,81 +4,40 @@
 library(tidyverse)
 library(tidymodels)
 library(gtsummary)
-library(janitor)
 ```
 
 # Estimated Marginal Means {#EMMs}
 
-Estimated marginal means (EMMs) are the mean predicted values for a specified combination of predictor values. Whereas ordinary marginal means are conditional means of the raw data, EMMs are conditional means of _modeled_ data. Use the `emmeans` package to calculate EMMs.
-
-```{r}
-library(emmeans)
-```
-
-Let's work with the `mtcars` dataset. Suppose you are interested in `mpg` as the outcome variable and are exploring differences in levels of factor variable, `cyl`. Your model will control for factor variable, `gear`, and continuous variable, `disp`. 
+I'm modeling the effect of the number of cylinders on vehicle fuel economy. I don't think `cyl` should matter if you control for `disp` and `gear`. Take a look at this regression output. What do you think? The coefficient for `cyl=6` is -4.8 (*p* = .009), but `cyl=8` is indistinguishable from `cyl=4`.
 
 ```{r}
 #| code-fold: false
 
-my_cars <- 
-  mtcars |>
-  mutate(across(c(cyl, gear), factor)) |>
-  select(mpg, cyl, gear, disp)
-```
+my_cars <- mtcars |> mutate(across(c(cyl, gear), factor))
 
-```{r}
-#| code-fold: true
-
-gtsummary::tbl_summary(
-  my_cars,
-  by = cyl,
-  statistic = list(all_continuous() ~ "{mean}, {sd}"),
-  digits = all_continuous() ~ 1
-) |>
-  add_overall() |>
-  modify_header(label ~ "**Variable**") |>
-  modify_spanning_header(c("stat_1", "stat_2", "stat_3") ~ "**cyl**") |>
-  as_gt() |>
-  gt::tab_header(title = "Summary Statistics")
-```
-
-We'll fit two models to illustrate how emmeans work: an intercept-only model and the full model.
-
-```{r}
-#| code-fold: false
-
-fit_intercept <- 
-  linear_reg() |>
-  fit(mpg ~ 1, data = my_cars) |>
-  extract_fit_engine()
-
-fit_full <-
+my_fit <-
   linear_reg() |>
   fit(mpg ~ cyl + disp + gear, data = my_cars) |>
   extract_fit_engine()
+
+tbl_regression(my_fit, intercept = TRUE)
 ```
+
+The problem with this regression is that it holds `cyl=4` as the standard for comparison. That's more aggressive than what I'm after. I want to know if any of the `cyl` levels stand out relative to the whole, not whether any two particular levels differ. In this case, at least `cyl=4` and `cyl=6` differed. If `cyl8` was the reference, none of the *p*-values would be significant.
+
+I think I have a better way: report contrasts from the *estimated marginal means* (EMMs).
+
+## Calculating EMMs
+
+Estimated marginal means (EMMs) are the mean predicted values over supplies set of predictor values. Whereas ordinary marginal means are conditional means of the raw data, EMMs are conditional means of _modeled_ data.
 
 ```{r}
-#| code-fold: true
+#| code-fold: false
 
-gt_intercept <-
-  tbl_regression(fit_intercept, intercept = TRUE, conf.int = FALSE) |>
-  gtsummary::add_significance_stars(hide_se = TRUE)
-
-gt_full <-
-  tbl_regression(fit_full, intercept = TRUE, conf.int = FALSE) |>
-  gtsummary::add_significance_stars(hide_se = TRUE)
-
-tbl_merge(
-  list(gt_intercept, gt_full),
-  tab_spanner = c("**Intercept**", "**Full Model**")
-) |>
-  as_gt() |>
-  gt::fmt_number(decimals = 3) |>
-  gt::tab_header(title = "Regression summary")
+library(emmeans)
 ```
 
-Controlling for `disp` an `gear`, relative to reference level `cyl4`,  `cyl6` reduces expected `mpg` by 4.800 mpg while `cyl8` reduces it slightly more, but without statistical significance at the .05 level. One way to interpret the fit is by calculating the expected value at a set of predictor variable levels. You might fix `disp` at the dataset average, and take the combinations of levels in `cyl` and `gear`. That's nine combinations of predictors. 
+One way to get at the impact of `cyl` is by calculating the expected `mpg` by `cyl`, holding the other predictors fixed at some realistic value. You might set `disp` to the dataset average. For factors like `gear` you can make a prediction for each level. That's nine combinations of predictors. 
 
 ```{r}
 #| code-fold: false
@@ -89,133 +48,114 @@ newdata <- expand.grid(
   gear = levels(my_cars$gear)
 )
 
-(my_preds <- augment(fit_full, newdata = newdata))
+(my_preds <- augment(my_fit, newdata = newdata))
 ```
 
-The estimated marginal mean is the mean of `my_preds$.fitted`, `r comma(mean(my_preds$.fitted), .01)`. This prediction dataset (reference grid) is what `emmeans()` uses by default. `emmeans()` makes predictions across a _reference grid_, then averages the predictions by the `specs` setting. As bonus, you get the confidence interval around the expected value. Set `specs = "1"` to predict the mean over the grid.
+This predictor dataset is called a _reference grid_. `emmeans()` creates a reference grid, makes predictions, then averages them by the `specs` argument. `specs = "1"` averages over the whole grid, `mean(my_preds$.fitted)` = `r comma(mean(my_preds$.fitted), .1)`.
 
 ```{r}
 #| code-fold: false
 
-emmeans(fit_full, specs = "1")
+emmeans(my_fit, specs = "1")
 ```
 
-You can see the reference grid or create a new one using `ref_grid()`.
-
-```{r}
-#| code-fold: false
-
-ref_grid(fit_full)
-```
-
-Instead of averaging _over_ the levels of `cyl`, you can average _by_ each level.
+I'm interested in `cyl`. `specs = "cyl"` will average across the three `gear` levels. Specifying `weights = "proportional"` will weight EMMs by the number of rows in the original data for each level of `cyl`.
  
 ```{r}
 #| code-fold: false
 
-(emm_cyl <- emmeans(fit_full, specs = "cyl"))
+(emm_cyl <- emmeans(my_fit, specs = "cyl", weights = "proportional"))
 ```
+
+What does this get us? The expected `mpg` for a car with 4 cylinders is 23.3. That's 5 mpg greater than the other two. The SEs are pretty large though, so I can't conclude fuel economy varies by `cyl`. For that, I need a contrast.
 
 ## Level Comparisons
 
-### Pairwise
+There's a multitude of ways to analyze EMMs. You can compare them to each other, to the overall mean, to a single level, and so many other ways in the `contrast` documentation that I don't understand.
 
-Calculate EMM pairwise differences with `pairs()`.
+### Pairwise {-}
 
-```{r}
-#| code-fold: false
-
-emmeans(fit_full, specs = "cyl") |>
-  pairs()
-```
-
-Cohen's *d* effect size standardizes the differences by dividing by the model residual standard error. An effect size over .8 is large, .5 medium, and .2 small. The 95% CI crosses zero, so there may be no measurable effects here.
+Let's start with pairwise comparisons. This is definitely _not_ how I want to compare `cyl` levels, but it's a useful introduction.
 
 ```{r}
 #| code-fold: false
 
-emmeans(fit_full, specs = "cyl") |> 
-  eff_size(sigma = sigma(fit_full), edf = df.residual(fit_full))
+pairs(emm_cyl)
 ```
 
-### One vs Whole
+The EMM of `cyl4` is 4.7998 mpg greater than `cyl6` and statistically significant (*p* = .0248). `cyl4 - cyl8` is large, but not significant. This is what the regression output was saying, but `pairs()` gives me `cyl6 - cyl8` too.
 
-Instead of comparing groups to each other, you might compare groups to the *whole* using a contrast. The default is to subtract the grand mean, the mean of the three EMMs, `r comma(mean(tidy(emm_cyl)$estimate), .001)`, from each EMM.
+A more general way to report paired differences is with Cohen's *d* effect size. It standardizes the differences by dividing by the model residual standard error. An effect size >.8 is large, >.5 medium, and >.2 small.
 
 ```{r}
 #| code-fold: false
 
-emmeans(fit_full, specs = "cyl") |> 
-  contrast()
+eff_size(emm_cyl, sigma = sigma(my_fit), edf = df.residual(my_fit))
 ```
 
-If group sizes are imbalanced, as they are here, subtract the *weighted* grand mean. The population sizes are `4` = 11, `6` = 7, `8` = 14, so the weighted grand mean is `r emm_cyl |> tidy() |> mutate(estimate = estimate * case_match(cyl, "4"~11/32, "6"~7/32, "8"~14/32)) |> pull(estimate) |> sum() |> comma(.01)`.
+But again, I'm interested in identifying `cyl` levels that stand out from the rest, not ferreting out two levels that differ from each other.
+
+### One vs Whole {-}
+
+Instead of comparing `cyl` levels to each other, I'll compare them to the *whole* using a contrast. The default contrast subtracts the grand mean, the mean of the three EMMs, `r comma(mean(tidy(emm_cyl)$estimate), .001)`, from each EMM.
 
 ```{r}
 #| code-fold: false
 
-emmeans(fit_full, specs = "cyl") |> 
-  contrast(wts = NA)
+contrast(emm_cyl)
 ```
+
+If group sizes are imbalanced, as they are here, subtract the *weighted* grand mean. The population sizes are `cyl4` = 11, `cyl6` = 7, and `cyl8` = 14, so the weighted grand mean is `r emm_cyl |> tidy() |> mutate(estimate = estimate * case_match(cyl, "4"~11/32, "6"~7/32, "8"~14/32)) |> pull(estimate) |> sum() |> comma(.01)`.
+
+```{r}
+#| code-fold: false
+
+contrast(emm_cyl, wts = NA)
+```
+
+Now we're talking. Instead of subtracting the grand mean of the EMMs, it's subtracting the simple mean of the underlying data. Controlling for other variables, cars with `cyl = 4` are predicted to have an `mpg` 3.17 higher, cals with `cyl = 6` 1.63 lower. *None of these effects are statistically significant.*
 
 ### One vs Others
 
-The contrast shows how each leave relates to the whole. That feels strange because each level biases the whole toward its value. Instead, you can create a contrast that shows how each level relates to the other levels. The estimates below are each EMM minus the average of the other EMMs. The EMM for `cyl=4` was `r comma(tidy(emm_cyl)$estimate[1], .001)`. The average of the other two EMMs was `mean c(18.2, 21.5)` = `r comma(mean(tidy(emm_cyl)$estimate[2:3]), .001)`.
+The default contrast shows how each level relates to the whole, but it feels like double counting since each level also contributes to the whole. Maybe `cyl4` would be statistically different if it wasn't included in the whole. You can do this with `method = "del.eff"`!
 
 ```{r}
 #| code-fold: false
 
-emmeans(fit_full, specs = "cyl") |> 
-  contrast("del.eff")
+contrast(emm_cyl, wts = NA, method = "del.eff")
 ```
 
-The expected `mpg` of a car with `cyl=4` is 4.83 mpg higher than the average expected value of the other `cyl` levels. You can uses a weighted average instead with `wts = NA`.
+Yep, a much larger effect. Note however that the *p*-values are unchanged. The contrast is just not large enough, given the sample size, to be distinguishable from zero.
 
 ## Nuisance Variables
 
-By "expected", we specifically mean the _average predicted value across the reference grid_. Our grid includes the mean `disp` and the three levels of `gear`.
+`gear` has been a bit of a nuisance so far. It is an important part of the model, but after that it was just something to proportionally average over. In fact, controlling variables can become crippling if there are enough of them because the reference grid is composed of all combinations of variable levels.
 
 ```{r}
 #| code-fold: false
 
-ref_grid(fit_full)
+ref_grid(my_fit)
 ```
 
-So the EMMs are averaging over 9 predictions:
+It would be preferable to predict on the "average" `gear`, just like we predicted on the average `disp`. Well, you can! Models one-hot encode factor variables, so you get `gear3 = 0|1`, `gear4 = 0|1`, and `gear5 = 0|1`. What if instead of three combinations you predicted on `gear3=1/3`, `gear4=1/3`, and `gear5=1/3`?
 
 ```{r}
 #| code-fold: false
 
-ref_grid(fit_full) |> tidy()
+ref_grid(my_fit, nuisance = "gear")
 ```
 
-That's great except that `gear` is kind of a nuisance. It would be preferable to predict on the "average" `gear`, just like we predicted on the average `disp`. Well, you can! Recall that models one-hot encode factor variables, so you get `gear3 = 0|1`, `gear4 = 0|1`, and `gear5 = 0|1`. What if instead of three combinations you predicted on `gear3=1/3`, `gear4=1/3`, and `gear5=1/3`?
+Now we'll have just three predictions. This is closer to the "typical" car, but we can do even better by weighting the levels proportionally to their frequency (`gear3=15/32`, `gear4=12/32`, and `gear5=5/32`).
 
 ```{r}
 #| code-fold: false
 
-(nuis_grid_0 <- ref_grid(fit_full, nuisance = "gear"))
-```
-
-Now we have just three predictions. Each estimate below uses the simple average of the three `gear` levels above.
-
-```{r}
-#| code-fold: false
-
-tidy(nuis_grid_0)
-```
-
-This is closer to the "typical" car, but we can do even better by weighting the levels proportionally to their frequency (`gear3=15/32`, `gear4=12/32`, and `gear5=5/32`).
-
-```{r}
-#| code-fold: false
-
-nuis_grid <- ref_grid(fit_full, nuisance = "gear", wt.nuis = "proportional")
+nuis_grid <- ref_grid(my_fit, nuisance = "gear", wt.nuis = "proportional")
 
 tidy(nuis_grid)
 ```
 
-Now the one vs others contrast is more like the "average" car, varying only the number of cylinders. Recall, the default is to weight the other two EMMs equally, and `wts = NA` weights them by `cyl` count.
+Now the one vs others contrast is more like the "average" car, varying only the number of cylinders. Recall that the default is to weight the other two EMMs equally, so `wts = NA` weights them by `cyl` count.
 
 ```{r}
 #| code-fold: false
@@ -225,11 +165,11 @@ emmeans(nuis_grid, specs = "cyl") |>
   tidy()
 ```
 
-So the expected value of `cyl4` is 4.837 mpg greater than the weighted average of the other `cyl` levels.
+The expected value of `cyl4` is 4.837 mpg greater than the weighted average of the other `cyl` levels. Let's report this!
 
 ## Reporting EMM + Contrast
 
-Sometimes reporting model coefficients suffers from lack of context. The model fit coefficient for `cyl6` indicates it reduces the expected `mpg` by 4.800 relative to `cyl4`. That's less useful if you don't have a baseline `mpg` to compare 4.800 to. Instead, you might report that a 'representative' (mediod?) car, that is, a car with a proportional mix of all modeled car attributes, has an expected `mpg` of 20.091 (intercept-only model) and the effect of fixing `cyl = 4` is to increase this expected value by 3.174 to 23.265, and fixing `cyl = 6` decreases it 1.625 to 18.465. 
+Sometimes reporting model coefficients suffers from lack of context. The model fit coefficient for `cyl6` indicates it reduces the expected `mpg` by 4.800 relative to `cyl4`. Instead, I will report that a 'representative' car, a car with a proportional mix of all modeled car attributes, has an expected `mpg` of 20.091 (intercept-only model) and the effect of fixing `cyl = 4` is to increase this expected value by 3.174 to 23.265, and fixing `cyl = 6` decreases it 1.625 to 18.465. 
 
 ```{r}
 #| code-fold: false
@@ -240,58 +180,45 @@ emmeans(nuis_grid, specs = "cyl") |> contrast(wts = NA) |> tidy()
 We can report this in a single row.
 
 ```{r}
-#| code-fold: true
+final_fit <- 
+  linear_reg() |> 
+  fit(mpg ~ cyl + disp + gear, data = my_cars) |>
+  extract_fit_engine()
 
-contrast_color <- function(bg) {
-  if_else(colorspace::contrast_ratio(bg, "black") > 
-            colorspace::contrast_ratio(bg, "white"),
-          "black", "white")
-}
+nuis_grid <- ref_grid(final_fit, nuisance = "gear", wt.nuis = "proportional")
 
-smry <- 
-  bind_rows(
-    ref_grid(fit_full, nuisance = c("cyl", "gear"), wt.nuis = "proportional") |> 
-      emmeans(specs = "1") |> tidy() |> rename(contrast = `1`),
-    emmeans(nuis_grid, specs = "cyl") |> contrast(wts = NA) |> tidy()
-  ) |>
-  select(contrast, estimate, adj.p.value) |>
-  mutate(contrast = fct_relevel(contrast, "overall", after = 0)) |>
-  arrange(contrast) |>
-  mutate(
-    pct = estimate / first(estimate),
-    bg = case_when(
-      adj.p.value < .05 & estimate < 0 ~ "firebrick",
-      adj.p.value < .05 & estimate > 0 ~ "dodgerblue",
-      TRUE ~ "white"
-    ),
-    color = contrast_color(bg)
-  )
+cyl_emm <- emmeans(nuis_grid, specs = "cyl") 
 
-smry |>
-  select(contrast, estimate) |>
-  mutate(contrast = str_remove(contrast, " effect")) |>
-  pivot_wider(names_from = contrast, values_from = estimate) |>
+cyl_contrast <- contrast(cyl_emm, wts = NA)
+
+intercept_emm <- emmeans(nuis_grid, specs = "1", weights = "proportional")
+
+bind_rows(
+  EMM = tidy(cyl_emm),
+  Effect = tidy(cyl_contrast) |> 
+    mutate(cyl = str_sub(contrast, 4, 4)) |>
+    rename(p.value = adj.p.value),
+  .id = "measure"
+) |>
+  select(measure, cyl, estimate, p.value) |>
+  pivot_wider(names_from = measure, values_from = c(estimate, p.value)) |>
+  bind_rows(tidy(intercept_emm) |>
+              mutate(cyl = "Intercept") |> 
+              rename(estimate_EMM = estimate)) |>
+  select(cyl, estimate_EMM, p.value_EMM, estimate_Effect, p.value_Effect) |>
+  mutate(cyl = fct_relevel(cyl, "Intercept", after = 0)) |>
+  arrange(cyl) |>
   gt::gt() |>
-  gt::fmt_number(decimals = 3) |>
-  gt::tab_spanner("Effect", columns = 2:3) |>
-  gt::tab_header(title = "Effect of gender on estimated marginal means.") |>
-  gt::tab_options(heading.align = "left") |>
-  gt::tab_style(
-    style = gt::cell_fill("firebrick"),
-    locations = gt::cells_body(columns = which(smry$bg == "firebrick"))
+  gt::cols_label(
+    estimate_EMM = "Estimate",
+    p.value_EMM = "p-value",
+    estimate_Effect = "Estimate",
+    p.value_Effect = "p-value"
   ) |>
-  gt::tab_style(
-    style = gt::cell_fill("dodgerblue"),
-    locations = gt::cells_body(columns = which(smry$bg == "dodgerblue"))
-  ) |>
-  gt::tab_style(
-    style = gt::cell_text("white"),
-    locations = gt::cells_body(columns = which(smry$color == "white"))
-  ) |>
-  gt::tab_style(
-    style = gt::cell_text("black"),
-    locations = gt::cells_body(columns = which(smry$color == "black"))
-  )
+  gt::tab_spanner("EMM", c(estimate_EMM, p.value_EMM)) |>
+  gt::tab_spanner("Effect", c(estimate_Effect, p.value_Effect)) |>
+  gt::fmt_number(c(estimate_EMM, estimate_Effect), decimals = 2) |>
+  gt::fmt_number(c(p.value_EMM, p.value_Effect), decimals = 3)
 ```
 
 ## Learn More
