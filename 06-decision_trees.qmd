@@ -19,13 +19,6 @@ theme_set(
       strip.text = element_text(color = "gray20")
     )
 )
-
-scoreboard <- function(dat){
-   dat %>%
-      flextable::flextable() %>%
-      flextable::colformat_num(j = 2, digits = 4) %>%
-      flextable::autofit()
-}
 ```
 
 Decision tree models, also known as classification and regression trees (CART), split the dataset into subsets based on the value of input features, creating a tree-like structure of decision rules. At each node, the algorithm chooses the best split. The process continues recursively until a stopping condition is met. The result is a tree that can be used to make predictions for new data points.
@@ -114,7 +107,7 @@ oj_cart_wf <-
 
 ### Fit the Model {.unnumbered}
 
-Tune the hyperparameters with 10-fold CV using a regular grid. With 3 hyperparameters and 5 levels, the grid has 5\^3=125 combinations. That means the tuning exercise will fit 125 models for each of the 10 folds - 1,250 fits! We'll evaluate the fits based on accuracy and AUC. The dataset is somewhat imbalanced (`r percent(mean(oj_dat$Purchase == "CH"), 1)` "CH"), so AUC will be the more important metric. It takes about a minute and a half to fit the `r nrow(oj_train)` x `r ncol(oj_train)` dataset.
+Tune the hyperparameters with 10-fold CV using a regular grid. With 3 hyperparameters and 5 levels, the grid has 5\^3=125 combinations. That means the tuning step fits 125 models for each of the 10 folds (1,250 fits). We'll evaluate the fits based on accuracy and AUC. The dataset is somewhat imbalanced (`r percent(mean(oj_dat$Purchase == "CH"), 1)` "CH"), so AUC is the more important metric. This step takes about a minute to complete.
 
 ```{r}
 #| label: fit-cart-class
@@ -147,7 +140,7 @@ toc()
 oj_cart_resamples
 ```
 
-Each row contains a metrics list with values for each hyperparameter combination and performance metric. There were 125 parameter combinations and two metrics, so 250 rows. Here's what the metrics object from the first fold look like.
+Each row contains a metrics list with values for each hyperparameter combination and performance metric. There were 125 parameter combinations and two metrics, so 250 rows. Here's the metrics object from the first fold.
 
 ```{r}
 #| code-fold: false
@@ -160,7 +153,7 @@ oj_cart_resamples[1, ]$.metrics[[1]] |> glimpse()
 ```{r}
 #| code-fold: false
 
-oj_cart_resamples |> show_best(metric = "roc_auc") |> knitr::kable()
+show_best(oj_cart_resamples, metric = "roc_auc") |> knitr::kable()
 ```
 
 Plot the sensitivity to the hyperparameter combinations to make sure you've explored a range that gives you a peek.
@@ -182,7 +175,7 @@ bind_rows(
   ggplot(aes(x = x, y = mean_auc, color = .metric)) +
   geom_line(linewidth = 1.5, alpha = .6) +
   facet_wrap(vars(hyperparameter), scales = "free_x") +
-  labs(x = NULL, y = "Mean AUC", color = NULL, title = "Hyperparameter Tuning") +
+  labs(x = NULL, y = "Mean", color = NULL, title = "Hyperparameter Tuning") +
   theme(legend.position = "top")
 ```
 
@@ -196,6 +189,8 @@ oj_cart_fit <-
   last_fit(oj_split)
 ```
 
+### Interpretation {.unnumbered}
+
 Here is the tree. The output starts with the root node. Terminal nodes are labeled with an asterisk (\*), so this is just a summary node of everything beneath. Node 1 Contains all 855 observations with 333 misclassifications. The majority class is CH, with a proportion of 0.6105 for CH and 0.3895 for MM. Node 2 Splits on `LoyalCH` >= 0.48285, containing 534 observations with 92 misclassifications. The majority class is CH, with a higher proportion of CH. The child nodes of node "x" having labeling pattern 2x) and 2x+1), so for node 1) it's 2) and 3), and for 2) it's 4) and 5).
 
 ```{r}
@@ -206,11 +201,15 @@ extract_workflow(oj_cart_fit)
 A diagram of the tree can sometimes help if its not too large. The node label indicates the predicted value, error rate, and proportion of observations included. Below the nodes are the splitting criteria.
 
 ```{r}
+#| code-fold: false
+
 oj_cart_fit |>
   extract_workflow() |>
   extract_fit_engine() |>
   rpart.plot(yesno = TRUE, roundint = FALSE)
 ```
+
+#### VIP {.unnumbered}
 
 A variable's importance is the sum of the improvement in the overall Gini (or RMSE) measure produced by the nodes in which it appears. From the **rpart** [vignette](https://cran.r-project.org/web/packages/rpart/vignettes/longintro.pdf) (page 12),
 
@@ -219,11 +218,45 @@ A variable's importance is the sum of the improvement in the overall Gini (or RM
 `LoyalCH` was the most important variable, followed by `PriceDiff`.
 
 ```{r}
+#| code-fold: false
+
 oj_cart_fit |>
   extract_workflow() |>
   extract_fit_parsnip() |>
   vip::vip()
 ```
+
+#### SHAP {.unnumbered}
+
+SHAP (SHapley Additive exPlanations) values are based on game theory and provide a way to understand how each feature contributes to a prediction. They’re model-agnostic and work for both global and local interpretability. They fairly distribute the “credit” for a prediction among all input features.
+
+SHAP works by computing the marginal contribution of each feature by comparing predictions with and without the feature across all possible feature combinations. This is computationally expensive, so approximations exist. Unlike other feature importance methods, SHAP accounts for feature interactions and local behavior.
+
+```{r}
+library(fastshap)
+library(shapviz)
+
+pfun <- function(object, newdata) {
+  preds <- predict(object, newdata = newdata, type = "prob")
+  unname(preds[, "CH"])
+}
+
+X <- oj_train |> select(-Purchase)
+
+oj_cart_shap <- 
+  oj_cart_fit |> 
+  extract_workflow() |> 
+  extract_fit_engine() |>
+  fastshap::explain(
+    X = select(oj_train, -Purchase),
+    nsim = 10,
+    pred_wrapper = pfun,
+    shap_only = FALSE
+  )
+
+shapviz(oj_cart_shap) |> sv_importance()
+```
+
 
 ### Performance {.unnumbered}
 
@@ -1109,3 +1142,5 @@ cs_xgb$fit %>%
    geom_abline(intercept = 0, slope = 1, linetype = 2) +
    labs(title = "Carseats Random Forest, Predicted vs Actual")
 ```
+
+## Model Summary {-}

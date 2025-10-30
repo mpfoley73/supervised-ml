@@ -3,6 +3,7 @@
 ```{r include=FALSE}
 library(tidyverse)
 library(tidymodels)
+library(glue)
 library(vip)
 
 set.seed(1)
@@ -10,13 +11,13 @@ set.seed(1)
 
 Regularization is a set of methods in linear regression that manage the "bias-variance" tradeoff in machine learning. Bias and variance are two types of errors that affect model performance.
 
-- Bias refers to errors introduced by overly simplistic models that make strong assumptions. High-bias models, like linear models for nonlinear data, tend to underfit, meaning they fail to capture important patterns. This leads to systematic errors when predicting on new data.
+- Bias is the error introduced by the strong assumptions of an overly simplistic model. High-bias models, like linear models for nonlinear data, tend to under fit, meaning they fail to capture important patterns. This leads to systematic errors when predicting with new data.
 
-- Variance is the model’s sensitivity to fluctuations in the training data. High-variance models, like linear models with highly correlated features and deep neural networks, tend to overfit, meaning they capture noise in the data as if it were part of the underlying pattern. These models perform well on training data but are less reliable on new data. 
+- Variance is the model’s sensitivity to fluctuations in the training data. High-variance models, like linear models with highly correlated features and deep neural networks, tend to overfit, meaning they capture noise in the data as if it were part of the underlying pattern. High-variance models perform well on training data, but are less reliable on new data. 
 
-The tradeoff is that increasing model complexity to decrease predictive bias (expected prediction error) comes at the cost of increasing prediction variance (variance of expected prediction error). The goal is to find a "sweet spot" with an optimal level of model complexity that minimizes overall error on new, unseen data.
+The tradeoff is that increasing model complexity to decrease predictive bias (expected prediction error) comes at the cost of increasing prediction variance (variance of expected prediction error). Regularization finds the sweet spot that balances the tradeoff.
 
-## Bias-Variance Trade-off
+## Bias-Variance Tradeoff
 
 The linear regression model is $Y = X \beta + \epsilon$, where $\epsilon \sim N(0, \sigma^2)$. OLS estimates the coefficients by minimizing the loss function
 
@@ -24,25 +25,25 @@ $$L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2$$
 
 where $\hat{f} = x_i^{'} \hat\beta$ is the estimator of the true regression function, $f$. 
 
-This results estimate for the coefficients of
+The resulting estimate for the coefficients is
 
 $$\hat{\beta} = \left(X'X\right)^{-1}\left(X'Y\right).$$
 
-There are two important characteristics of any estimator: its *bias* and its *variance*.  For OLS, these are
+There are two important characteristics of any estimator: *bias* and its *variance*.  For OLS, these are
 
-$$Bias(\hat{\beta}) = E(\hat{\beta}) - \beta = 0$$
+$$\text{Bias}(\hat{\beta}) = E(\hat{\beta}) - \beta = 0$$
 
 and
 
-$$Var(\hat{\beta}) = \sigma^2(X'X)^{-1}$$
+$$\mathbb{V}(\hat{\beta}) = \sigma^2(X'X)^{-1}$$
 
 where the unknown population variance $\sigma^2$ is estimated from the residuals
 
 $$\hat\sigma^2 = \frac{\epsilon' \epsilon}{n - k}.$$
 
-The OLS estimator is unbiased, but can have a large variance when the predictor variables are highly correlated with each other, or when there are many predictors (notice how $\hat{\sigma}^2$ increases as $k \rightarrow n$).  Stepwise selection balances the trade-off by eliminating variables, but this throws away information.  *Regularization* keeps all the predictors, but reduces coefficient magnitudes to reduce variance at the expense of some bias.
+The OLS estimator is unbiased, but can have a large variance when the predictor variables are highly correlated, or when there are many predictors (notice how $\hat{\sigma}^2$ increases as $k \rightarrow n$).  Stepwise selection balances the trade-off by eliminating variables, but this throws away information.  *Regularization* keeps all the predictors, but reduces coefficient magnitudes to reduce variance at the expense of some bias.
 
-We can decompose the expected prediction error (EPE) into a *reducible error* related to the type of model, and *irreducible error* related to the variance $y$ (noise).
+We can decompose the expected prediction error (EPE) into a *reducible error* related to the type of model, and *irreducible error* related to the variance in $y$ (noise).
 
 $$
 \text{EPE} = \mathbb{E}\left[\left(f(x) - \hat{f}(x)\right)^2\right] + 
@@ -57,47 +58,49 @@ $$
   \mathbb{V}[y|x]
 $$
 
-**Illustration**.  Let's set up a bias-variance tradeoff by fitting several models of increasing complexity to a random data-generating process, $f(x) = x^3$. We'll create 250 random samples by choosing $x$ between 1 and 5 and $y = f(x) + e$ where $e$ is noise.
+**Illustration**. You can see the bias-variance tradeoff by fitting models of increasing complexity to a random data-generating process, $f(x) = x^3$. Create 250 random samples of $y = f(x) + e$ where $x \in [1,5]$ and $e$ is noise.
 
 ```{r}
 #| code-fold: false
-f <- function(x) {x^3}
 
 make_sample = function() {
-  x = runif(n = 100, 1, 5)
-  e = rnorm(n = 100, 0, 5)
-  y = f(x) + e
-  data.frame(x, y)
+  tibble(
+    x = runif(n = 100, 1, 5),
+    y = x^3 + rnorm(n = 100, 0, 5)
+  )
 }
 
-sim_dat <-
-  tibble(sim = 1:250) |>
-  mutate(dat = map(sim, ~ make_sample()))
+sim_dat <- tibble(
+  sim = seq_len(250),
+  dat = map(sim, ~ make_sample())
+)
 ```
 
-We'll fit five models. The first is a linear model, $y \sim x$. Then we'll fit polynomial model of degree 2. These first two models underfit the data. Then one of degree 3 - matching the underlying data-generating process. Then we'll overfit with one of degree 9. Finally, we'll use regularization to improve on the degree 9 model.
+Fit four polynomial models of degree 1, 2, 3, and 9. The first two under fit the data. The degree 3 model matches the underlying data-generating process. The degree 9 model over fits. Then fit a fourth model using regularization on the degree 9.
 
 ```{r}
 #| code-fold: false
+
 sim_fit <-
   sim_dat |>
   mutate(
-    dat = map(sim, ~ make_sample()),
     fit_1 = map(dat, ~ linear_reg() |> fit(y ~ poly(x, degree = 1), data = .)),
     fit_2 = map(dat, ~ linear_reg() |> fit(y ~ poly(x, degree = 2), data = .)),
     fit_3 = map(dat, ~ linear_reg() |> fit(y ~ poly(x, degree = 3), data = .)),
     fit_9 = map(dat, ~ linear_reg() |> fit(y ~ poly(x, degree = 9), data = .)),
-    fit_9a = map(dat, 
-                  ~ linear_reg(engine = "glmnet", penalty = 0.2, mixture = 1) |>
-                    fit(y ~ poly(x, degree = 9), data = .))
+    fit_9a = map(
+      dat, 
+      ~ linear_reg(engine = "glmnet", penalty = 0.2, mixture = 1) |>
+        fit(y ~ poly(x, degree = 9), data = .))
   )
 ```
 
-This gives us 5 models fit to 250 random samples, each sample containing 100 points from an $f(x) = x^3 + \epsilon$ data-generating process. Let's predict a single value, $f(x = 4)$ from each model.
+We have 5 models, each fitted 250 times to random samples of size 100 points from an $f(x) = x^3 + \epsilon$ data-generating process. Now use the models predict a single value, $f(x = 4)$,.
 
 ```{r}
 #| code-fold: false
-test_dat <- data.frame(x = 4)
+
+test_dat <- tibble(x = 4)
 
 sim_preds <-
   sim_fit |>
@@ -110,38 +113,46 @@ sim_preds <-
   )
 ```
 
-Check out the distribution of fitted values. The degree 3 polynomial is the gold standard, and you see both low bias and variance. The degree-1 polynomial was just bad. The degree 2 had a high bias, but at least the variance was small. The degree 9 model overfit the data. It had low bias overall, but very high variance. The last model used regularization to improve its reliability, and you see the variance has shrunk with only a small reduction in bias.
+This gives us 250 predictions per model. Check out their distributions. The degree 3 polynomial is the gold standard, and you see both low bias and variance. The degree 1 and 2 polynomials under-fit, resulting in high bias. But at least the variance is small on degree-2 polynomial. The degree 9 model overfits, resulting in low bias, but at the expense of high variance. The regularization model shrunk the variance with only a small increase in bias.
 
 ```{r}
 #| code-fold: true
+
 sim_preds |>
   select(`1`:`9 (LASSO)`) |>
   pivot_longer(c(everything())) |>
   ggplot(aes(x = name, y = value)) +
-  geom_hline(yintercept = f(4), linewidth = 1, color = "goldenrod") +
+  geom_hline(yintercept = 4^3, linetype = 2, linewidth = 1, color = "goldenrod") +
   geom_boxplot(fill = NA, outlier.shape = NA) +
   geom_jitter(height = 0, width = .2, alpha = .2) +
   theme(panel.grid = element_blank()) +
   labs(
     x = "Polynomial Degree", y = "Preds",
-    title = "Increasing complexity improves bias at expense of higher variance.",
-    subtitle = "Simulated Predictions from Four Linear Models"
+    title = str_wrap(glue(
+      "Increasing complexity improves bias at expense of higher variance, ",
+      "but regularization balances the trade-off"
+    ), 80),
+    subtitle = "Simulated Predictions from Polynomial Models"
   )
 ```
 
 ## Case Study
 
-The sections below use the `mtcars` dataset to predict `mpg` from the other variables with regularization function `glmnet::glmnet()`. Set up a train-test split, training on 5-fold CV.
+The following three sections use regularization to fit a model of `mpg` on the other variables in the `mtcars` dataset. Set up a train-test split, training with 5-fold CV.
 
 ```{r}
 #| code-fold: false
+
 data("mtcars")
 
 glimpse(mtcars)
 
-(mt_split <- initial_split(mtcars))
+(mt_split <- rsample::initial_split(mtcars))
 
-(mt_folds <- vfold_cv(training(mt_split), v = 5))
+(mt_folds <- rsample::vfold_cv(
+  rsample::training(mt_split), 
+  v = 5
+))
 ```
 
 ## Ridge
