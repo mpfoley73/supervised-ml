@@ -291,7 +291,7 @@ window.Quarto = {
 <p>The resulting estimate for the coefficients is</p>
 <p><span class="math display">\[\hat{\beta} = \left(X'X\right)^{-1}\left(X'Y\right).\]</span></p>
 <p>There are two important characteristics of any estimator: <em>bias</em> and its <em>variance</em>. For OLS, these are</p>
-<p><span class="math display">\[\text{Bias}(\hat{\beta}) = E(\hat{\beta}) - \beta = 0\]</span></p>
+<p><span class="math display">\[\mathbb{B}(\hat{\beta}) = E(\hat{\beta}) - \beta = 0\]</span></p>
 <p>and</p>
 <p><span class="math display">\[\mathbb{V}(\hat{\beta}) = \sigma^2(X'X)^{-1}\]</span></p>
 <p>where the unknown population variance <span class="math inline">\(\sigma^2\)</span> is estimated from the residuals</p>
@@ -383,7 +383,7 @@ window.Quarto = {
 </section>
 <section id="case-study" class="level2" data-number="5.2">
 <h2 data-number="5.2" class="anchored" data-anchor-id="case-study"><span class="header-section-number">5.2</span> Case Study</h2>
-<p>The following three sections use regularization to fit a model of <code>mpg</code> on the other variables in the <code>mtcars</code> dataset. Set up a train-test split, training with 5-fold CV.</p>
+<p>The next three sections use regularization to fit a model of <code>mpg</code> on the other variables in the <code>mtcars</code> dataset. Set up a train-test split, training with 5-fold CV.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"mtcars"</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -428,11 +428,13 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 <section id="ridge" class="level2" data-number="5.3">
 <h2 data-number="5.3" class="anchored" data-anchor-id="ridge"><span class="header-section-number">5.3</span> Ridge</h2>
 <p>Ridge regression estimates the linear model coefficients by minimizing an augmented loss function which includes a term, <span class="math inline">\(\lambda\)</span>, that penalizes the magnitude of the coefficient estimates,</p>
-<p><span class="math display">\[L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \hat{\beta}_j^2.\]</span></p>
+<p><span id="eq-ridge-loss"><span class="math display">\[
+L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \hat{\beta}_j^2.
+\tag{5.1}\]</span></span></p>
 <p>The resulting estimate for the coefficients is</p>
 <p><span class="math display">\[\hat{\beta} = \left(X'X + \lambda I\right)^{-1}\left(X'Y \right).\]</span></p>
 <p>As <span class="math inline">\(\lambda \rightarrow 0\)</span>, ridge regression approaches OLS. The bias and variance for the ridge estimator are</p>
-<p><span class="math display">\[\mathrm{Bias}(\hat{\beta}) = -\lambda \left(X'X + \lambda I \right)^{-1} \beta\]</span> <span class="math display">\[\mathbb{V}(\hat{\beta}) = \sigma^2 \left(X'X + \lambda I \right)^{-1}X'X \left(X'X + \lambda I \right)^{-1}\]</span></p>
+<p><span class="math display">\[\mathbb{B}(\hat{\beta}) = -\lambda \left(X'X + \lambda I \right)^{-1} \beta\]</span> <span class="math display">\[\mathbb{V}(\hat{\beta}) = \sigma^2 \left(X'X + \lambda I \right)^{-1}X'X \left(X'X + \lambda I \right)^{-1}\]</span></p>
 <p>Notice how the estimator bias increases with <span class="math inline">\(\lambda\)</span> while the variance decreases with <span class="math inline">\(\lambda\)</span>. The optimal level for <span class="math inline">\(\lambda\)</span> is the one that minimizes the root mean squared error (RMSE) or the Akaike or Bayesian Information Criterion (AIC or BIC), or R-squared.</p>
 <p>To fit a linear model with ridge regression, specify <code>linear_reg(mixture = 0)</code>. Standardize the predictors in the recipe so that each contributes to the model on a similar scale. Otherwise, predictors with larger scales would naturally have larger coefficients.</p>
 <div class="cell">
@@ -536,6 +538,7 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </table>
 </div>
 </div>
+<p><br> A plot shows how the RMSE varies with the penalty. <span class="math inline">\(R^2\)</span> is shown too. The minimum RMSE is at 3.4.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -597,7 +600,7 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </table>
 </div>
 </div>
-<p><br> The most important variables here were <code>am</code> and <code>wt</code>.</p>
+<p><br> Use <code>vip::vi()</code> to calculate variable importance.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -627,7 +630,9 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 <h2 data-number="5.4" class="anchored" data-anchor-id="lasso"><span class="header-section-number">5.4</span> Lasso</h2>
 <p>Lasso stands for “least absolute shrinkage and selection operator”. Like ridge, lasso adds a penalty for coefficients, but instead of penalizing the sum of squared coefficients (L2 penalty), lasso penalizes the sum of absolute values (L1 penalty). As a result, coefficients can be zeroed under lasso for high values of <span class="math inline">\(\lambda\)</span>.</p>
 <p>The loss function for lasso is</p>
-<p><span class="math display">\[L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \left| \hat{\beta}_j \right|.\]</span></p>
+<p><span id="eq-lasso-loss"><span class="math display">\[
+L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \left| \hat{\beta}_j \right|.
+\tag{5.2}\]</span></span></p>
 <p>To fit a linear model with lasso regression, specify <code>linear_reg(mixture = 1)</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>lasso_mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">engine =</span> <span class="st">"glmnet"</span>, <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>)</span>
@@ -730,6 +735,7 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </table>
 </div>
 </div>
+<p>The minimum RMSE is at 0.5.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -791,7 +797,7 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </table>
 </div>
 </div>
-<p><br> The most important variables here were <code>am</code> and <code>wt</code>.</p>
+<p><br> Hera are the most important variables.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -820,8 +826,10 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 <section id="elastic-net" class="level2" data-number="5.5">
 <h2 data-number="5.5" class="anchored" data-anchor-id="elastic-net"><span class="header-section-number">5.5</span> Elastic Net</h2>
 <p>Elastic Net combines the penalties of ridge and lasso to get the best of both worlds. The loss function for elastic net is</p>
-<p><span class="math display">\[L = \frac{\sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2}{2n} + \lambda \frac{1 - \alpha}{2}\sum_{j=1}^k \hat{\beta}_j^2 + \lambda \alpha\left| \hat{\beta}_j \right|.\]</span></p>
-<p>In this loss function, new parameter <span class="math inline">\(\alpha\)</span> is a “mixing” parameter that balances the two approaches. If <span class="math inline">\(\alpha\)</span> is zero, you are back to ridge regression, and if <span class="math inline">\(\alpha\)</span> is one, you are back to lasso. To fit a linear model with elastic net regression, specify <code>linear_reg(mixture = tune())</code>.</p>
+<p><span id="eq-elnet-loss"><span class="math display">\[
+L = \frac{\sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2}{2n} + \lambda \frac{1 - \alpha}{2}\sum_{j=1}^k \hat{\beta}_j^2 + \lambda \alpha\left| \hat{\beta}_j \right|.
+\tag{5.3}\]</span></span></p>
+<p>In <a href="#eq-elnet-loss" class="quarto-xref">Equation&nbsp;<span>5.3</span></a>, new parameter <span class="math inline">\(\alpha\)</span> is a “mixing” parameter that balances the two approaches. If <span class="math inline">\(\alpha\)</span> is zero, you are back to ridge regression, and if <span class="math inline">\(\alpha\)</span> is one, you are back to lasso. To fit a linear model with elastic net regression, specify <code>linear_reg(mixture = tune())</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>elnet_mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">engine =</span> <span class="st">"glmnet"</span>, <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="fu">tune</span>())</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -992,7 +1000,7 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </table>
 </div>
 </div>
-<p><br> The most important variables here were <code>wt</code>, <code>qsec</code> and <code>disp</code>.</p>
+<p><br> Hera are the most important variables again.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -1063,7 +1071,7 @@ $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1
 </table>
 </div>
 </div>
-<p>Final thoughts on the models.</p>
+<p><br> Final thoughts on the models.</p>
 <ul>
 <li>Lasso can set some coefficients to zero, thus performing variable selection.</li>
 <li>Lasso and Ridge address multicollinearity differently: in ridge regression, the coefficients of correlated predictors are similar; In lasso, one of the correlated predictors has a larger coefficient, while the rest are (nearly) zeroed.</li>
@@ -1590,7 +1598,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a>There are two important characteristics of any estimator: *bias* and its *variance*.  For OLS, these are</span>
 <span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>$$\text{Bias}(\hat{\beta}) = E(\hat{\beta}) - \beta = 0$$</span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>$$\mathbb{B}(\hat{\beta}) = E(\hat{\beta}) - \beta = 0$$</span>
 <span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>and</span>
 <span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a></span>
@@ -1697,7 +1705,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb24-146"><a href="#cb24-146" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-147"><a href="#cb24-147" aria-hidden="true" tabindex="-1"></a><span class="fu">## Case Study</span></span>
 <span id="cb24-148"><a href="#cb24-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-149"><a href="#cb24-149" aria-hidden="true" tabindex="-1"></a>The following three sections use regularization to fit a model of <span class="in">`mpg`</span> on the other variables in the <span class="in">`mtcars`</span> dataset. Set up a train-test split, training with 5-fold CV.</span>
+<span id="cb24-149"><a href="#cb24-149" aria-hidden="true" tabindex="-1"></a>The next three sections use regularization to fit a model of <span class="in">`mpg`</span> on the other variables in the <span class="in">`mtcars`</span> dataset. Set up a train-test split, training with 5-fold CV.</span>
 <span id="cb24-150"><a href="#cb24-150" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-153"><a href="#cb24-153" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb24-154"><a href="#cb24-154" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
@@ -1718,298 +1726,311 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb24-169"><a href="#cb24-169" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-170"><a href="#cb24-170" aria-hidden="true" tabindex="-1"></a>Ridge regression estimates the linear model coefficients by minimizing an augmented loss function which includes a term, $\lambda$, that penalizes the magnitude of the coefficient estimates,</span>
 <span id="cb24-171"><a href="#cb24-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-172"><a href="#cb24-172" aria-hidden="true" tabindex="-1"></a>$$L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \hat{\beta}_j^2.$$</span>
-<span id="cb24-173"><a href="#cb24-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-174"><a href="#cb24-174" aria-hidden="true" tabindex="-1"></a>The resulting estimate for the coefficients is </span>
+<span id="cb24-172"><a href="#cb24-172" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb24-173"><a href="#cb24-173" aria-hidden="true" tabindex="-1"></a>L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \hat{\beta}_j^2.</span>
+<span id="cb24-174"><a href="#cb24-174" aria-hidden="true" tabindex="-1"></a>$$ {#eq-ridge-loss}</span>
 <span id="cb24-175"><a href="#cb24-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-176"><a href="#cb24-176" aria-hidden="true" tabindex="-1"></a>$$\hat{\beta} = \left(X'X + \lambda I\right)^{-1}\left(X'Y \right).$$</span>
+<span id="cb24-176"><a href="#cb24-176" aria-hidden="true" tabindex="-1"></a>The resulting estimate for the coefficients is </span>
 <span id="cb24-177"><a href="#cb24-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-178"><a href="#cb24-178" aria-hidden="true" tabindex="-1"></a>As $\lambda \rightarrow 0$, ridge regression approaches OLS.  The bias and variance for the ridge estimator are</span>
+<span id="cb24-178"><a href="#cb24-178" aria-hidden="true" tabindex="-1"></a>$$\hat{\beta} = \left(X'X + \lambda I\right)^{-1}\left(X'Y \right).$$</span>
 <span id="cb24-179"><a href="#cb24-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-180"><a href="#cb24-180" aria-hidden="true" tabindex="-1"></a>$$\mathrm{Bias}(\hat{\beta}) = -\lambda \left(X'X + \lambda I \right)^{-1} \beta$$</span>
-<span id="cb24-181"><a href="#cb24-181" aria-hidden="true" tabindex="-1"></a>$$\mathbb{V}(\hat{\beta}) = \sigma^2 \left(X'X + \lambda I \right)^{-1}X'X \left(X'X + \lambda I \right)^{-1}$$</span>
-<span id="cb24-182"><a href="#cb24-182" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-183"><a href="#cb24-183" aria-hidden="true" tabindex="-1"></a>Notice how the estimator bias increases with $\lambda$ while the variance decreases with $\lambda$. The optimal level for $\lambda$ is the one that minimizes the root mean squared error (RMSE) or the Akaike or Bayesian Information Criterion (AIC or BIC), or R-squared.</span>
+<span id="cb24-180"><a href="#cb24-180" aria-hidden="true" tabindex="-1"></a>As $\lambda \rightarrow 0$, ridge regression approaches OLS.  The bias and variance for the ridge estimator are</span>
+<span id="cb24-181"><a href="#cb24-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-182"><a href="#cb24-182" aria-hidden="true" tabindex="-1"></a>$$\mathbb{B}(\hat{\beta}) = -\lambda \left(X'X + \lambda I \right)^{-1} \beta$$</span>
+<span id="cb24-183"><a href="#cb24-183" aria-hidden="true" tabindex="-1"></a>$$\mathbb{V}(\hat{\beta}) = \sigma^2 \left(X'X + \lambda I \right)^{-1}X'X \left(X'X + \lambda I \right)^{-1}$$</span>
 <span id="cb24-184"><a href="#cb24-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-185"><a href="#cb24-185" aria-hidden="true" tabindex="-1"></a>To fit a linear model with ridge regression, specify <span class="in">`linear_reg(mixture = 0)`</span>. Standardize the predictors in the recipe so that each contributes to the model on a similar scale. Otherwise, predictors with larger scales would naturally have larger coefficients.</span>
+<span id="cb24-185"><a href="#cb24-185" aria-hidden="true" tabindex="-1"></a>Notice how the estimator bias increases with $\lambda$ while the variance decreases with $\lambda$. The optimal level for $\lambda$ is the one that minimizes the root mean squared error (RMSE) or the Akaike or Bayesian Information Criterion (AIC or BIC), or R-squared.</span>
 <span id="cb24-186"><a href="#cb24-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-189"><a href="#cb24-189" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-190"><a href="#cb24-190" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb24-191"><a href="#cb24-191" aria-hidden="true" tabindex="-1"></a>ridge_mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">engine =</span> <span class="st">"glmnet"</span>, <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">0</span>)</span>
-<span id="cb24-192"><a href="#cb24-192" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-193"><a href="#cb24-193" aria-hidden="true" tabindex="-1"></a>ridge_rec <span class="ot">&lt;-</span></span>
-<span id="cb24-194"><a href="#cb24-194" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(mpg <span class="sc">~</span> ., <span class="at">data =</span> mtcars) <span class="sc">|&gt;</span></span>
-<span id="cb24-195"><a href="#cb24-195" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
-<span id="cb24-196"><a href="#cb24-196" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-197"><a href="#cb24-197" aria-hidden="true" tabindex="-1"></a>ridge_wflow <span class="ot">&lt;-</span></span>
-<span id="cb24-198"><a href="#cb24-198" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-199"><a href="#cb24-199" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ridge_mdl) <span class="sc">|&gt;</span></span>
-<span id="cb24-200"><a href="#cb24-200" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(ridge_rec)</span>
-<span id="cb24-201"><a href="#cb24-201" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-202"><a href="#cb24-202" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the hyperparameter space for penalty. Set range through trial and error.</span></span>
-<span id="cb24-203"><a href="#cb24-203" aria-hidden="true" tabindex="-1"></a>ridge_grid <span class="ot">&lt;-</span></span>
-<span id="cb24-204"><a href="#cb24-204" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid_latin_hypercube</span>(</span>
-<span id="cb24-205"><a href="#cb24-205" aria-hidden="true" tabindex="-1"></a>    <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">trans =</span> <span class="cn">NULL</span>), </span>
-<span id="cb24-206"><a href="#cb24-206" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">30</span></span>
-<span id="cb24-207"><a href="#cb24-207" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-208"><a href="#cb24-208" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-209"><a href="#cb24-209" aria-hidden="true" tabindex="-1"></a><span class="co"># tune_grid() returns a resamples object, essentially a tibble with turning</span></span>
-<span id="cb24-210"><a href="#cb24-210" aria-hidden="true" tabindex="-1"></a><span class="co"># results for each hyperparameter combination and fold.</span></span>
-<span id="cb24-211"><a href="#cb24-211" aria-hidden="true" tabindex="-1"></a>ridge_resamples <span class="ot">&lt;-</span></span>
-<span id="cb24-212"><a href="#cb24-212" aria-hidden="true" tabindex="-1"></a>  ridge_wflow <span class="sc">|&gt;</span></span>
-<span id="cb24-213"><a href="#cb24-213" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(</span>
-<span id="cb24-214"><a href="#cb24-214" aria-hidden="true" tabindex="-1"></a>    <span class="at">resamples =</span> mt_folds,</span>
-<span id="cb24-215"><a href="#cb24-215" aria-hidden="true" tabindex="-1"></a>    <span class="at">grid =</span> ridge_grid</span>
-<span id="cb24-216"><a href="#cb24-216" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-217"><a href="#cb24-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-218"><a href="#cb24-218" aria-hidden="true" tabindex="-1"></a>ridge_resamples <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="at">metric =</span> <span class="st">"rmse"</span>) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb24-219"><a href="#cb24-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-220"><a href="#cb24-220" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-223"><a href="#cb24-223" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-224"><a href="#cb24-224" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb24-225"><a href="#cb24-225" aria-hidden="true" tabindex="-1"></a>ridge_resamples <span class="sc">|&gt;</span></span>
-<span id="cb24-226"><a href="#cb24-226" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-227"><a href="#cb24-227" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
-<span id="cb24-228"><a href="#cb24-228" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb24-229"><a href="#cb24-229" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(.metric), <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb24-230"><a href="#cb24-230" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Ridge Regression Hyperparameter Tuning"</span>)</span>
-<span id="cb24-231"><a href="#cb24-231" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-232"><a href="#cb24-232" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-233"><a href="#cb24-233" aria-hidden="true" tabindex="-1"></a>Finalize the workflow with the optimal hyperparameter setting.</span>
-<span id="cb24-234"><a href="#cb24-234" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-237"><a href="#cb24-237" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-238"><a href="#cb24-238" aria-hidden="true" tabindex="-1"></a><span class="co"># Update the workflow with the optimal hyperparameter values.</span></span>
-<span id="cb24-239"><a href="#cb24-239" aria-hidden="true" tabindex="-1"></a>ridge_final <span class="ot">&lt;-</span></span>
-<span id="cb24-240"><a href="#cb24-240" aria-hidden="true" tabindex="-1"></a>  ridge_wflow <span class="sc">|&gt;</span></span>
-<span id="cb24-241"><a href="#cb24-241" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(<span class="at">parameters =</span> <span class="fu">select_best</span>(ridge_resamples, <span class="at">metric =</span> <span class="st">"rmse"</span>))</span>
-<span id="cb24-242"><a href="#cb24-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-243"><a href="#cb24-243" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit the model with the optimal hyperparameters using the _full_ training </span></span>
-<span id="cb24-244"><a href="#cb24-244" aria-hidden="true" tabindex="-1"></a><span class="co"># dataset (not the folds).</span></span>
-<span id="cb24-245"><a href="#cb24-245" aria-hidden="true" tabindex="-1"></a>ridge_fit <span class="ot">&lt;-</span> ridge_final <span class="sc">|&gt;</span> <span class="fu">last_fit</span>(mt_split)</span>
-<span id="cb24-246"><a href="#cb24-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-247"><a href="#cb24-247" aria-hidden="true" tabindex="-1"></a><span class="co"># Metrics are evaluated on the testing dataset.</span></span>
-<span id="cb24-248"><a href="#cb24-248" aria-hidden="true" tabindex="-1"></a>ridge_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb24-249"><a href="#cb24-249" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-250"><a href="#cb24-250" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-251"><a href="#cb24-251" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
-<span id="cb24-252"><a href="#cb24-252" aria-hidden="true" tabindex="-1"></a>The most important variables here were <span class="in">`am`</span> and <span class="in">`wt`</span>.</span>
-<span id="cb24-253"><a href="#cb24-253" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-256"><a href="#cb24-256" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-257"><a href="#cb24-257" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb24-258"><a href="#cb24-258" aria-hidden="true" tabindex="-1"></a>ridge_final <span class="sc">|&gt;</span></span>
-<span id="cb24-259"><a href="#cb24-259" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="fu">training</span>(mt_split)) <span class="sc">|&gt;</span></span>
-<span id="cb24-260"><a href="#cb24-260" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-261"><a href="#cb24-261" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-262"><a href="#cb24-262" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> <span class="fu">fct_rev</span>(<span class="fu">fct_inorder</span>(Variable)), <span class="at">color =</span> Sign)) <span class="sc">+</span></span>
-<span id="cb24-263"><a href="#cb24-263" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb24-264"><a href="#cb24-264" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">0</span>, <span class="at">xend =</span> Importance))  <span class="sc">+</span></span>
-<span id="cb24-265"><a href="#cb24-265" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
-<span id="cb24-266"><a href="#cb24-266" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb24-267"><a href="#cb24-267" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb24-268"><a href="#cb24-268" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Ridge Variable Importance"</span></span>
-<span id="cb24-269"><a href="#cb24-269" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-270"><a href="#cb24-270" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-271"><a href="#cb24-271" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-272"><a href="#cb24-272" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lasso</span></span>
-<span id="cb24-273"><a href="#cb24-273" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-274"><a href="#cb24-274" aria-hidden="true" tabindex="-1"></a>Lasso stands for “least absolute shrinkage and selection operator”. Like ridge, lasso adds a penalty for coefficients, but instead of penalizing the sum of squared coefficients (L2 penalty), lasso penalizes the sum of absolute values (L1 penalty). As a result, coefficients can be zeroed under lasso for high values of $\lambda$.</span>
-<span id="cb24-275"><a href="#cb24-275" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-276"><a href="#cb24-276" aria-hidden="true" tabindex="-1"></a>The loss function for lasso is</span>
+<span id="cb24-187"><a href="#cb24-187" aria-hidden="true" tabindex="-1"></a>To fit a linear model with ridge regression, specify <span class="in">`linear_reg(mixture = 0)`</span>. Standardize the predictors in the recipe so that each contributes to the model on a similar scale. Otherwise, predictors with larger scales would naturally have larger coefficients.</span>
+<span id="cb24-188"><a href="#cb24-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-191"><a href="#cb24-191" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-192"><a href="#cb24-192" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb24-193"><a href="#cb24-193" aria-hidden="true" tabindex="-1"></a>ridge_mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">engine =</span> <span class="st">"glmnet"</span>, <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">0</span>)</span>
+<span id="cb24-194"><a href="#cb24-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-195"><a href="#cb24-195" aria-hidden="true" tabindex="-1"></a>ridge_rec <span class="ot">&lt;-</span></span>
+<span id="cb24-196"><a href="#cb24-196" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(mpg <span class="sc">~</span> ., <span class="at">data =</span> mtcars) <span class="sc">|&gt;</span></span>
+<span id="cb24-197"><a href="#cb24-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
+<span id="cb24-198"><a href="#cb24-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-199"><a href="#cb24-199" aria-hidden="true" tabindex="-1"></a>ridge_wflow <span class="ot">&lt;-</span></span>
+<span id="cb24-200"><a href="#cb24-200" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-201"><a href="#cb24-201" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(ridge_mdl) <span class="sc">|&gt;</span></span>
+<span id="cb24-202"><a href="#cb24-202" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(ridge_rec)</span>
+<span id="cb24-203"><a href="#cb24-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-204"><a href="#cb24-204" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the hyperparameter space for penalty. Set range through trial and error.</span></span>
+<span id="cb24-205"><a href="#cb24-205" aria-hidden="true" tabindex="-1"></a>ridge_grid <span class="ot">&lt;-</span></span>
+<span id="cb24-206"><a href="#cb24-206" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid_latin_hypercube</span>(</span>
+<span id="cb24-207"><a href="#cb24-207" aria-hidden="true" tabindex="-1"></a>    <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">trans =</span> <span class="cn">NULL</span>), </span>
+<span id="cb24-208"><a href="#cb24-208" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">30</span></span>
+<span id="cb24-209"><a href="#cb24-209" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-210"><a href="#cb24-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-211"><a href="#cb24-211" aria-hidden="true" tabindex="-1"></a><span class="co"># tune_grid() returns a resamples object, essentially a tibble with turning</span></span>
+<span id="cb24-212"><a href="#cb24-212" aria-hidden="true" tabindex="-1"></a><span class="co"># results for each hyperparameter combination and fold.</span></span>
+<span id="cb24-213"><a href="#cb24-213" aria-hidden="true" tabindex="-1"></a>ridge_resamples <span class="ot">&lt;-</span></span>
+<span id="cb24-214"><a href="#cb24-214" aria-hidden="true" tabindex="-1"></a>  ridge_wflow <span class="sc">|&gt;</span></span>
+<span id="cb24-215"><a href="#cb24-215" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(</span>
+<span id="cb24-216"><a href="#cb24-216" aria-hidden="true" tabindex="-1"></a>    <span class="at">resamples =</span> mt_folds,</span>
+<span id="cb24-217"><a href="#cb24-217" aria-hidden="true" tabindex="-1"></a>    <span class="at">grid =</span> ridge_grid</span>
+<span id="cb24-218"><a href="#cb24-218" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-219"><a href="#cb24-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-220"><a href="#cb24-220" aria-hidden="true" tabindex="-1"></a>ridge_resamples <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="at">metric =</span> <span class="st">"rmse"</span>) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb24-221"><a href="#cb24-221" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-222"><a href="#cb24-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-223"><a href="#cb24-223" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
+<span id="cb24-224"><a href="#cb24-224" aria-hidden="true" tabindex="-1"></a>A plot shows how the RMSE varies with the penalty. $R^2$ is shown too. The minimum RMSE is at <span class="in">`r select_best(ridge_resamples, metric = "rmse") |&gt; pull(penalty) |&gt; comma(.1)`</span>.</span>
+<span id="cb24-225"><a href="#cb24-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-228"><a href="#cb24-228" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-229"><a href="#cb24-229" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb24-230"><a href="#cb24-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-231"><a href="#cb24-231" aria-hidden="true" tabindex="-1"></a>ridge_resamples <span class="sc">|&gt;</span></span>
+<span id="cb24-232"><a href="#cb24-232" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-233"><a href="#cb24-233" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
+<span id="cb24-234"><a href="#cb24-234" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb24-235"><a href="#cb24-235" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(.metric), <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb24-236"><a href="#cb24-236" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Ridge Regression Hyperparameter Tuning"</span>)</span>
+<span id="cb24-237"><a href="#cb24-237" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-238"><a href="#cb24-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-239"><a href="#cb24-239" aria-hidden="true" tabindex="-1"></a>Finalize the workflow with the optimal hyperparameter setting.</span>
+<span id="cb24-240"><a href="#cb24-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-243"><a href="#cb24-243" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-244"><a href="#cb24-244" aria-hidden="true" tabindex="-1"></a><span class="co"># Update the workflow with the optimal hyperparameter values.</span></span>
+<span id="cb24-245"><a href="#cb24-245" aria-hidden="true" tabindex="-1"></a>ridge_final <span class="ot">&lt;-</span></span>
+<span id="cb24-246"><a href="#cb24-246" aria-hidden="true" tabindex="-1"></a>  ridge_wflow <span class="sc">|&gt;</span></span>
+<span id="cb24-247"><a href="#cb24-247" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(<span class="at">parameters =</span> <span class="fu">select_best</span>(ridge_resamples, <span class="at">metric =</span> <span class="st">"rmse"</span>))</span>
+<span id="cb24-248"><a href="#cb24-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-249"><a href="#cb24-249" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit the model with the optimal hyperparameters using the _full_ training </span></span>
+<span id="cb24-250"><a href="#cb24-250" aria-hidden="true" tabindex="-1"></a><span class="co"># dataset (not the folds).</span></span>
+<span id="cb24-251"><a href="#cb24-251" aria-hidden="true" tabindex="-1"></a>ridge_fit <span class="ot">&lt;-</span> ridge_final <span class="sc">|&gt;</span> <span class="fu">last_fit</span>(mt_split)</span>
+<span id="cb24-252"><a href="#cb24-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-253"><a href="#cb24-253" aria-hidden="true" tabindex="-1"></a><span class="co"># Metrics are evaluated on the testing dataset.</span></span>
+<span id="cb24-254"><a href="#cb24-254" aria-hidden="true" tabindex="-1"></a>ridge_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb24-255"><a href="#cb24-255" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-256"><a href="#cb24-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-257"><a href="#cb24-257" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
+<span id="cb24-258"><a href="#cb24-258" aria-hidden="true" tabindex="-1"></a>Use <span class="in">`vip::vi()`</span> to calculate variable importance.</span>
+<span id="cb24-259"><a href="#cb24-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-262"><a href="#cb24-262" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-263"><a href="#cb24-263" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb24-264"><a href="#cb24-264" aria-hidden="true" tabindex="-1"></a>ridge_final <span class="sc">|&gt;</span></span>
+<span id="cb24-265"><a href="#cb24-265" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="fu">training</span>(mt_split)) <span class="sc">|&gt;</span></span>
+<span id="cb24-266"><a href="#cb24-266" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-267"><a href="#cb24-267" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-268"><a href="#cb24-268" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> <span class="fu">fct_rev</span>(<span class="fu">fct_inorder</span>(Variable)), <span class="at">color =</span> Sign)) <span class="sc">+</span></span>
+<span id="cb24-269"><a href="#cb24-269" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-270"><a href="#cb24-270" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">0</span>, <span class="at">xend =</span> Importance))  <span class="sc">+</span></span>
+<span id="cb24-271"><a href="#cb24-271" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
+<span id="cb24-272"><a href="#cb24-272" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb24-273"><a href="#cb24-273" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb24-274"><a href="#cb24-274" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Ridge Variable Importance"</span></span>
+<span id="cb24-275"><a href="#cb24-275" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-276"><a href="#cb24-276" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb24-277"><a href="#cb24-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-278"><a href="#cb24-278" aria-hidden="true" tabindex="-1"></a>$$L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \left| \hat{\beta}_j \right|.$$</span>
+<span id="cb24-278"><a href="#cb24-278" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lasso</span></span>
 <span id="cb24-279"><a href="#cb24-279" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-280"><a href="#cb24-280" aria-hidden="true" tabindex="-1"></a>To fit a linear model with lasso regression, specify <span class="in">`linear_reg(mixture = 1)`</span>.</span>
+<span id="cb24-280"><a href="#cb24-280" aria-hidden="true" tabindex="-1"></a>Lasso stands for “least absolute shrinkage and selection operator”. Like ridge, lasso adds a penalty for coefficients, but instead of penalizing the sum of squared coefficients (L2 penalty), lasso penalizes the sum of absolute values (L1 penalty). As a result, coefficients can be zeroed under lasso for high values of $\lambda$.</span>
 <span id="cb24-281"><a href="#cb24-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-284"><a href="#cb24-284" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-285"><a href="#cb24-285" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb24-286"><a href="#cb24-286" aria-hidden="true" tabindex="-1"></a>lasso_mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">engine =</span> <span class="st">"glmnet"</span>, <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>)</span>
+<span id="cb24-282"><a href="#cb24-282" aria-hidden="true" tabindex="-1"></a>The loss function for lasso is</span>
+<span id="cb24-283"><a href="#cb24-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-284"><a href="#cb24-284" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb24-285"><a href="#cb24-285" aria-hidden="true" tabindex="-1"></a>L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \left| \hat{\beta}_j \right|.</span>
+<span id="cb24-286"><a href="#cb24-286" aria-hidden="true" tabindex="-1"></a>$$ {#eq-lasso-loss}</span>
 <span id="cb24-287"><a href="#cb24-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-288"><a href="#cb24-288" aria-hidden="true" tabindex="-1"></a>lasso_rec <span class="ot">&lt;-</span></span>
-<span id="cb24-289"><a href="#cb24-289" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(mpg <span class="sc">~</span> ., <span class="at">data =</span> mtcars) <span class="sc">|&gt;</span></span>
-<span id="cb24-290"><a href="#cb24-290" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
-<span id="cb24-291"><a href="#cb24-291" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-292"><a href="#cb24-292" aria-hidden="true" tabindex="-1"></a>lasso_wflow <span class="ot">&lt;-</span></span>
-<span id="cb24-293"><a href="#cb24-293" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-294"><a href="#cb24-294" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_mdl) <span class="sc">|&gt;</span></span>
-<span id="cb24-295"><a href="#cb24-295" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(lasso_rec)</span>
-<span id="cb24-296"><a href="#cb24-296" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-297"><a href="#cb24-297" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the hyperparameter space for penalty. Set range through trial and error.</span></span>
-<span id="cb24-298"><a href="#cb24-298" aria-hidden="true" tabindex="-1"></a>lasso_grid <span class="ot">&lt;-</span></span>
-<span id="cb24-299"><a href="#cb24-299" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid_latin_hypercube</span>(</span>
-<span id="cb24-300"><a href="#cb24-300" aria-hidden="true" tabindex="-1"></a>    <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>), <span class="at">trans =</span> <span class="cn">NULL</span>), </span>
-<span id="cb24-301"><a href="#cb24-301" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">30</span></span>
-<span id="cb24-302"><a href="#cb24-302" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-303"><a href="#cb24-303" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-304"><a href="#cb24-304" aria-hidden="true" tabindex="-1"></a><span class="co"># tune_grid() returns a resamples object, essentially a tibble with turning</span></span>
-<span id="cb24-305"><a href="#cb24-305" aria-hidden="true" tabindex="-1"></a><span class="co"># results for each hyperparameter combination and fold.</span></span>
-<span id="cb24-306"><a href="#cb24-306" aria-hidden="true" tabindex="-1"></a>lasso_resamples <span class="ot">&lt;-</span></span>
-<span id="cb24-307"><a href="#cb24-307" aria-hidden="true" tabindex="-1"></a>  lasso_wflow <span class="sc">|&gt;</span></span>
-<span id="cb24-308"><a href="#cb24-308" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(</span>
-<span id="cb24-309"><a href="#cb24-309" aria-hidden="true" tabindex="-1"></a>    <span class="at">resamples =</span> mt_folds,</span>
-<span id="cb24-310"><a href="#cb24-310" aria-hidden="true" tabindex="-1"></a>    <span class="at">grid =</span> lasso_grid</span>
-<span id="cb24-311"><a href="#cb24-311" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-312"><a href="#cb24-312" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-313"><a href="#cb24-313" aria-hidden="true" tabindex="-1"></a>lasso_resamples <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="at">metric =</span> <span class="st">"rmse"</span>) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb24-314"><a href="#cb24-314" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-315"><a href="#cb24-315" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-318"><a href="#cb24-318" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-319"><a href="#cb24-319" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb24-320"><a href="#cb24-320" aria-hidden="true" tabindex="-1"></a>lasso_resamples <span class="sc">|&gt;</span></span>
-<span id="cb24-321"><a href="#cb24-321" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-322"><a href="#cb24-322" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
-<span id="cb24-323"><a href="#cb24-323" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb24-324"><a href="#cb24-324" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(.metric), <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
-<span id="cb24-325"><a href="#cb24-325" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Lasso Regression Hyperparameter Tuning"</span>)</span>
-<span id="cb24-326"><a href="#cb24-326" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-327"><a href="#cb24-327" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-328"><a href="#cb24-328" aria-hidden="true" tabindex="-1"></a>Finalize the workflow with the optimal hyperparameter setting.</span>
-<span id="cb24-329"><a href="#cb24-329" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-332"><a href="#cb24-332" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-333"><a href="#cb24-333" aria-hidden="true" tabindex="-1"></a><span class="co"># Update the workflow with the optimal hyperparameter values.</span></span>
-<span id="cb24-334"><a href="#cb24-334" aria-hidden="true" tabindex="-1"></a>lasso_final <span class="ot">&lt;-</span></span>
-<span id="cb24-335"><a href="#cb24-335" aria-hidden="true" tabindex="-1"></a>  lasso_wflow <span class="sc">|&gt;</span></span>
-<span id="cb24-336"><a href="#cb24-336" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(<span class="at">parameters =</span> <span class="fu">select_best</span>(lasso_resamples, <span class="at">metric =</span> <span class="st">"rmse"</span>))</span>
+<span id="cb24-288"><a href="#cb24-288" aria-hidden="true" tabindex="-1"></a>To fit a linear model with lasso regression, specify <span class="in">`linear_reg(mixture = 1)`</span>.</span>
+<span id="cb24-289"><a href="#cb24-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-292"><a href="#cb24-292" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-293"><a href="#cb24-293" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb24-294"><a href="#cb24-294" aria-hidden="true" tabindex="-1"></a>lasso_mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">engine =</span> <span class="st">"glmnet"</span>, <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="dv">1</span>)</span>
+<span id="cb24-295"><a href="#cb24-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-296"><a href="#cb24-296" aria-hidden="true" tabindex="-1"></a>lasso_rec <span class="ot">&lt;-</span></span>
+<span id="cb24-297"><a href="#cb24-297" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(mpg <span class="sc">~</span> ., <span class="at">data =</span> mtcars) <span class="sc">|&gt;</span></span>
+<span id="cb24-298"><a href="#cb24-298" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
+<span id="cb24-299"><a href="#cb24-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-300"><a href="#cb24-300" aria-hidden="true" tabindex="-1"></a>lasso_wflow <span class="ot">&lt;-</span></span>
+<span id="cb24-301"><a href="#cb24-301" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-302"><a href="#cb24-302" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(lasso_mdl) <span class="sc">|&gt;</span></span>
+<span id="cb24-303"><a href="#cb24-303" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(lasso_rec)</span>
+<span id="cb24-304"><a href="#cb24-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-305"><a href="#cb24-305" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the hyperparameter space for penalty. Set range through trial and error.</span></span>
+<span id="cb24-306"><a href="#cb24-306" aria-hidden="true" tabindex="-1"></a>lasso_grid <span class="ot">&lt;-</span></span>
+<span id="cb24-307"><a href="#cb24-307" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid_latin_hypercube</span>(</span>
+<span id="cb24-308"><a href="#cb24-308" aria-hidden="true" tabindex="-1"></a>    <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">4</span>), <span class="at">trans =</span> <span class="cn">NULL</span>), </span>
+<span id="cb24-309"><a href="#cb24-309" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">30</span></span>
+<span id="cb24-310"><a href="#cb24-310" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-311"><a href="#cb24-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-312"><a href="#cb24-312" aria-hidden="true" tabindex="-1"></a><span class="co"># tune_grid() returns a resamples object, essentially a tibble with turning</span></span>
+<span id="cb24-313"><a href="#cb24-313" aria-hidden="true" tabindex="-1"></a><span class="co"># results for each hyperparameter combination and fold.</span></span>
+<span id="cb24-314"><a href="#cb24-314" aria-hidden="true" tabindex="-1"></a>lasso_resamples <span class="ot">&lt;-</span></span>
+<span id="cb24-315"><a href="#cb24-315" aria-hidden="true" tabindex="-1"></a>  lasso_wflow <span class="sc">|&gt;</span></span>
+<span id="cb24-316"><a href="#cb24-316" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(</span>
+<span id="cb24-317"><a href="#cb24-317" aria-hidden="true" tabindex="-1"></a>    <span class="at">resamples =</span> mt_folds,</span>
+<span id="cb24-318"><a href="#cb24-318" aria-hidden="true" tabindex="-1"></a>    <span class="at">grid =</span> lasso_grid</span>
+<span id="cb24-319"><a href="#cb24-319" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-320"><a href="#cb24-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-321"><a href="#cb24-321" aria-hidden="true" tabindex="-1"></a>lasso_resamples <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="at">metric =</span> <span class="st">"rmse"</span>) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb24-322"><a href="#cb24-322" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-323"><a href="#cb24-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-324"><a href="#cb24-324" aria-hidden="true" tabindex="-1"></a>The minimum RMSE is at <span class="in">`r select_best(lasso_resamples, metric = "rmse") |&gt; pull(penalty) |&gt; comma(.1)`</span>.</span>
+<span id="cb24-325"><a href="#cb24-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-328"><a href="#cb24-328" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-329"><a href="#cb24-329" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb24-330"><a href="#cb24-330" aria-hidden="true" tabindex="-1"></a>lasso_resamples <span class="sc">|&gt;</span></span>
+<span id="cb24-331"><a href="#cb24-331" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-332"><a href="#cb24-332" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
+<span id="cb24-333"><a href="#cb24-333" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb24-334"><a href="#cb24-334" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(.metric), <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span></span>
+<span id="cb24-335"><a href="#cb24-335" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Lasso Regression Hyperparameter Tuning"</span>)</span>
+<span id="cb24-336"><a href="#cb24-336" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb24-337"><a href="#cb24-337" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-338"><a href="#cb24-338" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit the model with the optimal hyperparameters using the _full_ training </span></span>
-<span id="cb24-339"><a href="#cb24-339" aria-hidden="true" tabindex="-1"></a><span class="co"># dataset (not the folds).</span></span>
-<span id="cb24-340"><a href="#cb24-340" aria-hidden="true" tabindex="-1"></a>lasso_fit <span class="ot">&lt;-</span> lasso_final <span class="sc">|&gt;</span> <span class="fu">last_fit</span>(mt_split)</span>
-<span id="cb24-341"><a href="#cb24-341" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-342"><a href="#cb24-342" aria-hidden="true" tabindex="-1"></a><span class="co"># Metrics are evaluated on the testing dataset.</span></span>
-<span id="cb24-343"><a href="#cb24-343" aria-hidden="true" tabindex="-1"></a>lasso_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb24-344"><a href="#cb24-344" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-345"><a href="#cb24-345" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-346"><a href="#cb24-346" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
-<span id="cb24-347"><a href="#cb24-347" aria-hidden="true" tabindex="-1"></a>The most important variables here were <span class="in">`am`</span> and <span class="in">`wt`</span>.</span>
-<span id="cb24-348"><a href="#cb24-348" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-351"><a href="#cb24-351" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-352"><a href="#cb24-352" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb24-353"><a href="#cb24-353" aria-hidden="true" tabindex="-1"></a>lasso_final <span class="sc">|&gt;</span></span>
-<span id="cb24-354"><a href="#cb24-354" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="fu">training</span>(mt_split)) <span class="sc">|&gt;</span></span>
-<span id="cb24-355"><a href="#cb24-355" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-356"><a href="#cb24-356" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-357"><a href="#cb24-357" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> <span class="fu">fct_rev</span>(<span class="fu">fct_inorder</span>(Variable)), <span class="at">color =</span> Sign)) <span class="sc">+</span></span>
-<span id="cb24-358"><a href="#cb24-358" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb24-359"><a href="#cb24-359" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">0</span>, <span class="at">xend =</span> Importance))  <span class="sc">+</span></span>
-<span id="cb24-360"><a href="#cb24-360" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
-<span id="cb24-361"><a href="#cb24-361" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb24-362"><a href="#cb24-362" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb24-363"><a href="#cb24-363" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Lasso Variable Importance"</span></span>
-<span id="cb24-364"><a href="#cb24-364" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-365"><a href="#cb24-365" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-366"><a href="#cb24-366" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-367"><a href="#cb24-367" aria-hidden="true" tabindex="-1"></a><span class="fu">## Elastic Net</span></span>
-<span id="cb24-368"><a href="#cb24-368" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-369"><a href="#cb24-369" aria-hidden="true" tabindex="-1"></a>Elastic Net combines the penalties of ridge and lasso to get the best of both worlds. The loss function for elastic net is</span>
-<span id="cb24-370"><a href="#cb24-370" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-371"><a href="#cb24-371" aria-hidden="true" tabindex="-1"></a>$$L = \frac{\sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2}{2n} + \lambda \frac{1 - \alpha}{2}\sum_{j=1}^k \hat{\beta}_j^2 + \lambda \alpha\left| \hat{\beta}_j \right|.$$</span>
-<span id="cb24-372"><a href="#cb24-372" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-373"><a href="#cb24-373" aria-hidden="true" tabindex="-1"></a>In this loss function, new parameter $\alpha$ is a "mixing" parameter that balances the two approaches.  If $\alpha$ is zero, you are back to ridge regression, and if $\alpha$ is one, you are back to lasso. To fit a linear model with elastic net regression, specify <span class="in">`linear_reg(mixture = tune())`</span>.</span>
-<span id="cb24-374"><a href="#cb24-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-377"><a href="#cb24-377" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-378"><a href="#cb24-378" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb24-379"><a href="#cb24-379" aria-hidden="true" tabindex="-1"></a>elnet_mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">engine =</span> <span class="st">"glmnet"</span>, <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="fu">tune</span>())</span>
+<span id="cb24-338"><a href="#cb24-338" aria-hidden="true" tabindex="-1"></a>Finalize the workflow with the optimal hyperparameter setting.</span>
+<span id="cb24-339"><a href="#cb24-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-342"><a href="#cb24-342" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-343"><a href="#cb24-343" aria-hidden="true" tabindex="-1"></a><span class="co"># Update the workflow with the optimal hyperparameter values.</span></span>
+<span id="cb24-344"><a href="#cb24-344" aria-hidden="true" tabindex="-1"></a>lasso_final <span class="ot">&lt;-</span></span>
+<span id="cb24-345"><a href="#cb24-345" aria-hidden="true" tabindex="-1"></a>  lasso_wflow <span class="sc">|&gt;</span></span>
+<span id="cb24-346"><a href="#cb24-346" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(<span class="at">parameters =</span> <span class="fu">select_best</span>(lasso_resamples, <span class="at">metric =</span> <span class="st">"rmse"</span>))</span>
+<span id="cb24-347"><a href="#cb24-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-348"><a href="#cb24-348" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit the model with the optimal hyperparameters using the _full_ training </span></span>
+<span id="cb24-349"><a href="#cb24-349" aria-hidden="true" tabindex="-1"></a><span class="co"># dataset (not the folds).</span></span>
+<span id="cb24-350"><a href="#cb24-350" aria-hidden="true" tabindex="-1"></a>lasso_fit <span class="ot">&lt;-</span> lasso_final <span class="sc">|&gt;</span> <span class="fu">last_fit</span>(mt_split)</span>
+<span id="cb24-351"><a href="#cb24-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-352"><a href="#cb24-352" aria-hidden="true" tabindex="-1"></a><span class="co"># Metrics are evaluated on the testing dataset.</span></span>
+<span id="cb24-353"><a href="#cb24-353" aria-hidden="true" tabindex="-1"></a>lasso_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb24-354"><a href="#cb24-354" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-355"><a href="#cb24-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-356"><a href="#cb24-356" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
+<span id="cb24-357"><a href="#cb24-357" aria-hidden="true" tabindex="-1"></a>Hera are the most important variables.</span>
+<span id="cb24-358"><a href="#cb24-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-361"><a href="#cb24-361" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-362"><a href="#cb24-362" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb24-363"><a href="#cb24-363" aria-hidden="true" tabindex="-1"></a>lasso_final <span class="sc">|&gt;</span></span>
+<span id="cb24-364"><a href="#cb24-364" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="fu">training</span>(mt_split)) <span class="sc">|&gt;</span></span>
+<span id="cb24-365"><a href="#cb24-365" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-366"><a href="#cb24-366" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-367"><a href="#cb24-367" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> <span class="fu">fct_rev</span>(<span class="fu">fct_inorder</span>(Variable)), <span class="at">color =</span> Sign)) <span class="sc">+</span></span>
+<span id="cb24-368"><a href="#cb24-368" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-369"><a href="#cb24-369" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">0</span>, <span class="at">xend =</span> Importance))  <span class="sc">+</span></span>
+<span id="cb24-370"><a href="#cb24-370" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
+<span id="cb24-371"><a href="#cb24-371" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb24-372"><a href="#cb24-372" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb24-373"><a href="#cb24-373" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Lasso Variable Importance"</span></span>
+<span id="cb24-374"><a href="#cb24-374" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-375"><a href="#cb24-375" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-376"><a href="#cb24-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-377"><a href="#cb24-377" aria-hidden="true" tabindex="-1"></a><span class="fu">## Elastic Net</span></span>
+<span id="cb24-378"><a href="#cb24-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-379"><a href="#cb24-379" aria-hidden="true" tabindex="-1"></a>Elastic Net combines the penalties of ridge and lasso to get the best of both worlds. The loss function for elastic net is</span>
 <span id="cb24-380"><a href="#cb24-380" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-381"><a href="#cb24-381" aria-hidden="true" tabindex="-1"></a>elnet_rec <span class="ot">&lt;-</span></span>
-<span id="cb24-382"><a href="#cb24-382" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(mpg <span class="sc">~</span> ., <span class="at">data =</span> mtcars) <span class="sc">|&gt;</span></span>
-<span id="cb24-383"><a href="#cb24-383" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
+<span id="cb24-381"><a href="#cb24-381" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb24-382"><a href="#cb24-382" aria-hidden="true" tabindex="-1"></a>L = \frac{\sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2}{2n} + \lambda \frac{1 - \alpha}{2}\sum_{j=1}^k \hat{\beta}_j^2 + \lambda \alpha\left| \hat{\beta}_j \right|.</span>
+<span id="cb24-383"><a href="#cb24-383" aria-hidden="true" tabindex="-1"></a>$$ {#eq-elnet-loss}</span>
 <span id="cb24-384"><a href="#cb24-384" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-385"><a href="#cb24-385" aria-hidden="true" tabindex="-1"></a>elnet_wflow <span class="ot">&lt;-</span></span>
-<span id="cb24-386"><a href="#cb24-386" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-387"><a href="#cb24-387" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(elnet_mdl) <span class="sc">|&gt;</span></span>
-<span id="cb24-388"><a href="#cb24-388" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(elnet_rec)</span>
-<span id="cb24-389"><a href="#cb24-389" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-390"><a href="#cb24-390" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the hyperparameter space for penalty and mixture. Set penalty range </span></span>
-<span id="cb24-391"><a href="#cb24-391" aria-hidden="true" tabindex="-1"></a><span class="co"># through trial and error.</span></span>
-<span id="cb24-392"><a href="#cb24-392" aria-hidden="true" tabindex="-1"></a>elnet_grid <span class="ot">&lt;-</span></span>
-<span id="cb24-393"><a href="#cb24-393" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid_latin_hypercube</span>(</span>
-<span id="cb24-394"><a href="#cb24-394" aria-hidden="true" tabindex="-1"></a>    <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">7</span>), <span class="at">trans =</span> <span class="cn">NULL</span>), </span>
-<span id="cb24-395"><a href="#cb24-395" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mixture</span>(<span class="at">range =</span> <span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">8</span>)),</span>
-<span id="cb24-396"><a href="#cb24-396" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">30</span></span>
-<span id="cb24-397"><a href="#cb24-397" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-398"><a href="#cb24-398" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-399"><a href="#cb24-399" aria-hidden="true" tabindex="-1"></a><span class="co"># tune_grid() returns a resamples object, essentially a tibble with turning</span></span>
-<span id="cb24-400"><a href="#cb24-400" aria-hidden="true" tabindex="-1"></a><span class="co"># results for each hyperparameter combination and fold.</span></span>
-<span id="cb24-401"><a href="#cb24-401" aria-hidden="true" tabindex="-1"></a>elnet_resamples <span class="ot">&lt;-</span></span>
-<span id="cb24-402"><a href="#cb24-402" aria-hidden="true" tabindex="-1"></a>  elnet_wflow <span class="sc">|&gt;</span></span>
-<span id="cb24-403"><a href="#cb24-403" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(</span>
-<span id="cb24-404"><a href="#cb24-404" aria-hidden="true" tabindex="-1"></a>    <span class="at">resamples =</span> mt_folds,</span>
-<span id="cb24-405"><a href="#cb24-405" aria-hidden="true" tabindex="-1"></a>    <span class="at">grid =</span> elnet_grid</span>
-<span id="cb24-406"><a href="#cb24-406" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-407"><a href="#cb24-407" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-408"><a href="#cb24-408" aria-hidden="true" tabindex="-1"></a>elnet_resamples <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="at">metric =</span> <span class="st">"rmse"</span>) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb24-409"><a href="#cb24-409" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-385"><a href="#cb24-385" aria-hidden="true" tabindex="-1"></a>In @eq-elnet-loss, new parameter $\alpha$ is a "mixing" parameter that balances the two approaches.  If $\alpha$ is zero, you are back to ridge regression, and if $\alpha$ is one, you are back to lasso. To fit a linear model with elastic net regression, specify <span class="in">`linear_reg(mixture = tune())`</span>.</span>
+<span id="cb24-386"><a href="#cb24-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-389"><a href="#cb24-389" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-390"><a href="#cb24-390" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb24-391"><a href="#cb24-391" aria-hidden="true" tabindex="-1"></a>elnet_mdl <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>(<span class="at">engine =</span> <span class="st">"glmnet"</span>, <span class="at">penalty =</span> <span class="fu">tune</span>(), <span class="at">mixture =</span> <span class="fu">tune</span>())</span>
+<span id="cb24-392"><a href="#cb24-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-393"><a href="#cb24-393" aria-hidden="true" tabindex="-1"></a>elnet_rec <span class="ot">&lt;-</span></span>
+<span id="cb24-394"><a href="#cb24-394" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(mpg <span class="sc">~</span> ., <span class="at">data =</span> mtcars) <span class="sc">|&gt;</span></span>
+<span id="cb24-395"><a href="#cb24-395" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
+<span id="cb24-396"><a href="#cb24-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-397"><a href="#cb24-397" aria-hidden="true" tabindex="-1"></a>elnet_wflow <span class="ot">&lt;-</span></span>
+<span id="cb24-398"><a href="#cb24-398" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-399"><a href="#cb24-399" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(elnet_mdl) <span class="sc">|&gt;</span></span>
+<span id="cb24-400"><a href="#cb24-400" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(elnet_rec)</span>
+<span id="cb24-401"><a href="#cb24-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-402"><a href="#cb24-402" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up the hyperparameter space for penalty and mixture. Set penalty range </span></span>
+<span id="cb24-403"><a href="#cb24-403" aria-hidden="true" tabindex="-1"></a><span class="co"># through trial and error.</span></span>
+<span id="cb24-404"><a href="#cb24-404" aria-hidden="true" tabindex="-1"></a>elnet_grid <span class="ot">&lt;-</span></span>
+<span id="cb24-405"><a href="#cb24-405" aria-hidden="true" tabindex="-1"></a>  <span class="fu">grid_latin_hypercube</span>(</span>
+<span id="cb24-406"><a href="#cb24-406" aria-hidden="true" tabindex="-1"></a>    <span class="fu">penalty</span>(<span class="at">range =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">7</span>), <span class="at">trans =</span> <span class="cn">NULL</span>), </span>
+<span id="cb24-407"><a href="#cb24-407" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mixture</span>(<span class="at">range =</span> <span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">8</span>)),</span>
+<span id="cb24-408"><a href="#cb24-408" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">30</span></span>
+<span id="cb24-409"><a href="#cb24-409" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb24-410"><a href="#cb24-410" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-413"><a href="#cb24-413" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-414"><a href="#cb24-414" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb24-415"><a href="#cb24-415" aria-hidden="true" tabindex="-1"></a>elnet_resamples <span class="sc">|&gt;</span></span>
-<span id="cb24-416"><a href="#cb24-416" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-417"><a href="#cb24-417" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"rmse"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb24-418"><a href="#cb24-418" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> mixture, <span class="at">color =</span> mean)) <span class="sc">+</span></span>
-<span id="cb24-419"><a href="#cb24-419" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb24-420"><a href="#cb24-420" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb24-421"><a href="#cb24-421" aria-hidden="true" tabindex="-1"></a>  <span class="co"># facet_wrap(facets = vars(.metric), scales = "free_y") +</span></span>
-<span id="cb24-422"><a href="#cb24-422" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Elastic Net Regression Hyperparameter Tuning"</span>, <span class="at">color =</span> <span class="st">"rmse"</span>)</span>
-<span id="cb24-423"><a href="#cb24-423" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-424"><a href="#cb24-424" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-425"><a href="#cb24-425" aria-hidden="true" tabindex="-1"></a>Finalize the workflow with the optimal hyperparameter setting.</span>
-<span id="cb24-426"><a href="#cb24-426" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-429"><a href="#cb24-429" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-430"><a href="#cb24-430" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb24-431"><a href="#cb24-431" aria-hidden="true" tabindex="-1"></a><span class="co"># Update the workflow with the optimal hyperparameter values.</span></span>
-<span id="cb24-432"><a href="#cb24-432" aria-hidden="true" tabindex="-1"></a>elnet_final <span class="ot">&lt;-</span></span>
-<span id="cb24-433"><a href="#cb24-433" aria-hidden="true" tabindex="-1"></a>  elnet_wflow <span class="sc">|&gt;</span></span>
-<span id="cb24-434"><a href="#cb24-434" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(<span class="at">parameters =</span> <span class="fu">select_best</span>(elnet_resamples, <span class="at">metric =</span> <span class="st">"rmse"</span>))</span>
-<span id="cb24-435"><a href="#cb24-435" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-436"><a href="#cb24-436" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit the model with the optimal hyperparameters using the _full_ training </span></span>
-<span id="cb24-437"><a href="#cb24-437" aria-hidden="true" tabindex="-1"></a><span class="co"># dataset (not the folds).</span></span>
-<span id="cb24-438"><a href="#cb24-438" aria-hidden="true" tabindex="-1"></a>elnet_fit <span class="ot">&lt;-</span> elnet_final <span class="sc">|&gt;</span> <span class="fu">last_fit</span>(mt_split)</span>
-<span id="cb24-439"><a href="#cb24-439" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-440"><a href="#cb24-440" aria-hidden="true" tabindex="-1"></a><span class="co"># Metrics are evaluated on the testing dataset.</span></span>
-<span id="cb24-441"><a href="#cb24-441" aria-hidden="true" tabindex="-1"></a>elnet_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb24-442"><a href="#cb24-442" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-443"><a href="#cb24-443" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-444"><a href="#cb24-444" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
-<span id="cb24-445"><a href="#cb24-445" aria-hidden="true" tabindex="-1"></a>The most important variables here were <span class="in">`wt`</span>, <span class="in">`qsec`</span> and <span class="in">`disp`</span>.</span>
-<span id="cb24-446"><a href="#cb24-446" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-449"><a href="#cb24-449" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-450"><a href="#cb24-450" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb24-451"><a href="#cb24-451" aria-hidden="true" tabindex="-1"></a>elnet_final <span class="sc">|&gt;</span></span>
-<span id="cb24-452"><a href="#cb24-452" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="fu">training</span>(mt_split)) <span class="sc">|&gt;</span></span>
-<span id="cb24-453"><a href="#cb24-453" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-454"><a href="#cb24-454" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>() <span class="sc">|&gt;</span></span>
-<span id="cb24-455"><a href="#cb24-455" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> <span class="fu">fct_rev</span>(<span class="fu">fct_inorder</span>(Variable)), <span class="at">color =</span> Sign)) <span class="sc">+</span></span>
-<span id="cb24-456"><a href="#cb24-456" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb24-457"><a href="#cb24-457" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">0</span>, <span class="at">xend =</span> Importance))  <span class="sc">+</span></span>
-<span id="cb24-458"><a href="#cb24-458" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
-<span id="cb24-459"><a href="#cb24-459" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb24-460"><a href="#cb24-460" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
-<span id="cb24-461"><a href="#cb24-461" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Elastic Net Variable Importance"</span></span>
-<span id="cb24-462"><a href="#cb24-462" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb24-463"><a href="#cb24-463" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-464"><a href="#cb24-464" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-465"><a href="#cb24-465" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Summary {-}</span></span>
-<span id="cb24-466"><a href="#cb24-466" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-467"><a href="#cb24-467" aria-hidden="true" tabindex="-1"></a>Lasso performed best on RMSE and R-squared.</span>
-<span id="cb24-468"><a href="#cb24-468" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-471"><a href="#cb24-471" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb24-472"><a href="#cb24-472" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb24-473"><a href="#cb24-473" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb24-474"><a href="#cb24-474" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ridge =</span> <span class="fu">collect_metrics</span>(ridge_fit),</span>
-<span id="cb24-475"><a href="#cb24-475" aria-hidden="true" tabindex="-1"></a>  <span class="at">Lasso =</span> <span class="fu">collect_metrics</span>(lasso_fit),</span>
-<span id="cb24-476"><a href="#cb24-476" aria-hidden="true" tabindex="-1"></a>  <span class="at">ElNet =</span> <span class="fu">collect_metrics</span>(elnet_fit),</span>
-<span id="cb24-477"><a href="#cb24-477" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"Model"</span></span>
-<span id="cb24-478"><a href="#cb24-478" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb24-479"><a href="#cb24-479" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Model, .metric, .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb24-480"><a href="#cb24-480" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
-<span id="cb24-481"><a href="#cb24-481" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb24-482"><a href="#cb24-482" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb24-483"><a href="#cb24-483" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-484"><a href="#cb24-484" aria-hidden="true" tabindex="-1"></a>Final thoughts on the models.</span>
-<span id="cb24-485"><a href="#cb24-485" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-486"><a href="#cb24-486" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Lasso can set some coefficients to zero, thus performing variable selection.</span>
-<span id="cb24-487"><a href="#cb24-487" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Lasso and Ridge address multicollinearity differently: in ridge regression, the coefficients of correlated predictors are similar; In lasso, one of the correlated predictors has a larger coefficient, while the rest are (nearly) zeroed.</span>
-<span id="cb24-488"><a href="#cb24-488" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Lasso tends to do well if there are a small number of significant parameters and the others are close to zero. Ridge tends to work well if there are many large parameters of about the same value.</span>
-<span id="cb24-489"><a href="#cb24-489" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>In practice, you don't know which will be best, so run cross-validation pick the best.</span>
+<span id="cb24-411"><a href="#cb24-411" aria-hidden="true" tabindex="-1"></a><span class="co"># tune_grid() returns a resamples object, essentially a tibble with turning</span></span>
+<span id="cb24-412"><a href="#cb24-412" aria-hidden="true" tabindex="-1"></a><span class="co"># results for each hyperparameter combination and fold.</span></span>
+<span id="cb24-413"><a href="#cb24-413" aria-hidden="true" tabindex="-1"></a>elnet_resamples <span class="ot">&lt;-</span></span>
+<span id="cb24-414"><a href="#cb24-414" aria-hidden="true" tabindex="-1"></a>  elnet_wflow <span class="sc">|&gt;</span></span>
+<span id="cb24-415"><a href="#cb24-415" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tune_grid</span>(</span>
+<span id="cb24-416"><a href="#cb24-416" aria-hidden="true" tabindex="-1"></a>    <span class="at">resamples =</span> mt_folds,</span>
+<span id="cb24-417"><a href="#cb24-417" aria-hidden="true" tabindex="-1"></a>    <span class="at">grid =</span> elnet_grid</span>
+<span id="cb24-418"><a href="#cb24-418" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-419"><a href="#cb24-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-420"><a href="#cb24-420" aria-hidden="true" tabindex="-1"></a>elnet_resamples <span class="sc">|&gt;</span> <span class="fu">show_best</span>(<span class="at">metric =</span> <span class="st">"rmse"</span>) <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb24-421"><a href="#cb24-421" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-422"><a href="#cb24-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-425"><a href="#cb24-425" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-426"><a href="#cb24-426" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb24-427"><a href="#cb24-427" aria-hidden="true" tabindex="-1"></a>elnet_resamples <span class="sc">|&gt;</span></span>
+<span id="cb24-428"><a href="#cb24-428" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-429"><a href="#cb24-429" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"rmse"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-430"><a href="#cb24-430" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> penalty, <span class="at">y =</span> mixture, <span class="at">color =</span> mean)) <span class="sc">+</span></span>
+<span id="cb24-431"><a href="#cb24-431" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-432"><a href="#cb24-432" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> <span class="st">"red"</span>, <span class="at">high =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb24-433"><a href="#cb24-433" aria-hidden="true" tabindex="-1"></a>  <span class="co"># facet_wrap(facets = vars(.metric), scales = "free_y") +</span></span>
+<span id="cb24-434"><a href="#cb24-434" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Elastic Net Regression Hyperparameter Tuning"</span>, <span class="at">color =</span> <span class="st">"rmse"</span>)</span>
+<span id="cb24-435"><a href="#cb24-435" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-436"><a href="#cb24-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-437"><a href="#cb24-437" aria-hidden="true" tabindex="-1"></a>Finalize the workflow with the optimal hyperparameter setting.</span>
+<span id="cb24-438"><a href="#cb24-438" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-441"><a href="#cb24-441" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-442"><a href="#cb24-442" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb24-443"><a href="#cb24-443" aria-hidden="true" tabindex="-1"></a><span class="co"># Update the workflow with the optimal hyperparameter values.</span></span>
+<span id="cb24-444"><a href="#cb24-444" aria-hidden="true" tabindex="-1"></a>elnet_final <span class="ot">&lt;-</span></span>
+<span id="cb24-445"><a href="#cb24-445" aria-hidden="true" tabindex="-1"></a>  elnet_wflow <span class="sc">|&gt;</span></span>
+<span id="cb24-446"><a href="#cb24-446" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(<span class="at">parameters =</span> <span class="fu">select_best</span>(elnet_resamples, <span class="at">metric =</span> <span class="st">"rmse"</span>))</span>
+<span id="cb24-447"><a href="#cb24-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-448"><a href="#cb24-448" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit the model with the optimal hyperparameters using the _full_ training </span></span>
+<span id="cb24-449"><a href="#cb24-449" aria-hidden="true" tabindex="-1"></a><span class="co"># dataset (not the folds).</span></span>
+<span id="cb24-450"><a href="#cb24-450" aria-hidden="true" tabindex="-1"></a>elnet_fit <span class="ot">&lt;-</span> elnet_final <span class="sc">|&gt;</span> <span class="fu">last_fit</span>(mt_split)</span>
+<span id="cb24-451"><a href="#cb24-451" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-452"><a href="#cb24-452" aria-hidden="true" tabindex="-1"></a><span class="co"># Metrics are evaluated on the testing dataset.</span></span>
+<span id="cb24-453"><a href="#cb24-453" aria-hidden="true" tabindex="-1"></a>elnet_fit <span class="sc">|&gt;</span> <span class="fu">collect_metrics</span>() <span class="sc">|&gt;</span> knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb24-454"><a href="#cb24-454" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-455"><a href="#cb24-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-456"><a href="#cb24-456" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
+<span id="cb24-457"><a href="#cb24-457" aria-hidden="true" tabindex="-1"></a>Hera are the most important variables again.</span>
+<span id="cb24-458"><a href="#cb24-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-461"><a href="#cb24-461" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-462"><a href="#cb24-462" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb24-463"><a href="#cb24-463" aria-hidden="true" tabindex="-1"></a>elnet_final <span class="sc">|&gt;</span></span>
+<span id="cb24-464"><a href="#cb24-464" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="fu">training</span>(mt_split)) <span class="sc">|&gt;</span></span>
+<span id="cb24-465"><a href="#cb24-465" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-466"><a href="#cb24-466" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vi</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-467"><a href="#cb24-467" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Importance, <span class="at">y =</span> <span class="fu">fct_rev</span>(<span class="fu">fct_inorder</span>(Variable)), <span class="at">color =</span> Sign)) <span class="sc">+</span></span>
+<span id="cb24-468"><a href="#cb24-468" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-469"><a href="#cb24-469" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">0</span>, <span class="at">xend =</span> Importance))  <span class="sc">+</span></span>
+<span id="cb24-470"><a href="#cb24-470" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"top"</span>) <span class="sc">+</span></span>
+<span id="cb24-471"><a href="#cb24-471" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb24-472"><a href="#cb24-472" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="cn">NULL</span>,</span>
+<span id="cb24-473"><a href="#cb24-473" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Elastic Net Variable Importance"</span></span>
+<span id="cb24-474"><a href="#cb24-474" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-475"><a href="#cb24-475" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-476"><a href="#cb24-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-477"><a href="#cb24-477" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Summary {-}</span></span>
+<span id="cb24-478"><a href="#cb24-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-479"><a href="#cb24-479" aria-hidden="true" tabindex="-1"></a>Lasso performed best on RMSE and R-squared.</span>
+<span id="cb24-480"><a href="#cb24-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-483"><a href="#cb24-483" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb24-484"><a href="#cb24-484" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb24-485"><a href="#cb24-485" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb24-486"><a href="#cb24-486" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ridge =</span> <span class="fu">collect_metrics</span>(ridge_fit),</span>
+<span id="cb24-487"><a href="#cb24-487" aria-hidden="true" tabindex="-1"></a>  <span class="at">Lasso =</span> <span class="fu">collect_metrics</span>(lasso_fit),</span>
+<span id="cb24-488"><a href="#cb24-488" aria-hidden="true" tabindex="-1"></a>  <span class="at">ElNet =</span> <span class="fu">collect_metrics</span>(elnet_fit),</span>
+<span id="cb24-489"><a href="#cb24-489" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"Model"</span></span>
+<span id="cb24-490"><a href="#cb24-490" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb24-491"><a href="#cb24-491" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Model, .metric, .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb24-492"><a href="#cb24-492" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> .estimate) <span class="sc">|&gt;</span></span>
+<span id="cb24-493"><a href="#cb24-493" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb24-494"><a href="#cb24-494" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-495"><a href="#cb24-495" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-496"><a href="#cb24-496" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
+<span id="cb24-497"><a href="#cb24-497" aria-hidden="true" tabindex="-1"></a>Final thoughts on the models.</span>
+<span id="cb24-498"><a href="#cb24-498" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-499"><a href="#cb24-499" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Lasso can set some coefficients to zero, thus performing variable selection.</span>
+<span id="cb24-500"><a href="#cb24-500" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Lasso and Ridge address multicollinearity differently: in ridge regression, the coefficients of correlated predictors are similar; In lasso, one of the correlated predictors has a larger coefficient, while the rest are (nearly) zeroed.</span>
+<span id="cb24-501"><a href="#cb24-501" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Lasso tends to do well if there are a small number of significant parameters and the others are close to zero. Ridge tends to work well if there are many large parameters of about the same value.</span>
+<span id="cb24-502"><a href="#cb24-502" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>In practice, you don't know which will be best, so run cross-validation pick the best.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

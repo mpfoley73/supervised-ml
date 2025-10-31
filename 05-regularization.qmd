@@ -31,7 +31,7 @@ $$\hat{\beta} = \left(X'X\right)^{-1}\left(X'Y\right).$$
 
 There are two important characteristics of any estimator: *bias* and its *variance*.  For OLS, these are
 
-$$\text{Bias}(\hat{\beta}) = E(\hat{\beta}) - \beta = 0$$
+$$\mathbb{B}(\hat{\beta}) = E(\hat{\beta}) - \beta = 0$$
 
 and
 
@@ -138,7 +138,7 @@ sim_preds |>
 
 ## Case Study
 
-The following three sections use regularization to fit a model of `mpg` on the other variables in the `mtcars` dataset. Set up a train-test split, training with 5-fold CV.
+The next three sections use regularization to fit a model of `mpg` on the other variables in the `mtcars` dataset. Set up a train-test split, training with 5-fold CV.
 
 ```{r}
 #| code-fold: false
@@ -159,7 +159,9 @@ glimpse(mtcars)
 
 Ridge regression estimates the linear model coefficients by minimizing an augmented loss function which includes a term, $\lambda$, that penalizes the magnitude of the coefficient estimates,
 
-$$L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \hat{\beta}_j^2.$$
+$$
+L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \hat{\beta}_j^2.
+$$ {#eq-ridge-loss}
 
 The resulting estimate for the coefficients is 
 
@@ -167,7 +169,7 @@ $$\hat{\beta} = \left(X'X + \lambda I\right)^{-1}\left(X'Y \right).$$
 
 As $\lambda \rightarrow 0$, ridge regression approaches OLS.  The bias and variance for the ridge estimator are
 
-$$\mathrm{Bias}(\hat{\beta}) = -\lambda \left(X'X + \lambda I \right)^{-1} \beta$$
+$$\mathbb{B}(\hat{\beta}) = -\lambda \left(X'X + \lambda I \right)^{-1} \beta$$
 $$\mathbb{V}(\hat{\beta}) = \sigma^2 \left(X'X + \lambda I \right)^{-1}X'X \left(X'X + \lambda I \right)^{-1}$$
 
 Notice how the estimator bias increases with $\lambda$ while the variance decreases with $\lambda$. The optimal level for $\lambda$ is the one that minimizes the root mean squared error (RMSE) or the Akaike or Bayesian Information Criterion (AIC or BIC), or R-squared.
@@ -206,8 +208,12 @@ ridge_resamples <-
 ridge_resamples |> show_best(metric = "rmse") |> knitr::kable()
 ```
 
+<br>
+A plot shows how the RMSE varies with the penalty. $R^2$ is shown too. The minimum RMSE is at `r select_best(ridge_resamples, metric = "rmse") |> pull(penalty) |> comma(.1)`.
+
 ```{r}
 #| code-fold: true
+
 ridge_resamples |>
   collect_metrics() |>
   ggplot(aes(x = penalty, y = mean)) +
@@ -233,7 +239,7 @@ ridge_fit |> collect_metrics() |> knitr::kable()
 ```
 
 <br>
-The most important variables here were `am` and `wt`.
+Use `vip::vi()` to calculate variable importance.
 
 ```{r}
 #| code-fold: true
@@ -257,7 +263,9 @@ Lasso stands for “least absolute shrinkage and selection operator”. Like rid
 
 The loss function for lasso is
 
-$$L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \left| \hat{\beta}_j \right|.$$
+$$
+L = \sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2 + \lambda \sum_{j=1}^k \left| \hat{\beta}_j \right|.
+$$ {#eq-lasso-loss}
 
 To fit a linear model with lasso regression, specify `linear_reg(mixture = 1)`.
 
@@ -293,6 +301,8 @@ lasso_resamples <-
 lasso_resamples |> show_best(metric = "rmse") |> knitr::kable()
 ```
 
+The minimum RMSE is at `r select_best(lasso_resamples, metric = "rmse") |> pull(penalty) |> comma(.1)`.
+
 ```{r}
 #| code-fold: true
 lasso_resamples |>
@@ -320,7 +330,7 @@ lasso_fit |> collect_metrics() |> knitr::kable()
 ```
 
 <br>
-The most important variables here were `am` and `wt`.
+Hera are the most important variables.
 
 ```{r}
 #| code-fold: true
@@ -342,9 +352,11 @@ lasso_final |>
 
 Elastic Net combines the penalties of ridge and lasso to get the best of both worlds. The loss function for elastic net is
 
-$$L = \frac{\sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2}{2n} + \lambda \frac{1 - \alpha}{2}\sum_{j=1}^k \hat{\beta}_j^2 + \lambda \alpha\left| \hat{\beta}_j \right|.$$
+$$
+L = \frac{\sum_{i = 1}^n \left(y_i - x_i^{'} \hat\beta \right)^2}{2n} + \lambda \frac{1 - \alpha}{2}\sum_{j=1}^k \hat{\beta}_j^2 + \lambda \alpha\left| \hat{\beta}_j \right|.
+$$ {#eq-elnet-loss}
 
-In this loss function, new parameter $\alpha$ is a "mixing" parameter that balances the two approaches.  If $\alpha$ is zero, you are back to ridge regression, and if $\alpha$ is one, you are back to lasso. To fit a linear model with elastic net regression, specify `linear_reg(mixture = tune())`.
+In @eq-elnet-loss, new parameter $\alpha$ is a "mixing" parameter that balances the two approaches.  If $\alpha$ is zero, you are back to ridge regression, and if $\alpha$ is one, you are back to lasso. To fit a linear model with elastic net regression, specify `linear_reg(mixture = tune())`.
 
 ```{r}
 #| code-fold: false
@@ -410,7 +422,7 @@ elnet_fit |> collect_metrics() |> knitr::kable()
 ```
 
 <br>
-The most important variables here were `wt`, `qsec` and `disp`.
+Hera are the most important variables again.
 
 ```{r}
 #| code-fold: true
@@ -445,6 +457,7 @@ bind_rows(
   knitr::kable()
 ```
 
+<br>
 Final thoughts on the models.
 
 * Lasso can set some coefficients to zero, thus performing variable selection.
