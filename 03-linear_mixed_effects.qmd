@@ -16,61 +16,90 @@ theme_set(
     theme(
       plot.caption = element_text(hjust = 0),
       strip.background = element_rect(fill = "gray90", color = "gray60"),
-      strip.text = element_text(color = "gray20")
+      strip.text = element_text(color = "gray20", size = 12)
     )
 )
 ```
 
-Suppose you run an experiment measuring how long it takes a person to complete one task while also completing one of two types of secondary tasks. Do the secondary task types have differing effects? This is normally a good candidate for a linear regression, but there is a twist: the participants in the study naturally vary in their ability to multitask. Plus, the participants each generate many data points for each of the two secondary tasks. This twist is a violation the independent observations assumption in linear regression. What to do? The solution is *linear mixed effects models* (LMMs).
+Suppose you run an experiment measuring the effect of two types of secondary tasks on the time it takes a person to complete a primary task. This is normally a good candidate for a linear regression, but there is a twist: the participants each generate many data points, and they naturally vary in their multitasking skills. This twist violates the _independent observations_ assumption. What to do? The solution is *linear mixed effects models* (LMMs).[^lmer-1]
 
-We'll use the dataset included in the [supplemental materials](https://osf.io/v6qag/) in *An Introduction to Linear Mixed-Effects Modeling* [@Brown2021] to illustrate. 
+[^lmer-1]: Another option is repeated measures ANOVA. However, repeated measures ANOVA can model either participant or item variability, but not both simultaneously. Also, ANOVA requires continuous outcomes and ccategorical predictors.
+
+We'll work with a datasets included in the [supplemental materials](https://osf.io/v6qag/) of *An Introduction to Linear Mixed-Effects Modeling* [@Brown2021].[^lmer-2]
+
+[^lmer-2]: The article is a good tutorial and worth reading.
 
 ```{r}
 #| code-fold: false
 #| echo: true
 
-mdl_dat <- 
+rt_dat <-
   readr::read_csv("./input/mixed-effects-rt.csv", col_types = "cdcc") |>
   mutate(modality = factor(modality, levels = c("Audio-only", "Audiovisual")))
 
-glimpse(mdl_dat)
+acc_dat <-
+  readr::read_csv("./input/mixed-effects-acc.csv", col_types = "cdcc") |>
+  mutate(
+    modality = factor(modality, levels = c("Audio-only", "Audiovisual")),
+    acc = factor(acc)
+  )
+
+glimpse(rt_dat)
+
+glimpse(acc_dat)
 ```
 
-The study measured participant (`PID`) response time (`RT`) to a primary task while completing a secondary task repeating words presented in one of two modalities (`modality`): audio-only and audiovisual. The researchers hypothesized that the higher cognitive load associated with audiovisual stimulation would increase `RT`. The experiment is complicated by the fact that each participant performed the experiment repeatedly with varying words (stimulus, `stim`) form each modality.
+The datasets are from a study about multi-tasking. In `rt_dat`, the researchers measured participant (`PID`) response time (`RT`) on a primary task while completing a secondary task of repeating words presented in one of two modalities (`modality`): audio-only and audiovisual. The researchers hypothesized that the higher cognitive load associated with audiovisual stimulation would increase `RT`. Each participant repeated the experiment with various words (stimulus, `stim`). In `acc_dat`, the dependent variable is response accuracy (`acc` $\in [0,1]$) rather than response time.
 
 ```{r}
 #| include: false
 
-n_PID <- n_distinct(mdl_dat$PID)
+n_PID <- n_distinct(rt_dat$PID)
 
-n_stim <- n_distinct(mdl_dat$stim)
+n_stim <- n_distinct(rt_dat$stim)
 ```
 
-
-There were `r n_PID` participants and `r n_stim` words. The initial summary table suggests audiovisual modality does indeed retard response times over audio-only.
+There were `r n_PID` participants and `r n_stim` words in `rt_dat`. The summary tables suggests the audiovisual modality does indeed retard response times over audio-only, but increased accuracy.
 
 ```{r}
 #| code-fold: true
 #| message: false
 
 gtsummary::tbl_summary(
-  mdl_dat,
+  rt_dat,
   by = modality,
   include = -c(PID, stim),
   statistic = list(gtsummary::all_continuous() ~ "{mean}, {sd}")
-)
+) |>
+  gtsummary::as_gt() |>
+  gt::tab_header(title = "rt_dat")
 ```
 
 <br>
 
-`PID` and `stim` are important covariates because it is plain to see that humans differ in their ability to multitask, and words vary in difficulty.
+```{r}
+#| code-fold: true
+#| message: false
+
+gtsummary::tbl_summary(
+  acc_dat,
+  by = modality,
+  include = -c(PID, stim)
+) |>
+  gtsummary::as_gt() |>
+  gt::tab_header(title = "acc_dat")
+```
+
+<br>
+
+`PID` and `stim` are important covariates because people differ in their ability to multitask, and words vary in difficulty.
 
 ```{r}
 #| code-fold: true
 
 bind_rows(
-  Participants = summarize(mdl_dat, .by = c(modality, PID), M = mean(RT)),
-  Stimulus = summarize(mdl_dat, .by = c(modality, stim), M = mean(RT)),
+  Participants = summarize(rt_dat, .by = c(modality, PID), M = mean(RT)),
+  Stimulus = summarize(rt_dat, .by = c(modality, stim), M = mean(RT)),
   .id = "Factor"
 ) |>
   mutate(
@@ -84,148 +113,180 @@ bind_rows(
   geom_line(aes(y = M, group = grp), alpha = .3, color = "dodgerblue3") +
   facet_wrap(facets = vars(Factor)) +
   labs(
-    title = "Effect of Modality on Task Mean Response Time",
+    title = "Modality Effect on Mean Response Time",
     subtitle = "by Participant and Word Stimulas",
     y = "milliseconds (ms)"
   )
 ```
 
-## The LMM Model
+## LMM Model
 
-Mixed-effects models are called “mixed” because they simultaneously model fixed and random effects. Fixed effects are population-level effects that should persist across experiments. Fixed effects are the traditional predictors in a regression model. `modality` is a fixed effect. Random effects are level effects that account for variability at different levels of the data hierarchy. For example, in a study with students from different schools, the variation between schools would be random effects. `PID` and `stim` are random effects because they are randomly sampled and you expect variability within the populations.
+Mixed-effects models are called “mixed” because they simultaneously model fixed and random effects. Fixed effects are population-level effects that should persist across experiments. Fixed effects are the traditional predictors in a regression model. `modality` is a fixed effect. Random effects are level effects that account for variability at different levels of the data hierarchy. `PID` and `stim` are random effects because they are randomly sampled and you expect variability within the populations.
 
-The LMM represents the $i$-th observation for the $j$-th random-effects group as
+LMM represents the $i$-th observation for the $j$-th random-effects group as
 
 $$
 y_{ij} = \beta_0 + \beta_1x_{ij} + u_j + \epsilon_{ij}
-$$
+$$ {#eq-lmm-model}
 
 Where $\beta_0$ and $\beta_1$ are the fixed effect intercept and slope, and $u_j$ is the random effect for the $j$-th group. The $u_j$ terms are the group deviations from the population mean and are assumed to be normally distributed with mean 0 and variance $\sigma_u^2$. The residual term is also assumed to be normally distributed with mean 0 and variance $\sigma_\epsilon^2$
 
-In our case, $\beta_0$ and $\beta_1$ are the fixed effects of `modality`. $u_j$ would be the $j$ = `r n_PID` levels of `PID`. There might also be an $\eta_k$ term representing $k$ = `r n_stim` word stimuli.
+In our study, $\beta_0$ and $\beta_1$ are the fixed effects of `modality`; $u_j$ is the $j$ = `r n_PID` `PID` levels; and the model includes an additional term, $\eta_k$, for the $k$ = `r n_stim` `stim` levels.
 
-## The lmer Engine
+$$
+y_{ij} = \beta_0 + \beta_1x_{ij} + u_j + \eta_k + \epsilon_{ijk}
+$$
 
-Fit an LMM with the lmer package. The pipes (|) in the formula indicate the value to the left varies by the variable to the right. 1 is the intercept (no interactions).
+## The _lmer_ Engine
 
+Fit an LMM with the _lmer_ package. The pipes (\|) in the formula indicate the value to the left varies by the variable to the right. 1 is the intercept (no interactions). You can model the random effects two ways:
+
+- `(1|PID) + (1|stim)`: level effects by participant and stimulus.
+- `(1 + modality|PID) + (1 + modality|stim)`: level effects plus interaction effects.
+
+Start with the level effect model.
+
+```{r fit-1}
+#| code-fold: false
+
+rt_fit_1 <-
+  linear_reg() |>
+  set_engine("lmer") |>
+  fit(
+  RT ~ 1 + modality + (1|PID) + (1|stim),
+    data = rt_dat
+  )
+
+extract_fit_engine(rt_fit_1) |> summary()
+```
+
+Let's walk through these sections. 
+
+::: {.callout-tip}
+Use `broom.mixed::tidy()` to pull the coefficient estimates.
 ```{r}
 #| code-fold: false
 
-fit_1 <- 
-  linear_reg() |> 
-  set_engine("lmer") |>
-  fit(
-    RT ~ modality + (1 | PID) + (1 | stim), 
-    data = mdl_dat
-  )
-
-summary(extract_fit_engine(fit_1))
+(tidy_fit <- broom.mixed::tidy(rt_fit_1))
 ```
+:::
 
-The *Random effects* section shows the variability in `RT` due to `stim` and `PID`. The variability among participants (`PID` sd = `r broom.mixed::tidy(fit_1) |> filter(group == "PID", term == "sd__(Intercept)") |> pull(estimate) |> comma()` ms) is much greater than the variability among words (`stim` sd = `r broom.mixed::tidy(fit_1) |> filter(group == "stim", term == "sd__(Intercept)") |> pull(estimate) |> comma()` ms). 
+- The *Random effects* show the variability in `RT` due to `stim` and `PID`. The variability among participants (`PID` sd = `r tidy_fit |> filter(group == "PID", term == "sd__(Intercept)") |> pull(estimate) |> comma()` ms) is much greater than the variability among words (`stim` sd = `r tidy_fit |> filter(group == "stim", term == "sd__(Intercept)") |> pull(estimate) |> comma()` ms).
 
-The *Fixed effects* section shows audio-visual modality slows `RT` by `r broom.mixed::tidy(fit_1) |> filter(effect == "fixed", term == "modalityAudiovisual") |> pull(estimate) |> comma()` ms over audio-only.
+- The *Fixed effects* show audio-visual modality slows `RT` by `r tidy_fit |> filter(effect == "fixed", term == "modalityAudiovisual") |> pull(estimate) |> comma(.1)` ms over audio-only.
 
-The last section, *Correlation of Fixed Effects*, indicates there is a weak negative correlation between the intercept and the audio-visual modality effect, meaning when `RT` was higher, the effect of audiovisual was slightly less.
+- The *Correlation of Fixed Effects* shows a weak negative correlation between the intercept and the audio-visual modality effect (`modltyAdvsl` = `r extract_fit_engine(rt_fit_1) |> summary() |> pluck("vcov", "factors", "correlation") |> pluck("x", 3) |> comma(.001)` ms). This means when `RT` times were high, audiovisual effect was somewhat diminished.
 
-Model interactions between the fixed effect variable(s) and random effects variable(s) by changing the random intercept to the fixed effect variable so both the intercept and the slope can vary.
+To add interactions between the fixed effect variable(s) and the random effects variable(s), change the random intercept (1) to the fixed effect variable. Then both the intercept and the slope can vary.
 
-```{r}
+```{r fit-2}
 #| code-fold: false
 
-fit_2 <- 
-  linear_reg() |> 
+rt_fit_2 <-
+  linear_reg() |>
   set_engine("lmer") |>
   fit(
-    RT ~ modality + (modality | PID) + (modality | stim), 
-    data = mdl_dat
+    RT ~ 1 + modality + (1 + modality|PID) + (1 + modality|stim),
+    data = rt_dat
   )
 
-summary(extract_fit_engine(fit_2))
+summary(extract_fit_engine(rt_fit_2))
 ```
 
-This formulation includes random slopes for `modality` within `PID` and `stim`, meaning you’re accounting for differences in how each participant and stimulus responds to modality. Response times varied around `r broom.mixed::tidy(fit_2) %>% filter(term == "(Intercept)") %>% pull(estimate) %>% comma(1)` ms by sd = `r broom.mixed::tidy(fit_2) %>% filter(term == "sd__(Intercept)", group == "stim") %>% pull(estimate) %>% comma(1)` ms for `stim` and sd = `r broom.mixed::tidy(fit_2) %>% filter(term == "sd__(Intercept)", group == "PID") %>% pull(estimate) %>% comma(1)` ms for `PID`. The modality effect on response times varied around `r broom.mixed::tidy(fit_2) %>% filter(term == "modalityAudiovisual") %>% pull(estimate) %>% comma(1)` ms by sd = `r broom.mixed::tidy(fit_2) %>% filter(term == "sd__modalityAudiovisual", group == "stim") %>% pull(estimate) %>% comma(1)` ms for `stim` and sd = `r broom.mixed::tidy(fit_2) %>% filter(term == "sd__modalityAudiovisual", group == "PID") %>% pull(estimate) %>% comma(1)` ms for PID. That last satistic means a participant whose slope is 1 SD below the mean would have a slope near zero - a modality effect of zero.
+This formulation includes random slopes for `modality` within `PID` and `stim`, meaning you’re accounting for differences in how each participant and stimulus responds to modality. Response times varied around `r broom.mixed::tidy(rt_fit_2) %>% filter(term == "(Intercept)") %>% pull(estimate) %>% comma(1)` ms by sd = `r broom.mixed::tidy(rt_fit_2) %>% filter(term == "sd__(Intercept)", group == "stim") %>% pull(estimate) %>% comma(1)` ms for `stim` and sd = `r broom.mixed::tidy(rt_fit_2) %>% filter(term == "sd__(Intercept)", group == "PID") %>% pull(estimate) %>% comma(1)` ms for `PID`. The modality effect on response times varied around `r broom.mixed::tidy(rt_fit_2) %>% filter(term == "modalityAudiovisual") %>% pull(estimate) %>% comma(1)` ms by sd = `r broom.mixed::tidy(rt_fit_2) %>% filter(term == "sd__modalityAudiovisual", group == "stim") %>% pull(estimate) %>% comma(1)` ms for `stim` and sd = `r broom.mixed::tidy(rt_fit_2) %>% filter(term == "sd__modalityAudiovisual", group == "PID") %>% pull(estimate) %>% comma(1)` ms for PID. That last statistic means a participant whose slope is 1 sd below the mean would have a slope near zero - a modality effect of zero.
 
-The added correlations in the *Random effects* section show how the intercept and slopes for `modality` vary together within each group. The `r broom.mixed::tidy(fit_2) %>% filter(term == "cor__(Intercept).modalityAudiovisual", group == "stim") %>% pull(estimate) %>% comma(.01)` correlation between the stimuli and fixed-effect intercepts indicates that stimuli with longer response times in the audio modality tended to have more positive slopes (stronger positive audiovisual effect). The `r broom.mixed::tidy(fit_2) %>% filter(term == "cor__(Intercept).modalityAudiovisual", group == "PID") %>% pull(estimate) %>% comma(.01)` correlation between the participant and fixed-effect intercepts indicates that participants with longer response times in the audio modality tended to have a less positive slope (weaker positive, or possibly even a negative, audiovisual effect).
+The added correlations in the *Random effects* section show how the intercept and slopes for `modality` vary together within each group. The `r broom.mixed::tidy(rt_fit_2) %>% filter(term == "cor__(Intercept).modalityAudiovisual", group == "stim") %>% pull(estimate) %>% comma(.01)` correlation between the stimuli and fixed-effect intercepts indicates that stimuli with longer response times in the audio modality tended to have more positive slopes (stronger positive audiovisual effect). The `r broom.mixed::tidy(rt_fit_2) %>% filter(term == "cor__(Intercept).modalityAudiovisual", group == "PID") %>% pull(estimate) %>% comma(.01)` correlation between the participant and fixed-effect intercepts indicates that participants with longer response times in the audio modality tended to have a less positive slope (weaker positive, or possibly even a negative, audiovisual effect).
 
-The audio-visual modality slows `RT` by `r broom.mixed::tidy(fit_2) |> filter(effect == "fixed", term == "modalityAudiovisual") |> pull(estimate) |> comma()` ms over audio-only - same as in the first model. The REML criterion fell, so adding the random slopes for modality improved the fit.
+The audio-visual modality slows `RT` by `r broom.mixed::tidy(rt_fit_2) |> filter(effect == "fixed", term == "modalityAudiovisual") |> pull(estimate) |> comma()` ms over audio-only - same as in the first model. The REML criterion fell, so adding the random slopes for modality improved the fit.
 
-## Model Assumptions
+## Assumptions
 
-The linear regression model assumptions apply here: the relationship between the predictors and the response is linear and the residuals are independent random variables normally distributed with mean zero and constant variance. Additionally, the the random effects intercepts and slopes are assumed to follow a normal distribution. Use residual plots to assess linearity, homoscedasticity, and independence. Use Q-Q plots to check the normality of residuals and random effects. Variance Inflation Factor (VIF) can help detect multicollinearity among predictors.
+The linear regression model assumptions still apply: the relationship between the predictors and the response is linear and the residuals are independent random variables normally distributed with mean zero and constant variance. Additionally, the the random effects intercepts and slopes are assumed to follow a normal distribution. Use residual plots to assess linearity, homoscedasticity, and independence. Use Q-Q plots to check the normality of residuals and random effects. Variance inflation factors (VIFs) can help detect multicollinearity among predictors.
 
 ```{r}
 #| code-fold: false
 #| message: false
 
-resid_panel(extract_fit_engine(fit_2), smoother = TRUE, qqbands = TRUE)
+resid_panel(extract_fit_engine(rt_fit_2), smoother = TRUE, qqbands = TRUE)
 ```
 
-## Evaluate the Fit
+## Evaluation
 
-Use likelihood ratio test to determine whether predictors affect the response variable. Compare the fit to a model without the predictor of interest. The likelihood ratio test is usually performed with the anova function, but there is a better way. `afex::mixed(method = "LRT")` performs the test for all fixed effects variables in the model. In this case study we have only one.
+To determine whether `modality` affects response times, compare the model to a nested model without `modality` using a likelihood-ratio test (LRT). LRT calculates the model likelihoods using maximum likelihood estimation then compares those likelihoods. A significant test result indicates the full model fits the data better.
 
-```{r, warning=FALSE, message=FALSE}
-#| code-fold: false
+::: {.callout-note}
+### Why not rely on the Wald (coefficient t-) test?
+Degrees-of-freedom are tricky for mixed models and Wald *p*-values use approximations that can be unrliable in complex random structures. 
+:::
 
-lrt <- afex::mixed(
-  RT ~ modality + (modality | PID) + (modality | stim), 
-  data = mdl_dat, 
-  method = "LRT"
+```{r rt-lrt}
+# reduced model exlcludes the `modality` predictor.
+rt_reduced <- linear_reg() |>
+  set_engine("lmer") |>
+  fit(
+    RT ~ 1 + (1 + modality|PID) + (1 + modality|stim),
+    data = rt_dat
+  )
+
+rt_lrt <- anova(
+  extract_fit_engine(rt_fit_2),
+  extract_fit_engine(rt_reduced)
 )
 
-lrt
+tidy(rt_lrt)
 ```
 
-The likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, $\chi^2$(1) = `r lrt$anova_table$Chisq %>% comma(.1)`, *p* < .001.
+The likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, $\chi^2$(1) = `r comma(rt_lrt$Chisq[2], .1)`, *p* \< .001.
 
 ## Reporting
 
 ```{r}
 #| code-fold: false
 
-av_terms <- broom.mixed::tidy(fit_2) |> filter(term == "modalityAudiovisual")
+av_terms <- broom.mixed::tidy(rt_fit_2) |> filter(term == "modalityAudiovisual")
 ```
 
-
-> A likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, $\chi^2$(1) = `r lrt$anova_table$Chisq %>% comma(.1)`, *p* < .001. Examination of the summary output for the full model indicated that response times were on average an estimated `r comma(av_terms[1, ]$estimate, .1)` ms slower in the audiovisual relative to the audio-only condition ($\hat{\beta}$ = `r comma(av_terms[1, ]$estimate, .1)`, *SE* = `r comma(av_terms[1, ]$std.error, .1)`, *t* = `r comma(av_terms[1, ]$estimate, .1)`, *SE* = `r comma(av_terms[1, ]$statistic, .1)`).
+> A likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, $\chi^2$(1) = `r comma(rt_lrt$Chisq[2], .1)`, *p* \< .001. Examination of the summary output for the full model indicated that response times were on average an estimated `r comma(av_terms[1, ]$estimate, .1)` ms slower in the audiovisual relative to the audio-only condition ($\hat{\beta}$ = `r comma(av_terms[1, ]$estimate, .1)`, *SE* = `r comma(av_terms[1, ]$std.error, .1)`, *t* = `r comma(av_terms[1, ]$estimate, .1)`, *SE* = `r comma(av_terms[1, ]$statistic, .1)`).
 
 ```{r message=FALSE}
 #| code-fold: false
 
-gtsummary::tbl_regression(fit_2)
+gtsummary::tbl_regression(rt_fit_2)
 ```
 
-## Appendix: Comparison to OLS
+## Logistic Regression
 
-You might consider just throwing `PID` and `stim` into a simple linear regression as covariates. 
+This section fits a logistic LMM to the `acc_dat` dataset.
 
-```{r}
-linear_reg() |>
-  fit(RT ~ modality + PID + stim, data = mdl_dat) |>
-  tidy() |> 
-  filter(
-    !str_detect(term, "^PID"), 
-    !str_detect(term, "^stim")
+```{r acc-fit}
+acc_fit <-
+  logistic_reg() |>
+  set_engine("glmer") |>
+  set_mode("classification") |>
+  fit(
+    acc ~ 1 + modality + (1 + 1|PID) + (1 + 1|stim),
+    data = acc_dat,
+    family = "binomial"
   )
 ```
 
-Or maybe pre-summarize the data by calculating the mean response time across all words by `PID` and `modality`, then run the regression controlling for just `PID`.
+Fit a reduced model lacking the `modality` fixed effect to use in a likelihood ratio test.
 
-```{r}
-x <- summarize(mdl_dat, .by = c(modality, PID), MRT = mean(RT))
+```{r acc-lrt}
+acc_reduced_fit <-
+  logistic_reg() |>
+  set_engine("glmer") |>
+  set_mode("classification") |>
+  fit(
+    acc ~ 1 + (1 + 1|PID) + (1 + 1|stim),
+    data = acc_dat,
+    family = "binomial"
+  )
 
-linear_reg() |>
-  fit(MRT ~ modality + PID, data = x) |>
-  tidy() |> 
-  filter(!str_detect(term, "^PID"))
+lrt_acc <- anova(
+  extract_fit_engine(acc_fit),
+  extract_fit_engine(acc_reduced_fit)
+)
+
+tidy(lrt_acc)
 ```
-
-Or what the heck, don't even control for `pID` or `stim`.
-
-```{r}
-linear_reg() |>
-  fit(RT ~ modality, data = mdl_dat) |>
-  tidy()
-```
-

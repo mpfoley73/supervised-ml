@@ -266,12 +266,13 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#the-lmm-model" id="toc-the-lmm-model" class="nav-link active" data-scroll-target="#the-lmm-model"><span class="header-section-number">3.1</span> The LMM Model</a></li>
-  <li><a href="#the-lmer-engine" id="toc-the-lmer-engine" class="nav-link" data-scroll-target="#the-lmer-engine"><span class="header-section-number">3.2</span> The lmer Engine</a></li>
-  <li><a href="#model-assumptions" id="toc-model-assumptions" class="nav-link" data-scroll-target="#model-assumptions"><span class="header-section-number">3.3</span> Model Assumptions</a></li>
-  <li><a href="#evaluate-the-fit" id="toc-evaluate-the-fit" class="nav-link" data-scroll-target="#evaluate-the-fit"><span class="header-section-number">3.4</span> Evaluate the Fit</a></li>
+  <li><a href="#lmm-model" id="toc-lmm-model" class="nav-link active" data-scroll-target="#lmm-model"><span class="header-section-number">3.1</span> LMM Model</a></li>
+  <li><a href="#the-lmer-engine" id="toc-the-lmer-engine" class="nav-link" data-scroll-target="#the-lmer-engine"><span class="header-section-number">3.2</span> The <em>lmer</em> Engine</a></li>
+  <li><a href="#assumptions" id="toc-assumptions" class="nav-link" data-scroll-target="#assumptions"><span class="header-section-number">3.3</span> Assumptions</a></li>
+  <li><a href="#evaluation" id="toc-evaluation" class="nav-link" data-scroll-target="#evaluation"><span class="header-section-number">3.4</span> Evaluation</a></li>
   <li><a href="#reporting" id="toc-reporting" class="nav-link" data-scroll-target="#reporting"><span class="header-section-number">3.5</span> Reporting</a></li>
-  <li><a href="#appendix-comparison-to-ols" id="toc-appendix-comparison-to-ols" class="nav-link" data-scroll-target="#appendix-comparison-to-ols"><span class="header-section-number">3.6</span> Appendix: Comparison to OLS</a></li>
+  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link" data-scroll-target="#logistic-regression"><span class="header-section-number">3.6</span> Logistic Regression</a></li>
+  <li><a href="#appendix-comparison-to-ols" id="toc-appendix-comparison-to-ols" class="nav-link" data-scroll-target="#appendix-comparison-to-ols"><span class="header-section-number">3.7</span> Appendix: Comparison to OLS</a></li>
   </ul>
 </nav>
     </div>
@@ -297,14 +298,21 @@ window.Quarto = {
 </header>
 
 
-<p>Suppose you run an experiment measuring how long it takes a person to complete one task while also completing one of two types of secondary tasks. Do the secondary task types have differing effects? This is normally a good candidate for a linear regression, but there is a twist: the participants in the study naturally vary in their ability to multitask. Plus, the participants each generate many data points for each of the two secondary tasks. This twist is a violation the independent observations assumption in linear regression. What to do? The solution is <em>linear mixed effects models</em> (LMMs).</p>
-<p>We’ll use the dataset included in the <a href="https://osf.io/v6qag/">supplemental materials</a> in <em>An Introduction to Linear Mixed-Effects Modeling</em> <span class="citation" data-cites="Brown2021">(<a href="10-references.html#ref-Brown2021" role="doc-biblioref">Brown 2021</a>)</span> to illustrate.</p>
+<p>Suppose you run an experiment measuring the effect of two types of secondary tasks on the time it takes a person to complete a primary task. This is normally a good candidate for a linear regression, but there is a twist: the participants each generate many data points, and they naturally vary in their multitasking skills. This twist violates the <em>independent observations</em> assumption. What to do? The solution is <em>linear mixed effects models</em> (LMMs).<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>We’ll work with a datasets included in the <a href="https://osf.io/v6qag/">supplemental materials</a> of <em>An Introduction to Linear Mixed-Effects Modeling</em> <span class="citation" data-cites="Brown2021">(<a href="10-references.html#ref-Brown2021" role="doc-biblioref">Brown 2021</a>)</span>.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>mdl_dat <span class="ot">&lt;-</span> </span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>rt_dat <span class="ot">&lt;-</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"./input/mixed-effects-rt.csv"</span>, <span class="at">col_types =</span> <span class="st">"cdcc"</span>) <span class="sc">|&gt;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">modality =</span> <span class="fu">factor</span>(modality, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Audio-only"</span>, <span class="st">"Audiovisual"</span>)))</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(mdl_dat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>acc_dat <span class="ot">&lt;-</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"./input/mixed-effects-acc.csv"</span>, <span class="at">col_types =</span> <span class="st">"cdcc"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">modality =</span> <span class="fu">factor</span>(modality, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Audio-only"</span>, <span class="st">"Audiovisual"</span>)),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">acc =</span> <span class="fu">factor</span>(acc)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(rt_dat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 21,679
 Columns: 4
@@ -313,37 +321,48 @@ $ RT       &lt;dbl&gt; 1024, 838, 1060, 882, 971, 1064, 1283, 982, 1144, 743, 63
 $ modality &lt;fct&gt; Audio-only, Audio-only, Audio-only, Audio-only, Audio-only, A…
 $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "caug…</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(acc_dat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 28,807
+Columns: 4
+$ PID      &lt;chr&gt; "309", "311", "313", "314", "318", "325", "331", "335", "337"…
+$ acc      &lt;fct&gt; 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1…
+$ modality &lt;fct&gt; Audio-only, Audio-only, Audio-only, Audio-only, Audio-only, A…
+$ stim     &lt;chr&gt; "gong", "gong", "gong", "gong", "gong", "gong", "gong", "gong…</code></pre>
 </div>
-<p>The study measured participant (<code>PID</code>) response time (<code>RT</code>) to a primary task while completing a secondary task repeating words presented in one of two modalities (<code>modality</code>): audio-only and audiovisual. The researchers hypothesized that the higher cognitive load associated with audiovisual stimulation would increase <code>RT</code>. The experiment is complicated by the fact that each participant performed the experiment repeatedly with varying words (stimulus, <code>stim</code>) form each modality.</p>
-<p>There were 53 participants and 543 words. The initial summary table suggests audiovisual modality does indeed retard response times over audio-only.</p>
+</div>
+<p>The datasets are from a study about multi-tasking. In <code>rt_dat</code>, the researchers measured participant (<code>PID</code>) response time (<code>RT</code>) on a primary task while completing a secondary task of repeating words presented in one of two modalities (<code>modality</code>): audio-only and audiovisual. The researchers hypothesized that the higher cognitive load associated with audiovisual stimulation would increase <code>RT</code>. Each participant repeated the experiment with various words (stimulus, <code>stim</code>). In <code>acc_dat</code>, the dependent variable is response accuracy (<code>acc</code> <span class="math inline">\(\in [0,1]\)</span>) rather than response time.</p>
+<p>There were 53 participants and 543 words. The summary table suggests audiovisual modality does indeed retard response times over audio-only.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  mdl_dat,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> modality,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">include =</span> <span class="sc">-</span><span class="fu">c</span>(PID, stim),</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">statistic =</span> <span class="fu">list</span>(gtsummary<span class="sc">::</span><span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean}, {sd}"</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  rt_dat,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> modality,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">include =</span> <span class="sc">-</span><span class="fu">c</span>(PID, stim),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">statistic =</span> <span class="fu">list</span>(gtsummary<span class="sc">::</span><span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean}, {sd}"</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">as_gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"rt_dat"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="lixxjzcmbf" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#lixxjzcmbf table {
+<div id="sbowtprkvl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#sbowtprkvl table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#lixxjzcmbf thead, #lixxjzcmbf tbody, #lixxjzcmbf tfoot, #lixxjzcmbf tr, #lixxjzcmbf td, #lixxjzcmbf th {
+#sbowtprkvl thead, #sbowtprkvl tbody, #sbowtprkvl tfoot, #sbowtprkvl tr, #sbowtprkvl td, #sbowtprkvl th {
   border-style: none;
 }
 
-#lixxjzcmbf p {
+#sbowtprkvl p {
   margin: 0;
   padding: 0;
 }
 
-#lixxjzcmbf .gt_table {
+#sbowtprkvl .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -369,12 +388,12 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-left-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_caption {
+#sbowtprkvl .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#lixxjzcmbf .gt_title {
+#sbowtprkvl .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -386,7 +405,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-bottom-width: 0;
 }
 
-#lixxjzcmbf .gt_subtitle {
+#sbowtprkvl .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -398,7 +417,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-top-width: 0;
 }
 
-#lixxjzcmbf .gt_heading {
+#sbowtprkvl .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -410,13 +429,13 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-right-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_bottom_border {
+#sbowtprkvl .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_col_headings {
+#sbowtprkvl .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -431,7 +450,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-right-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_col_heading {
+#sbowtprkvl .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -451,7 +470,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   overflow-x: hidden;
 }
 
-#lixxjzcmbf .gt_column_spanner_outer {
+#sbowtprkvl .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -463,15 +482,15 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   padding-right: 4px;
 }
 
-#lixxjzcmbf .gt_column_spanner_outer:first-child {
+#sbowtprkvl .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#lixxjzcmbf .gt_column_spanner_outer:last-child {
+#sbowtprkvl .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#lixxjzcmbf .gt_column_spanner {
+#sbowtprkvl .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -483,11 +502,11 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   width: 100%;
 }
 
-#lixxjzcmbf .gt_spanner_row {
+#sbowtprkvl .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#lixxjzcmbf .gt_group_heading {
+#sbowtprkvl .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -513,7 +532,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   text-align: left;
 }
 
-#lixxjzcmbf .gt_empty_group_heading {
+#sbowtprkvl .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -528,15 +547,15 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   vertical-align: middle;
 }
 
-#lixxjzcmbf .gt_from_md > :first-child {
+#sbowtprkvl .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#lixxjzcmbf .gt_from_md > :last-child {
+#sbowtprkvl .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#lixxjzcmbf .gt_row {
+#sbowtprkvl .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -555,7 +574,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   overflow-x: hidden;
 }
 
-#lixxjzcmbf .gt_stub {
+#sbowtprkvl .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -568,7 +587,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   padding-right: 5px;
 }
 
-#lixxjzcmbf .gt_stub_row_group {
+#sbowtprkvl .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -582,15 +601,15 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   vertical-align: top;
 }
 
-#lixxjzcmbf .gt_row_group_first td {
+#sbowtprkvl .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#lixxjzcmbf .gt_row_group_first th {
+#sbowtprkvl .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#lixxjzcmbf .gt_summary_row {
+#sbowtprkvl .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -600,16 +619,16 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   padding-right: 5px;
 }
 
-#lixxjzcmbf .gt_first_summary_row {
+#sbowtprkvl .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_first_summary_row.thick {
+#sbowtprkvl .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#lixxjzcmbf .gt_last_summary_row {
+#sbowtprkvl .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -619,7 +638,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-bottom-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_grand_summary_row {
+#sbowtprkvl .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -629,7 +648,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   padding-right: 5px;
 }
 
-#lixxjzcmbf .gt_first_grand_summary_row {
+#sbowtprkvl .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -639,7 +658,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-top-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_last_grand_summary_row_top {
+#sbowtprkvl .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -649,11 +668,11 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-bottom-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_striped {
+#sbowtprkvl .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#lixxjzcmbf .gt_table_body {
+#sbowtprkvl .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -662,7 +681,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-bottom-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_footnotes {
+#sbowtprkvl .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -676,7 +695,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-right-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_footnote {
+#sbowtprkvl .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -685,7 +704,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   padding-right: 5px;
 }
 
-#lixxjzcmbf .gt_sourcenotes {
+#sbowtprkvl .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -699,7 +718,7 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   border-right-color: #D3D3D3;
 }
 
-#lixxjzcmbf .gt_sourcenote {
+#sbowtprkvl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -707,72 +726,72 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
   padding-right: 5px;
 }
 
-#lixxjzcmbf .gt_left {
+#sbowtprkvl .gt_left {
   text-align: left;
 }
 
-#lixxjzcmbf .gt_center {
+#sbowtprkvl .gt_center {
   text-align: center;
 }
 
-#lixxjzcmbf .gt_right {
+#sbowtprkvl .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#lixxjzcmbf .gt_font_normal {
+#sbowtprkvl .gt_font_normal {
   font-weight: normal;
 }
 
-#lixxjzcmbf .gt_font_bold {
+#sbowtprkvl .gt_font_bold {
   font-weight: bold;
 }
 
-#lixxjzcmbf .gt_font_italic {
+#sbowtprkvl .gt_font_italic {
   font-style: italic;
 }
 
-#lixxjzcmbf .gt_super {
+#sbowtprkvl .gt_super {
   font-size: 65%;
 }
 
-#lixxjzcmbf .gt_footnote_marks {
+#sbowtprkvl .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#lixxjzcmbf .gt_asterisk {
+#sbowtprkvl .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#lixxjzcmbf .gt_indent_1 {
+#sbowtprkvl .gt_indent_1 {
   text-indent: 5px;
 }
 
-#lixxjzcmbf .gt_indent_2 {
+#sbowtprkvl .gt_indent_2 {
   text-indent: 10px;
 }
 
-#lixxjzcmbf .gt_indent_3 {
+#sbowtprkvl .gt_indent_3 {
   text-indent: 15px;
 }
 
-#lixxjzcmbf .gt_indent_4 {
+#sbowtprkvl .gt_indent_4 {
   text-indent: 20px;
 }
 
-#lixxjzcmbf .gt_indent_5 {
+#sbowtprkvl .gt_indent_5 {
   text-indent: 25px;
 }
 
-#lixxjzcmbf .katex-display {
+#sbowtprkvl .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#lixxjzcmbf div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#sbowtprkvl div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -784,7 +803,10 @@ $ stim     &lt;chr&gt; "gown", "might", "fern", "vane", "pup", "rise", "hill", "
 <col style="width: 33%">
 </colgroup>
 <thead>
-<tr class="gt_col_headings header">
+<tr class="gt_heading header">
+<th colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border">rt_dat</th>
+</tr>
+<tr class="gt_col_headings even">
 <th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
 <th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>Audio-only</strong><br>
 N = 10,647<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
@@ -810,65 +832,583 @@ N = 11,032<span class="gt_footnote_marks" style="white-space:nowrap;font-style:i
 </div>
 </div>
 <p><br></p>
-<p><code>PID</code> and <code>stim</code> are important covariates because it is plain to see that humans differ in their ability to multitask, and words vary in difficulty.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Participants =</span> <span class="fu">summarize</span>(mdl_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, PID), <span class="at">M =</span> <span class="fu">mean</span>(RT)),</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stimulus =</span> <span class="fu">summarize</span>(mdl_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, stim), <span class="at">M =</span> <span class="fu">mean</span>(RT)),</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"Factor"</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Factor =</span> <span class="fu">case_when</span>(</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      Factor <span class="sc">==</span> <span class="st">"Participants"</span> <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"Participants (n = {n_PID})"</span>),</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      Factor <span class="sc">==</span> <span class="st">"Stimulus"</span> <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"Word Stimulus (n = {n_stim})"</span>)</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">grp =</span> <span class="fu">coalesce</span>(PID, stim)</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> modality)) <span class="sc">+</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> M, <span class="at">group =</span> grp), <span class="at">alpha =</span> .<span class="dv">3</span>, <span class="at">color =</span> <span class="st">"dodgerblue3"</span>) <span class="sc">+</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(Factor)) <span class="sc">+</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Effect of Modality on Task Mean Response Time"</span>,</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"by Participant and Word Stimulas"</span>,</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"milliseconds (ms)"</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  acc_dat,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> modality,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">include =</span> <span class="sc">-</span><span class="fu">c</span>(PID, stim)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">as_gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"acc_dat"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div id="uavqibryxa" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#uavqibryxa table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#uavqibryxa thead, #uavqibryxa tbody, #uavqibryxa tfoot, #uavqibryxa tr, #uavqibryxa td, #uavqibryxa th {
+  border-style: none;
+}
+
+#uavqibryxa p {
+  margin: 0;
+  padding: 0;
+}
+
+#uavqibryxa .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#uavqibryxa .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#uavqibryxa .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#uavqibryxa .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#uavqibryxa .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#uavqibryxa .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#uavqibryxa .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#uavqibryxa .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#uavqibryxa .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#uavqibryxa .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#uavqibryxa .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uavqibryxa .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#uavqibryxa .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#uavqibryxa .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#uavqibryxa .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uavqibryxa .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#uavqibryxa .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#uavqibryxa .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#uavqibryxa .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uavqibryxa .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#uavqibryxa .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uavqibryxa .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#uavqibryxa .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uavqibryxa .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uavqibryxa .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uavqibryxa .gt_left {
+  text-align: left;
+}
+
+#uavqibryxa .gt_center {
+  text-align: center;
+}
+
+#uavqibryxa .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#uavqibryxa .gt_font_normal {
+  font-weight: normal;
+}
+
+#uavqibryxa .gt_font_bold {
+  font-weight: bold;
+}
+
+#uavqibryxa .gt_font_italic {
+  font-style: italic;
+}
+
+#uavqibryxa .gt_super {
+  font-size: 65%;
+}
+
+#uavqibryxa .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#uavqibryxa .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#uavqibryxa .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#uavqibryxa .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#uavqibryxa .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#uavqibryxa .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#uavqibryxa .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#uavqibryxa .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#uavqibryxa div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="gt_heading header">
+<th colspan="3" class="gt_heading gt_title gt_font_normal gt_bottom_border">acc_dat</th>
+</tr>
+<tr class="gt_col_headings even">
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>Audio-only</strong><br>
+N = 14,391<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>Audiovisual</strong><br>
+N = 14,416<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">acc</td>
+<td class="gt_row gt_center" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" headers="stat_2"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;0</td>
+<td class="gt_row gt_center" headers="stat_1">4,880 (34%)</td>
+<td class="gt_row gt_center" headers="stat_2">1,992 (14%)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;1</td>
+<td class="gt_row gt_center" headers="stat_1">9,511 (66%)</td>
+<td class="gt_row gt_center" headers="stat_2">12,424 (86%)</td>
+</tr>
+</tbody><tfoot class="gt_footnotes">
+<tr class="odd">
+<td colspan="3" class="gt_footnote"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> n (%)</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+</div>
+</div>
+<p><br></p>
+<p><code>PID</code> and <code>stim</code> are important covariates because people differ in their ability to multitask, and words vary in difficulty.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Participants =</span> <span class="fu">summarize</span>(rt_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, PID), <span class="at">M =</span> <span class="fu">mean</span>(RT)),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stimulus =</span> <span class="fu">summarize</span>(rt_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, stim), <span class="at">M =</span> <span class="fu">mean</span>(RT)),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"Factor"</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Factor =</span> <span class="fu">case_when</span>(</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      Factor <span class="sc">==</span> <span class="st">"Participants"</span> <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"Participants (n = {n_PID})"</span>),</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>      Factor <span class="sc">==</span> <span class="st">"Stimulus"</span> <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"Word Stimulus (n = {n_stim})"</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">grp =</span> <span class="fu">coalesce</span>(PID, stim)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> modality)) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> M, <span class="at">group =</span> grp), <span class="at">alpha =</span> .<span class="dv">3</span>, <span class="at">color =</span> <span class="st">"dodgerblue3"</span>) <span class="sc">+</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(Factor)) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Modality Effect on Mean Response Time"</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"by Participant and Word Stimulas"</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"milliseconds (ms)"</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="03-linear_mixed_effects_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="03-linear_mixed_effects_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<section id="the-lmm-model" class="level2" data-number="3.1">
-<h2 data-number="3.1" class="anchored" data-anchor-id="the-lmm-model"><span class="header-section-number">3.1</span> The LMM Model</h2>
-<p>Mixed-effects models are called “mixed” because they simultaneously model fixed and random effects. Fixed effects are population-level effects that should persist across experiments. Fixed effects are the traditional predictors in a regression model. <code>modality</code> is a fixed effect. Random effects are level effects that account for variability at different levels of the data hierarchy. For example, in a study with students from different schools, the variation between schools would be random effects. <code>PID</code> and <code>stim</code> are random effects because they are randomly sampled and you expect variability within the populations.</p>
-<p>The LMM represents the <span class="math inline">\(i\)</span>-th observation for the <span class="math inline">\(j\)</span>-th random-effects group as</p>
-<p><span class="math display">\[
+<section id="lmm-model" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="lmm-model"><span class="header-section-number">3.1</span> LMM Model</h2>
+<p>Mixed-effects models are called “mixed” because they simultaneously model fixed and random effects. Fixed effects are population-level effects that should persist across experiments. Fixed effects are the traditional predictors in a regression model. <code>modality</code> is a fixed effect. Random effects are level effects that account for variability at different levels of the data hierarchy. <code>PID</code> and <code>stim</code> are random effects because they are randomly sampled and you expect variability within the populations.</p>
+<p>LMM represents the <span class="math inline">\(i\)</span>-th observation for the <span class="math inline">\(j\)</span>-th random-effects group as</p>
+<p><span id="eq-lmm-model"><span class="math display">\[
 y_{ij} = \beta_0 + \beta_1x_{ij} + u_j + \epsilon_{ij}
-\]</span></p>
+\tag{3.1}\]</span></span></p>
 <p>Where <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are the fixed effect intercept and slope, and <span class="math inline">\(u_j\)</span> is the random effect for the <span class="math inline">\(j\)</span>-th group. The <span class="math inline">\(u_j\)</span> terms are the group deviations from the population mean and are assumed to be normally distributed with mean 0 and variance <span class="math inline">\(\sigma_u^2\)</span>. The residual term is also assumed to be normally distributed with mean 0 and variance <span class="math inline">\(\sigma_\epsilon^2\)</span></p>
-<p>In our case, <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are the fixed effects of <code>modality</code>. <span class="math inline">\(u_j\)</span> would be the <span class="math inline">\(j\)</span> = 53 levels of <code>PID</code>. There might also be an <span class="math inline">\(\eta_k\)</span> term representing <span class="math inline">\(k\)</span> = 543 word stimuli.</p>
+<p>In our study, <span class="math inline">\(\beta_0\)</span> and <span class="math inline">\(\beta_1\)</span> are the fixed effects of <code>modality</code>; <span class="math inline">\(u_j\)</span> is the <span class="math inline">\(j\)</span> = 53 <code>PID</code> levels; and the model includes an additional term, <span class="math inline">\(\eta_k\)</span>, for the <span class="math inline">\(k\)</span> = 543 <code>stim</code> levels.</p>
+<p><span class="math display">\[
+y_{ij} = \beta_0 + \beta_1x_{ij} + u_j + \eta_k + \epsilon_{ijk}
+\]</span></p>
 </section>
 <section id="the-lmer-engine" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="the-lmer-engine"><span class="header-section-number">3.2</span> The lmer Engine</h2>
-<p>Fit an LMM with the lmer package. The pipes (|) in the formula indicate the value to the left varies by the variable to the right. 1 is the intercept (no interactions).</p>
+<h2 data-number="3.2" class="anchored" data-anchor-id="the-lmer-engine"><span class="header-section-number">3.2</span> The <em>lmer</em> Engine</h2>
+<p>Fit an LMM with the <em>lmer</em> package. The pipes (|) in the formula indicate the value to the left varies by the variable to the right. 1 is the intercept (no interactions). You can model the random effects two ways:</p>
+<ul>
+<li><code>(1|PID) + (1|stim)</code>: level effects by participant and stimulus.</li>
+<li><code>(1 + modality|PID) + (1 + modality|stim)</code>: level effects plus interaction effects.</li>
+</ul>
+<p>Start with the level effect model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fit_1 <span class="ot">&lt;-</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lmer"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    RT <span class="sc">~</span> modality <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> PID) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> stim), </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mdl_dat</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">extract_fit_engine</span>(fit_1))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>rt_fit_1 <span class="ot">&lt;-</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lmer"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  RT <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> modality <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>PID) <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stim),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> rt_dat</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_fit_engine</span>(rt_fit_1) <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by REML ['lmerMod']
-Formula: RT ~ modality + (1 | PID) + (1 | stim)
+Formula: RT ~ 1 + modality + (1 | PID) + (1 | stim)
    Data: data
 
 REML criterion at convergence: 302861.5
@@ -894,23 +1434,52 @@ Correlation of Fixed Effects:
 modltyAdvsl -0.078</code></pre>
 </div>
 </div>
-<p>The <em>Random effects</em> section shows the variability in <code>RT</code> due to <code>stim</code> and <code>PID</code>. The variability among participants (<code>PID</code> sd = 168 ms) is much greater than the variability among words (<code>stim</code> sd = 19 ms).</p>
-<p>The <em>Fixed effects</em> section shows audio-visual modality slows <code>RT</code> by 83 ms over audio-only.</p>
-<p>The last section, <em>Correlation of Fixed Effects</em>, indicates there is a weak negative correlation between the intercept and the audio-visual modality effect, meaning when <code>RT</code> was higher, the effect of audiovisual was slightly less.</p>
-<p>Model interactions between the fixed effect variable(s) and random effects variable(s) by changing the random intercept to the fixed effect variable so both the intercept and the slope can vary.</p>
+<p>Let’s walk through these sections.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use <code>broom.mixed::tidy()</code> to pull the coefficient estimates.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fit_2 <span class="ot">&lt;-</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lmer"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    RT <span class="sc">~</span> modality <span class="sc">+</span> (modality <span class="sc">|</span> PID) <span class="sc">+</span> (modality <span class="sc">|</span> stim), </span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mdl_dat</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">extract_fit_engine</span>(fit_2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>(tidy_fit <span class="ot">&lt;-</span> broom.mixed<span class="sc">::</span><span class="fu">tidy</span>(rt_fit_1))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 6
+  effect   group    term                estimate std.error statistic
+  &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;                  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 fixed    &lt;NA&gt;     (Intercept)           1044.      23.2       45.1
+2 fixed    &lt;NA&gt;     modalityAudiovisual     82.5      3.53      23.4
+3 ran_pars stim     sd__(Intercept)         19.0     NA         NA  
+4 ran_pars PID      sd__(Intercept)        168.      NA         NA  
+5 ran_pars Residual sd__Observation        259.      NA         NA  </code></pre>
+</div>
+</div>
+</div>
+</div>
+<ul>
+<li><p>The <em>Random effects</em> show the variability in <code>RT</code> due to <code>stim</code> and <code>PID</code>. The variability among participants (<code>PID</code> sd = 168 ms) is much greater than the variability among words (<code>stim</code> sd = 19 ms).</p></li>
+<li><p>The <em>Fixed effects</em> show audio-visual modality slows <code>RT</code> by 82.5 ms over audio-only.</p></li>
+<li><p>The <em>Correlation of Fixed Effects</em> shows a weak negative correlation between the intercept and the audio-visual modality effect (<code>modltyAdvsl</code> = -0.078 ms). This means when <code>RT</code> times were high, audiovisual effect was somewhat diminished.</p></li>
+</ul>
+<p>To add interactions between the fixed effect variable(s) and the random effects variable(s), change the random intercept (1) to the fixed effect variable. Then both the intercept and the slope can vary.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>rt_fit_2 <span class="ot">&lt;-</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lmer"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    RT <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> modality <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> modality<span class="sc">|</span>PID) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> modality<span class="sc">|</span>stim),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> rt_dat</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">extract_fit_engine</span>(rt_fit_2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by REML ['lmerMod']
-Formula: RT ~ modality + (modality | PID) + (modality | stim)
+Formula: RT ~ 1 + modality + (1 + modality | PID) + (1 + modality | stim)
    Data: data
 
 REML criterion at convergence: 302385.7
@@ -938,77 +1507,84 @@ Correlation of Fixed Effects:
 modltyAdvsl -0.178</code></pre>
 </div>
 </div>
-<p>This formulation includes random slopes for <code>modality</code> within <code>PID</code> and <code>stim</code>, meaning you’re accounting for differences in how each participant and stimulus responds to modality. Response times varied around 1,044 ms by sd = 17 ms for <code>stim</code> and sd = 169 ms for <code>PID</code>. The modality effect on response times varied around 83 ms by sd = 15 ms for <code>stim</code> and sd = 88 ms for PID. That last satistic means a participant whose slope is 1 SD below the mean would have a slope near zero - a modality effect of zero.</p>
+<p>This formulation includes random slopes for <code>modality</code> within <code>PID</code> and <code>stim</code>, meaning you’re accounting for differences in how each participant and stimulus responds to modality. Response times varied around 1,044 ms by sd = 17 ms for <code>stim</code> and sd = 169 ms for <code>PID</code>. The modality effect on response times varied around 83 ms by sd = 15 ms for <code>stim</code> and sd = 88 ms for PID. That last statistic means a participant whose slope is 1 sd below the mean would have a slope near zero - a modality effect of zero.</p>
 <p>The added correlations in the <em>Random effects</em> section show how the intercept and slopes for <code>modality</code> vary together within each group. The 0.16 correlation between the stimuli and fixed-effect intercepts indicates that stimuli with longer response times in the audio modality tended to have more positive slopes (stronger positive audiovisual effect). The -0.17 correlation between the participant and fixed-effect intercepts indicates that participants with longer response times in the audio modality tended to have a less positive slope (weaker positive, or possibly even a negative, audiovisual effect).</p>
 <p>The audio-visual modality slows <code>RT</code> by 83 ms over audio-only - same as in the first model. The REML criterion fell, so adding the random slopes for modality improved the fit.</p>
 </section>
-<section id="model-assumptions" class="level2" data-number="3.3">
-<h2 data-number="3.3" class="anchored" data-anchor-id="model-assumptions"><span class="header-section-number">3.3</span> Model Assumptions</h2>
-<p>The linear regression model assumptions apply here: the relationship between the predictors and the response is linear and the residuals are independent random variables normally distributed with mean zero and constant variance. Additionally, the the random effects intercepts and slopes are assumed to follow a normal distribution. Use residual plots to assess linearity, homoscedasticity, and independence. Use Q-Q plots to check the normality of residuals and random effects. Variance Inflation Factor (VIF) can help detect multicollinearity among predictors.</p>
+<section id="assumptions" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="assumptions"><span class="header-section-number">3.3</span> Assumptions</h2>
+<p>The linear regression model assumptions still apply: the relationship between the predictors and the response is linear and the residuals are independent random variables normally distributed with mean zero and constant variance. Additionally, the the random effects intercepts and slopes are assumed to follow a normal distribution. Use residual plots to assess linearity, homoscedasticity, and independence. Use Q-Q plots to check the normality of residuals and random effects. Variance inflation factors (VIFs) can help detect multicollinearity among predictors.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">resid_panel</span>(<span class="fu">extract_fit_engine</span>(fit_2), <span class="at">smoother =</span> <span class="cn">TRUE</span>, <span class="at">qqbands =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">resid_panel</span>(<span class="fu">extract_fit_engine</span>(rt_fit_2), <span class="at">smoother =</span> <span class="cn">TRUE</span>, <span class="at">qqbands =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="03-linear_mixed_effects_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="03-linear_mixed_effects_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="evaluate-the-fit" class="level2" data-number="3.4">
-<h2 data-number="3.4" class="anchored" data-anchor-id="evaluate-the-fit"><span class="header-section-number">3.4</span> Evaluate the Fit</h2>
-<p>Use likelihood ratio test to determine whether predictors affect the response variable. Compare the fit to a model without the predictor of interest. The likelihood ratio test is usually performed with the anova function, but there is a better way. <code>afex::mixed(method = "LRT")</code> performs the test for all fixed effects variables in the model. In this case study we have only one.</p>
+<section id="evaluation" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="evaluation"><span class="header-section-number">3.4</span> Evaluation</h2>
+<p>To determine whether the <code>modality</code> fixed effect actually affected response times, compare the model to a nested model without <code>modality</code> using a likelihood-ratio test. Likelihood ratio tests calculating the likelihoods for the models using maximum likelihood estimation then compares those likelihoods. A significant test results indicates the full model fit the data better. Perform a likelihood ratio test <code>anova()</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>lrt <span class="ot">&lt;-</span> afex<span class="sc">::</span><span class="fu">mixed</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  RT <span class="sc">~</span> modality <span class="sc">+</span> (modality <span class="sc">|</span> PID) <span class="sc">+</span> (modality <span class="sc">|</span> stim), </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mdl_dat, </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"LRT"</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>lrt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="" class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># reduced model exlcludes the `modality` predictor.</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>rt_reduced <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lmer"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    RT <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> modality<span class="sc">|</span>PID) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> modality<span class="sc">|</span>stim),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> rt_dat</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>lrt <span class="ot">&lt;-</span> <span class="fu">anova</span>(</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>(rt_fit_2),</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>(rt_reduced)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lrt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Mixed Model Anova Table (Type 3 tests, LRT-method)
-
-Model: RT ~ modality + (modality | PID) + (modality | stim)
-Data: mdl_dat
-Df full model: 9
-    Effect df     Chisq p.value
-1 modality  1 32.39 ***   &lt;.001
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
+<pre><code># A tibble: 2 × 9
+  term            npar    AIC    BIC  logLik minus2logL statistic    df  p.value
+  &lt;chr&gt;          &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+1 extract_fit_e…     8 3.02e5 3.03e5 -1.51e5    302433.      NA      NA NA      
+2 extract_fit_e…     9 3.02e5 3.02e5 -1.51e5    302401.      32.4     1  1.26e-8</code></pre>
 </div>
 </div>
+<p>, but there is a better way. <code>afex::mixed(method = "LRT")</code> performs the test for all fixed effects variables in the model. In this case study we have only one.</p>
 <p>The likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, <span class="math inline">\(\chi^2\)</span>(1) = 32.4, <em>p</em> &lt; .001.</p>
 </section>
 <section id="reporting" class="level2" data-number="3.5">
 <h2 data-number="3.5" class="anchored" data-anchor-id="reporting"><span class="header-section-number">3.5</span> Reporting</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>av_terms <span class="ot">&lt;-</span> broom.mixed<span class="sc">::</span><span class="fu">tidy</span>(fit_2) <span class="sc">|&gt;</span> <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"modalityAudiovisual"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>av_terms <span class="ot">&lt;-</span> broom.mixed<span class="sc">::</span><span class="fu">tidy</span>(rt_fit_2) <span class="sc">|&gt;</span> <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"modalityAudiovisual"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <blockquote class="blockquote">
 <p>A likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, <span class="math inline">\(\chi^2\)</span>(1) = 32.4, <em>p</em> &lt; .001. Examination of the summary output for the full model indicated that response times were on average an estimated 83.2 ms slower in the audiovisual relative to the audio-only condition (<span class="math inline">\(\hat{\beta}\)</span> = 83.2, <em>SE</em> = 12.6, <em>t</em> = 83.2, <em>SE</em> = 6.6).</p>
 </blockquote>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_regression</span>(fit_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_regression</span>(rt_fit_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div id="ucpqldjsyw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#ucpqldjsyw table {
+<div id="bgnuevsqsp" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#bgnuevsqsp table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#ucpqldjsyw thead, #ucpqldjsyw tbody, #ucpqldjsyw tfoot, #ucpqldjsyw tr, #ucpqldjsyw td, #ucpqldjsyw th {
+#bgnuevsqsp thead, #bgnuevsqsp tbody, #bgnuevsqsp tfoot, #bgnuevsqsp tr, #bgnuevsqsp td, #bgnuevsqsp th {
   border-style: none;
 }
 
-#ucpqldjsyw p {
+#bgnuevsqsp p {
   margin: 0;
   padding: 0;
 }
 
-#ucpqldjsyw .gt_table {
+#bgnuevsqsp .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1034,12 +1610,12 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_caption {
+#bgnuevsqsp .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ucpqldjsyw .gt_title {
+#bgnuevsqsp .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1051,7 +1627,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-bottom-width: 0;
 }
 
-#ucpqldjsyw .gt_subtitle {
+#bgnuevsqsp .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1063,7 +1639,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-top-width: 0;
 }
 
-#ucpqldjsyw .gt_heading {
+#bgnuevsqsp .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1075,13 +1651,13 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_bottom_border {
+#bgnuevsqsp .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_col_headings {
+#bgnuevsqsp .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1096,7 +1672,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_col_heading {
+#bgnuevsqsp .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1116,7 +1692,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   overflow-x: hidden;
 }
 
-#ucpqldjsyw .gt_column_spanner_outer {
+#bgnuevsqsp .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1128,15 +1704,15 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   padding-right: 4px;
 }
 
-#ucpqldjsyw .gt_column_spanner_outer:first-child {
+#bgnuevsqsp .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ucpqldjsyw .gt_column_spanner_outer:last-child {
+#bgnuevsqsp .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ucpqldjsyw .gt_column_spanner {
+#bgnuevsqsp .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1148,11 +1724,11 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   width: 100%;
 }
 
-#ucpqldjsyw .gt_spanner_row {
+#bgnuevsqsp .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#ucpqldjsyw .gt_group_heading {
+#bgnuevsqsp .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1178,7 +1754,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   text-align: left;
 }
 
-#ucpqldjsyw .gt_empty_group_heading {
+#bgnuevsqsp .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1193,15 +1769,15 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   vertical-align: middle;
 }
 
-#ucpqldjsyw .gt_from_md > :first-child {
+#bgnuevsqsp .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ucpqldjsyw .gt_from_md > :last-child {
+#bgnuevsqsp .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ucpqldjsyw .gt_row {
+#bgnuevsqsp .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1220,7 +1796,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   overflow-x: hidden;
 }
 
-#ucpqldjsyw .gt_stub {
+#bgnuevsqsp .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1233,7 +1809,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   padding-right: 5px;
 }
 
-#ucpqldjsyw .gt_stub_row_group {
+#bgnuevsqsp .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1247,15 +1823,15 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   vertical-align: top;
 }
 
-#ucpqldjsyw .gt_row_group_first td {
+#bgnuevsqsp .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ucpqldjsyw .gt_row_group_first th {
+#bgnuevsqsp .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#ucpqldjsyw .gt_summary_row {
+#bgnuevsqsp .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1265,16 +1841,16 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   padding-right: 5px;
 }
 
-#ucpqldjsyw .gt_first_summary_row {
+#bgnuevsqsp .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_first_summary_row.thick {
+#bgnuevsqsp .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ucpqldjsyw .gt_last_summary_row {
+#bgnuevsqsp .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1284,7 +1860,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_grand_summary_row {
+#bgnuevsqsp .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1294,7 +1870,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   padding-right: 5px;
 }
 
-#ucpqldjsyw .gt_first_grand_summary_row {
+#bgnuevsqsp .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1304,7 +1880,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_last_grand_summary_row_top {
+#bgnuevsqsp .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1314,11 +1890,11 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_striped {
+#bgnuevsqsp .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ucpqldjsyw .gt_table_body {
+#bgnuevsqsp .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1327,7 +1903,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_footnotes {
+#bgnuevsqsp .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1341,7 +1917,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_footnote {
+#bgnuevsqsp .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1350,7 +1926,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   padding-right: 5px;
 }
 
-#ucpqldjsyw .gt_sourcenotes {
+#bgnuevsqsp .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1364,7 +1940,7 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#ucpqldjsyw .gt_sourcenote {
+#bgnuevsqsp .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1372,72 +1948,72 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
   padding-right: 5px;
 }
 
-#ucpqldjsyw .gt_left {
+#bgnuevsqsp .gt_left {
   text-align: left;
 }
 
-#ucpqldjsyw .gt_center {
+#bgnuevsqsp .gt_center {
   text-align: center;
 }
 
-#ucpqldjsyw .gt_right {
+#bgnuevsqsp .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ucpqldjsyw .gt_font_normal {
+#bgnuevsqsp .gt_font_normal {
   font-weight: normal;
 }
 
-#ucpqldjsyw .gt_font_bold {
+#bgnuevsqsp .gt_font_bold {
   font-weight: bold;
 }
 
-#ucpqldjsyw .gt_font_italic {
+#bgnuevsqsp .gt_font_italic {
   font-style: italic;
 }
 
-#ucpqldjsyw .gt_super {
+#bgnuevsqsp .gt_super {
   font-size: 65%;
 }
 
-#ucpqldjsyw .gt_footnote_marks {
+#bgnuevsqsp .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#ucpqldjsyw .gt_asterisk {
+#bgnuevsqsp .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ucpqldjsyw .gt_indent_1 {
+#bgnuevsqsp .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ucpqldjsyw .gt_indent_2 {
+#bgnuevsqsp .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ucpqldjsyw .gt_indent_3 {
+#bgnuevsqsp .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ucpqldjsyw .gt_indent_4 {
+#bgnuevsqsp .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ucpqldjsyw .gt_indent_5 {
+#bgnuevsqsp .gt_indent_5 {
   text-indent: 25px;
 }
 
-#ucpqldjsyw .katex-display {
+#bgnuevsqsp .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#ucpqldjsyw div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#bgnuevsqsp div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1485,19 +2061,66 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 </section>
-<section id="appendix-comparison-to-ols" class="level2" data-number="3.6">
-<h2 data-number="3.6" class="anchored" data-anchor-id="appendix-comparison-to-ols"><span class="header-section-number">3.6</span> Appendix: Comparison to OLS</h2>
+<section id="logistic-regression" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="logistic-regression"><span class="header-section-number">3.6</span> Logistic Regression</h2>
+<p>This section fits a logistic LMM to the <code>acc_dat</code> dataset.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>acc_fit <span class="ot">&lt;-</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glmer"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    acc <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> modality <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">|</span>PID) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">|</span>stim),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> acc_dat,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"binomial"</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Fit a reduced model lacking the <code>modality</code> fixed effect to use in a likelihood ratio test.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>acc_reduced_fit <span class="ot">&lt;-</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">logistic_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glmer"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    acc <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">|</span>PID) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">|</span>stim),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> acc_dat,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">family =</span> <span class="st">"binomial"</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>lrt_acc <span class="ot">&lt;-</span> <span class="fu">anova</span>(</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>(acc_fit),</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>(acc_reduced_fit)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lrt_acc)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 9
+  term             npar    AIC    BIC  logLik minus2logL statistic    df p.value
+  &lt;chr&gt;           &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+1 extract_fit_en…     3 29930. 29955. -14962.     29924.       NA     NA      NA
+2 extract_fit_en…     4 28122. 28155. -14057.     28114.     1810.     1       0</code></pre>
+</div>
+</div>
+</section>
+<section id="appendix-comparison-to-ols" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="appendix-comparison-to-ols"><span class="header-section-number">3.7</span> Appendix: Comparison to OLS</h2>
 <p>You might consider just throwing <code>PID</code> and <code>stim</code> into a simple linear regression as covariates.</p>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(RT <span class="sc">~</span> modality <span class="sc">+</span> PID <span class="sc">+</span> stim, <span class="at">data =</span> mdl_dat) <span class="sc">|&gt;</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^PID"</span>), </span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^stim"</span>)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(RT <span class="sc">~</span> modality <span class="sc">+</span> PID <span class="sc">+</span> stim, <span class="at">data =</span> rt_dat) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^PID"</span>),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^stim"</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 5
@@ -1511,12 +2134,12 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">summarize</span>(mdl_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, PID), <span class="at">MRT =</span> <span class="fu">mean</span>(RT))</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MRT <span class="sc">~</span> modality <span class="sc">+</span> PID, <span class="at">data =</span> x) <span class="sc">|&gt;</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^PID"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">summarize</span>(rt_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, PID), <span class="at">MRT =</span> <span class="fu">mean</span>(RT))</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MRT <span class="sc">~</span> modality <span class="sc">+</span> PID, <span class="at">data =</span> x) <span class="sc">|&gt;</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^PID"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 5
@@ -1530,9 +2153,9 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
 <div class="cell">
 <details open="" class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(RT <span class="sc">~</span> modality, <span class="at">data =</span> mdl_dat) <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(RT <span class="sc">~</span> modality, <span class="at">data =</span> rt_dat) <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 5
@@ -1551,6 +2174,13 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '+' 0.1 ' ' 1</code></pre>
 Brown, Violet A. 2021. <span>“An Introduction to Linear Mixed-Effects Modeling in r.”</span> <em>Advances in Methods and Practices in Psychological Science</em> 4 (1): 2515245920960351. <a href="https://doi.org/10.1177/2515245920960351">https://doi.org/10.1177/2515245920960351</a>.
 </div>
 </div>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>Another option is repeated measures ANOVA. However, repeated measures ANOVA can model either participant or item variability, but not both simultaneously. Also, ANOVA requires continuous outcomes and ccategorical predictors.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>The article is a good tutorial and worth reading.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
 </section>
 
 </main> <!-- /main -->
@@ -2034,236 +2664,298 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb20" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Mixed Effects Models</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="in">```{r setup}</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="in">#| include: false</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="in">library(glue)</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidymodels)</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="in">library(gtsummary)</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="in">tidymodels_prefer()</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="in">library(multilevelmod)</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggResidpanel)</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="in">theme_set(</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_light() +</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="in">    theme(</span></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="in">      plot.caption = element_text(hjust = 0),</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a><span class="in">      strip.background = element_rect(fill = "gray90", color = "gray60"),</span></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a><span class="in">      strip.text = element_text(color = "gray20")</span></span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>Suppose you run an experiment measuring how long it takes a person to complete one task while also completing one of two types of secondary tasks. Do the secondary task types have differing effects? This is normally a good candidate for a linear regression, but there is a twist: the participants in the study naturally vary in their ability to multitask. Plus, the participants each generate many data points for each of the two secondary tasks. This twist is a violation the independent observations assumption in linear regression. What to do? The solution is *linear mixed effects models* (LMMs).</span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>We'll use the dataset included in the <span class="co">[</span><span class="ot">supplemental materials</span><span class="co">](https://osf.io/v6qag/)</span> in *An Introduction to Linear Mixed-Effects Modeling* <span class="co">[</span><span class="ot">@Brown2021</span><span class="co">]</span> to illustrate. </span>
-<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>mdl_dat <span class="ot">&lt;-</span> </span>
-<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"./input/mixed-effects-rt.csv"</span>, <span class="at">col_types =</span> <span class="st">"cdcc"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">modality =</span> <span class="fu">factor</span>(modality, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Audio-only"</span>, <span class="st">"Audiovisual"</span>)))</span>
-<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(mdl_dat)</span>
-<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>The study measured participant (<span class="in">`PID`</span>) response time (<span class="in">`RT`</span>) to a primary task while completing a secondary task repeating words presented in one of two modalities (<span class="in">`modality`</span>): audio-only and audiovisual. The researchers hypothesized that the higher cognitive load associated with audiovisual stimulation would increase <span class="in">`RT`</span>. The experiment is complicated by the fact that each participant performed the experiment repeatedly with varying words (stimulus, <span class="in">`stim`</span>) form each modality.</span>
-<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a>n_PID <span class="ot">&lt;-</span> <span class="fu">n_distinct</span>(mdl_dat<span class="sc">$</span>PID)</span>
-<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a>n_stim <span class="ot">&lt;-</span> <span class="fu">n_distinct</span>(mdl_dat<span class="sc">$</span>stim)</span>
-<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a>There were <span class="in">`r n_PID`</span> participants and <span class="in">`r n_stim`</span> words. The initial summary table suggests audiovisual modality does indeed retard response times over audio-only.</span>
-<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(</span>
-<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a>  mdl_dat,</span>
-<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> modality,</span>
-<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a>  <span class="at">include =</span> <span class="sc">-</span><span class="fu">c</span>(PID, stim),</span>
-<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a>  <span class="at">statistic =</span> <span class="fu">list</span>(gtsummary<span class="sc">::</span><span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean}, {sd}"</span>)</span>
-<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
-<span id="cb20-71"><a href="#cb20-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a><span class="in">`PID`</span> and <span class="in">`stim`</span> are important covariates because it is plain to see that humans differ in their ability to multitask, and words vary in difficulty.</span>
-<span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-79"><a href="#cb20-79" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
-<span id="cb20-80"><a href="#cb20-80" aria-hidden="true" tabindex="-1"></a>  <span class="at">Participants =</span> <span class="fu">summarize</span>(mdl_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, PID), <span class="at">M =</span> <span class="fu">mean</span>(RT)),</span>
-<span id="cb20-81"><a href="#cb20-81" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stimulus =</span> <span class="fu">summarize</span>(mdl_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, stim), <span class="at">M =</span> <span class="fu">mean</span>(RT)),</span>
-<span id="cb20-82"><a href="#cb20-82" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"Factor"</span></span>
-<span id="cb20-83"><a href="#cb20-83" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb20-84"><a href="#cb20-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb20-85"><a href="#cb20-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">Factor =</span> <span class="fu">case_when</span>(</span>
-<span id="cb20-86"><a href="#cb20-86" aria-hidden="true" tabindex="-1"></a>      Factor <span class="sc">==</span> <span class="st">"Participants"</span> <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"Participants (n = {n_PID})"</span>),</span>
-<span id="cb20-87"><a href="#cb20-87" aria-hidden="true" tabindex="-1"></a>      Factor <span class="sc">==</span> <span class="st">"Stimulus"</span> <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"Word Stimulus (n = {n_stim})"</span>)</span>
-<span id="cb20-88"><a href="#cb20-88" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a>    <span class="at">grp =</span> <span class="fu">coalesce</span>(PID, stim)</span>
-<span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> modality)) <span class="sc">+</span></span>
-<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> M, <span class="at">group =</span> grp), <span class="at">alpha =</span> .<span class="dv">3</span>, <span class="at">color =</span> <span class="st">"dodgerblue3"</span>) <span class="sc">+</span></span>
-<span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(Factor)) <span class="sc">+</span></span>
-<span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Effect of Modality on Task Mean Response Time"</span>,</span>
-<span id="cb20-96"><a href="#cb20-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"by Participant and Word Stimulas"</span>,</span>
-<span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"milliseconds (ms)"</span></span>
-<span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a><span class="fu">## The LMM Model</span></span>
-<span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a>Mixed-effects models are called “mixed” because they simultaneously model fixed and random effects. Fixed effects are population-level effects that should persist across experiments. Fixed effects are the traditional predictors in a regression model. <span class="in">`modality`</span> is a fixed effect. Random effects are level effects that account for variability at different levels of the data hierarchy. For example, in a study with students from different schools, the variation between schools would be random effects. <span class="in">`PID`</span> and <span class="in">`stim`</span> are random effects because they are randomly sampled and you expect variability within the populations.</span>
-<span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a>The LMM represents the $i$-th observation for the $j$-th random-effects group as</span>
-<span id="cb20-106"><a href="#cb20-106" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-107"><a href="#cb20-107" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb20-108"><a href="#cb20-108" aria-hidden="true" tabindex="-1"></a>y_{ij} = \beta_0 + \beta_1x_{ij} + u_j + \epsilon_{ij}</span>
-<span id="cb20-109"><a href="#cb20-109" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb20-110"><a href="#cb20-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-111"><a href="#cb20-111" aria-hidden="true" tabindex="-1"></a>Where $\beta_0$ and $\beta_1$ are the fixed effect intercept and slope, and $u_j$ is the random effect for the $j$-th group. The $u_j$ terms are the group deviations from the population mean and are assumed to be normally distributed with mean 0 and variance $\sigma_u^2$. The residual term is also assumed to be normally distributed with mean 0 and variance $\sigma_\epsilon^2$</span>
-<span id="cb20-112"><a href="#cb20-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-113"><a href="#cb20-113" aria-hidden="true" tabindex="-1"></a>In our case, $\beta_0$ and $\beta_1$ are the fixed effects of <span class="in">`modality`</span>. $u_j$ would be the $j$ = <span class="in">`r n_PID`</span> levels of <span class="in">`PID`</span>. There might also be an $\eta_k$ term representing $k$ = <span class="in">`r n_stim`</span> word stimuli.</span>
-<span id="cb20-114"><a href="#cb20-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-115"><a href="#cb20-115" aria-hidden="true" tabindex="-1"></a><span class="fu">## The lmer Engine</span></span>
-<span id="cb20-116"><a href="#cb20-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-117"><a href="#cb20-117" aria-hidden="true" tabindex="-1"></a>Fit an LMM with the lmer package. The pipes (|) in the formula indicate the value to the left varies by the variable to the right. 1 is the intercept (no interactions).</span>
-<span id="cb20-118"><a href="#cb20-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-121"><a href="#cb20-121" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-122"><a href="#cb20-122" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb20-123"><a href="#cb20-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-124"><a href="#cb20-124" aria-hidden="true" tabindex="-1"></a>fit_1 <span class="ot">&lt;-</span> </span>
-<span id="cb20-125"><a href="#cb20-125" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb20-126"><a href="#cb20-126" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lmer"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-127"><a href="#cb20-127" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb20-128"><a href="#cb20-128" aria-hidden="true" tabindex="-1"></a>    RT <span class="sc">~</span> modality <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> PID) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> stim), </span>
-<span id="cb20-129"><a href="#cb20-129" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mdl_dat</span>
-<span id="cb20-130"><a href="#cb20-130" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-131"><a href="#cb20-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-132"><a href="#cb20-132" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">extract_fit_engine</span>(fit_1))</span>
-<span id="cb20-133"><a href="#cb20-133" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-134"><a href="#cb20-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-135"><a href="#cb20-135" aria-hidden="true" tabindex="-1"></a>The *Random effects* section shows the variability in <span class="in">`RT`</span> due to <span class="in">`stim`</span> and <span class="in">`PID`</span>. The variability among participants (<span class="in">`PID`</span> sd = <span class="in">`r broom.mixed::tidy(fit_1) |&gt; filter(group == "PID", term == "sd__(Intercept)") |&gt; pull(estimate) |&gt; comma()`</span> ms) is much greater than the variability among words (<span class="in">`stim`</span> sd = <span class="in">`r broom.mixed::tidy(fit_1) |&gt; filter(group == "stim", term == "sd__(Intercept)") |&gt; pull(estimate) |&gt; comma()`</span> ms). </span>
-<span id="cb20-136"><a href="#cb20-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-137"><a href="#cb20-137" aria-hidden="true" tabindex="-1"></a>The *Fixed effects* section shows audio-visual modality slows <span class="in">`RT`</span> by <span class="in">`r broom.mixed::tidy(fit_1) |&gt; filter(effect == "fixed", term == "modalityAudiovisual") |&gt; pull(estimate) |&gt; comma()`</span> ms over audio-only.</span>
-<span id="cb20-138"><a href="#cb20-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-139"><a href="#cb20-139" aria-hidden="true" tabindex="-1"></a>The last section, *Correlation of Fixed Effects*, indicates there is a weak negative correlation between the intercept and the audio-visual modality effect, meaning when <span class="in">`RT`</span> was higher, the effect of audiovisual was slightly less.</span>
-<span id="cb20-140"><a href="#cb20-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-141"><a href="#cb20-141" aria-hidden="true" tabindex="-1"></a>Model interactions between the fixed effect variable(s) and random effects variable(s) by changing the random intercept to the fixed effect variable so both the intercept and the slope can vary.</span>
-<span id="cb20-142"><a href="#cb20-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-145"><a href="#cb20-145" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-146"><a href="#cb20-146" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb20-147"><a href="#cb20-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-148"><a href="#cb20-148" aria-hidden="true" tabindex="-1"></a>fit_2 <span class="ot">&lt;-</span> </span>
-<span id="cb20-149"><a href="#cb20-149" aria-hidden="true" tabindex="-1"></a>  <span class="fu">linear_reg</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb20-150"><a href="#cb20-150" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"lmer"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-151"><a href="#cb20-151" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(</span>
-<span id="cb20-152"><a href="#cb20-152" aria-hidden="true" tabindex="-1"></a>    RT <span class="sc">~</span> modality <span class="sc">+</span> (modality <span class="sc">|</span> PID) <span class="sc">+</span> (modality <span class="sc">|</span> stim), </span>
-<span id="cb20-153"><a href="#cb20-153" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> mdl_dat</span>
-<span id="cb20-154"><a href="#cb20-154" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-155"><a href="#cb20-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-156"><a href="#cb20-156" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">extract_fit_engine</span>(fit_2))</span>
-<span id="cb20-157"><a href="#cb20-157" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-158"><a href="#cb20-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-159"><a href="#cb20-159" aria-hidden="true" tabindex="-1"></a>This formulation includes random slopes for <span class="in">`modality`</span> within <span class="in">`PID`</span> and <span class="in">`stim`</span>, meaning you’re accounting for differences in how each participant and stimulus responds to modality. Response times varied around <span class="in">`r broom.mixed::tidy(fit_2) %&gt;% filter(term == "(Intercept)") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms by sd = <span class="in">`r broom.mixed::tidy(fit_2) %&gt;% filter(term == "sd__(Intercept)", group == "stim") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms for <span class="in">`stim`</span> and sd = <span class="in">`r broom.mixed::tidy(fit_2) %&gt;% filter(term == "sd__(Intercept)", group == "PID") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms for <span class="in">`PID`</span>. The modality effect on response times varied around <span class="in">`r broom.mixed::tidy(fit_2) %&gt;% filter(term == "modalityAudiovisual") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms by sd = <span class="in">`r broom.mixed::tidy(fit_2) %&gt;% filter(term == "sd__modalityAudiovisual", group == "stim") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms for <span class="in">`stim`</span> and sd = <span class="in">`r broom.mixed::tidy(fit_2) %&gt;% filter(term == "sd__modalityAudiovisual", group == "PID") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms for PID. That last satistic means a participant whose slope is 1 SD below the mean would have a slope near zero - a modality effect of zero.</span>
-<span id="cb20-160"><a href="#cb20-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-161"><a href="#cb20-161" aria-hidden="true" tabindex="-1"></a>The added correlations in the *Random effects* section show how the intercept and slopes for <span class="in">`modality`</span> vary together within each group. The <span class="in">`r broom.mixed::tidy(fit_2) %&gt;% filter(term == "cor__(Intercept).modalityAudiovisual", group == "stim") %&gt;% pull(estimate) %&gt;% comma(.01)`</span> correlation between the stimuli and fixed-effect intercepts indicates that stimuli with longer response times in the audio modality tended to have more positive slopes (stronger positive audiovisual effect). The <span class="in">`r broom.mixed::tidy(fit_2) %&gt;% filter(term == "cor__(Intercept).modalityAudiovisual", group == "PID") %&gt;% pull(estimate) %&gt;% comma(.01)`</span> correlation between the participant and fixed-effect intercepts indicates that participants with longer response times in the audio modality tended to have a less positive slope (weaker positive, or possibly even a negative, audiovisual effect).</span>
-<span id="cb20-162"><a href="#cb20-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-163"><a href="#cb20-163" aria-hidden="true" tabindex="-1"></a>The audio-visual modality slows <span class="in">`RT`</span> by <span class="in">`r broom.mixed::tidy(fit_2) |&gt; filter(effect == "fixed", term == "modalityAudiovisual") |&gt; pull(estimate) |&gt; comma()`</span> ms over audio-only - same as in the first model. The REML criterion fell, so adding the random slopes for modality improved the fit.</span>
-<span id="cb20-164"><a href="#cb20-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-165"><a href="#cb20-165" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Assumptions</span></span>
-<span id="cb20-166"><a href="#cb20-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-167"><a href="#cb20-167" aria-hidden="true" tabindex="-1"></a>The linear regression model assumptions apply here: the relationship between the predictors and the response is linear and the residuals are independent random variables normally distributed with mean zero and constant variance. Additionally, the the random effects intercepts and slopes are assumed to follow a normal distribution. Use residual plots to assess linearity, homoscedasticity, and independence. Use Q-Q plots to check the normality of residuals and random effects. Variance Inflation Factor (VIF) can help detect multicollinearity among predictors.</span>
-<span id="cb20-168"><a href="#cb20-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-171"><a href="#cb20-171" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-172"><a href="#cb20-172" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb20-173"><a href="#cb20-173" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb20-174"><a href="#cb20-174" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-175"><a href="#cb20-175" aria-hidden="true" tabindex="-1"></a><span class="fu">resid_panel</span>(<span class="fu">extract_fit_engine</span>(fit_2), <span class="at">smoother =</span> <span class="cn">TRUE</span>, <span class="at">qqbands =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb20-176"><a href="#cb20-176" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-177"><a href="#cb20-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-178"><a href="#cb20-178" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluate the Fit</span></span>
-<span id="cb20-179"><a href="#cb20-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-180"><a href="#cb20-180" aria-hidden="true" tabindex="-1"></a>Use likelihood ratio test to determine whether predictors affect the response variable. Compare the fit to a model without the predictor of interest. The likelihood ratio test is usually performed with the anova function, but there is a better way. <span class="in">`afex::mixed(method = "LRT")`</span> performs the test for all fixed effects variables in the model. In this case study we have only one.</span>
-<span id="cb20-181"><a href="#cb20-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-182"><a href="#cb20-182" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, warning=FALSE, message=FALSE}</span></span>
-<span id="cb20-183"><a href="#cb20-183" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: false</span></span>
-<span id="cb20-184"><a href="#cb20-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-185"><a href="#cb20-185" aria-hidden="true" tabindex="-1"></a><span class="in">lrt &lt;- afex::mixed(</span></span>
-<span id="cb20-186"><a href="#cb20-186" aria-hidden="true" tabindex="-1"></a><span class="in">  RT ~ modality + (modality | PID) + (modality | stim), </span></span>
-<span id="cb20-187"><a href="#cb20-187" aria-hidden="true" tabindex="-1"></a><span class="in">  data = mdl_dat, </span></span>
-<span id="cb20-188"><a href="#cb20-188" aria-hidden="true" tabindex="-1"></a><span class="in">  method = "LRT"</span></span>
-<span id="cb20-189"><a href="#cb20-189" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
-<span id="cb20-190"><a href="#cb20-190" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-191"><a href="#cb20-191" aria-hidden="true" tabindex="-1"></a><span class="in">lrt</span></span>
-<span id="cb20-192"><a href="#cb20-192" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-193"><a href="#cb20-193" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-194"><a href="#cb20-194" aria-hidden="true" tabindex="-1"></a>The likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, $\chi^2$(1) = <span class="in">`r lrt$anova_table$Chisq %&gt;% comma(.1)`</span>, *p* &lt; .001.</span>
-<span id="cb20-195"><a href="#cb20-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-196"><a href="#cb20-196" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reporting</span></span>
-<span id="cb20-197"><a href="#cb20-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-200"><a href="#cb20-200" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-201"><a href="#cb20-201" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
-<span id="cb20-202"><a href="#cb20-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-203"><a href="#cb20-203" aria-hidden="true" tabindex="-1"></a>av_terms <span class="ot">&lt;-</span> broom.mixed<span class="sc">::</span><span class="fu">tidy</span>(fit_2) <span class="sc">|&gt;</span> <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"modalityAudiovisual"</span>)</span>
-<span id="cb20-204"><a href="#cb20-204" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-205"><a href="#cb20-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-206"><a href="#cb20-206" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-207"><a href="#cb20-207" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; A likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, $\chi^2$(1) = </span><span class="in">`r lrt$anova_table$Chisq %&gt;% comma(.1)`</span><span class="at">, *p* &lt; .001. Examination of the summary output for the full model indicated that response times were on average an estimated `r comma(av_terms[1, ]$estimate, .1)` ms slower in the audiovisual relative to the audio-only condition ($\hat{\beta}$ = `r comma(av_terms[1, ]$estimate, .1)`, *SE* = `r comma(av_terms[1, ]$std.error, .1)`, *t* = `r comma(av_terms[1, ]$estimate, .1)`, *SE* = </span><span class="in">`r comma(av_terms[1, ]$statistic, .1)`</span><span class="at">).</span></span>
-<span id="cb20-208"><a href="#cb20-208" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-209"><a href="#cb20-209" aria-hidden="true" tabindex="-1"></a><span class="in">```{r message=FALSE}</span></span>
-<span id="cb20-210"><a href="#cb20-210" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: false</span></span>
-<span id="cb20-211"><a href="#cb20-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-212"><a href="#cb20-212" aria-hidden="true" tabindex="-1"></a><span class="in">gtsummary::tbl_regression(fit_2)</span></span>
-<span id="cb20-213"><a href="#cb20-213" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-214"><a href="#cb20-214" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-215"><a href="#cb20-215" aria-hidden="true" tabindex="-1"></a><span class="fu">## Appendix: Comparison to OLS</span></span>
-<span id="cb20-216"><a href="#cb20-216" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-217"><a href="#cb20-217" aria-hidden="true" tabindex="-1"></a>You might consider just throwing <span class="in">`PID`</span> and <span class="in">`stim`</span> into a simple linear regression as covariates. </span>
-<span id="cb20-218"><a href="#cb20-218" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-221"><a href="#cb20-221" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-222"><a href="#cb20-222" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-223"><a href="#cb20-223" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(RT <span class="sc">~</span> modality <span class="sc">+</span> PID <span class="sc">+</span> stim, <span class="at">data =</span> mdl_dat) <span class="sc">|&gt;</span></span>
-<span id="cb20-224"><a href="#cb20-224" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb20-225"><a href="#cb20-225" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
-<span id="cb20-226"><a href="#cb20-226" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^PID"</span>), </span>
-<span id="cb20-227"><a href="#cb20-227" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^stim"</span>)</span>
-<span id="cb20-228"><a href="#cb20-228" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-229"><a href="#cb20-229" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-230"><a href="#cb20-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-231"><a href="#cb20-231" aria-hidden="true" tabindex="-1"></a>Or maybe pre-summarize the data by calculating the mean response time across all words by <span class="in">`PID`</span> and <span class="in">`modality`</span>, then run the regression controlling for just <span class="in">`PID`</span>.</span>
-<span id="cb20-232"><a href="#cb20-232" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-235"><a href="#cb20-235" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-236"><a href="#cb20-236" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">summarize</span>(mdl_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, PID), <span class="at">MRT =</span> <span class="fu">mean</span>(RT))</span>
-<span id="cb20-237"><a href="#cb20-237" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-238"><a href="#cb20-238" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-239"><a href="#cb20-239" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(MRT <span class="sc">~</span> modality <span class="sc">+</span> PID, <span class="at">data =</span> x) <span class="sc">|&gt;</span></span>
-<span id="cb20-240"><a href="#cb20-240" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb20-241"><a href="#cb20-241" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(term, <span class="st">"^PID"</span>))</span>
-<span id="cb20-242"><a href="#cb20-242" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb20-243"><a href="#cb20-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-244"><a href="#cb20-244" aria-hidden="true" tabindex="-1"></a>Or what the heck, don't even control for <span class="in">`pID`</span> or <span class="in">`stim`</span>.</span>
-<span id="cb20-245"><a href="#cb20-245" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-248"><a href="#cb20-248" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb20-249"><a href="#cb20-249" aria-hidden="true" tabindex="-1"></a><span class="fu">linear_reg</span>() <span class="sc">|&gt;</span></span>
-<span id="cb20-250"><a href="#cb20-250" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(RT <span class="sc">~</span> modality, <span class="at">data =</span> mdl_dat) <span class="sc">|&gt;</span></span>
-<span id="cb20-251"><a href="#cb20-251" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span>
-<span id="cb20-252"><a href="#cb20-252" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="sourceCode" id="cb28" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Mixed Effects Models</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="in">```{r setup}</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="in">#| include: false</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="in">library(glue)</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidymodels)</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="in">library(gtsummary)</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="in">tidymodels_prefer()</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="in">library(multilevelmod)</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggResidpanel)</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="in">theme_set(</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="in">  theme_light() +</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="in">    theme(</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="in">      plot.caption = element_text(hjust = 0),</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="in">      strip.background = element_rect(fill = "gray90", color = "gray60"),</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a><span class="in">      strip.text = element_text(color = "gray20", size = 12)</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="in">    )</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>Suppose you run an experiment measuring the effect of two types of secondary tasks on the time it takes a person to complete a primary task. This is normally a good candidate for a linear regression, but there is a twist: the participants each generate many data points, and they naturally vary in their multitasking skills. This twist violates the _independent observations_ assumption. What to do? The solution is *linear mixed effects models* (LMMs).<span class="ot">[^lmer-1]</span></span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a><span class="ot">[^lmer-1]: </span>Another option is repeated measures ANOVA. However, repeated measures ANOVA can model either participant or item variability, but not both simultaneously. Also, ANOVA requires continuous outcomes and ccategorical predictors.</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a>We'll work with a datasets included in the <span class="co">[</span><span class="ot">supplemental materials</span><span class="co">](https://osf.io/v6qag/)</span> of *An Introduction to Linear Mixed-Effects Modeling* <span class="co">[</span><span class="ot">@Brown2021</span><span class="co">]</span>.<span class="ot">[^lmer-2]</span></span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a><span class="ot">[^lmer-2]: </span>The article is a good tutorial and worth reading.</span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>rt_dat <span class="ot">&lt;-</span></span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"./input/mixed-effects-rt.csv"</span>, <span class="at">col_types =</span> <span class="st">"cdcc"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">modality =</span> <span class="fu">factor</span>(modality, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Audio-only"</span>, <span class="st">"Audiovisual"</span>)))</span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a>acc_dat <span class="ot">&lt;-</span></span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">"./input/mixed-effects-acc.csv"</span>, <span class="at">col_types =</span> <span class="st">"cdcc"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">modality =</span> <span class="fu">factor</span>(modality, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Audio-only"</span>, <span class="st">"Audiovisual"</span>)),</span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">acc =</span> <span class="fu">factor</span>(acc)</span>
+<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(rt_dat)</span>
+<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(acc_dat)</span>
+<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-53"><a href="#cb28-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-54"><a href="#cb28-54" aria-hidden="true" tabindex="-1"></a>The datasets are from a study about multi-tasking. In <span class="in">`rt_dat`</span>, the researchers measured participant (<span class="in">`PID`</span>) response time (<span class="in">`RT`</span>) on a primary task while completing a secondary task of repeating words presented in one of two modalities (<span class="in">`modality`</span>): audio-only and audiovisual. The researchers hypothesized that the higher cognitive load associated with audiovisual stimulation would increase <span class="in">`RT`</span>. Each participant repeated the experiment with various words (stimulus, <span class="in">`stim`</span>). In <span class="in">`acc_dat`</span>, the dependent variable is response accuracy (<span class="in">`acc`</span> $\in <span class="co">[</span><span class="ot">0,1</span><span class="co">]</span>$) rather than response time.</span>
+<span id="cb28-55"><a href="#cb28-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-58"><a href="#cb28-58" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-59"><a href="#cb28-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb28-60"><a href="#cb28-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-61"><a href="#cb28-61" aria-hidden="true" tabindex="-1"></a>n_PID <span class="ot">&lt;-</span> <span class="fu">n_distinct</span>(rt_dat<span class="sc">$</span>PID)</span>
+<span id="cb28-62"><a href="#cb28-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-63"><a href="#cb28-63" aria-hidden="true" tabindex="-1"></a>n_stim <span class="ot">&lt;-</span> <span class="fu">n_distinct</span>(rt_dat<span class="sc">$</span>stim)</span>
+<span id="cb28-64"><a href="#cb28-64" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-65"><a href="#cb28-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-66"><a href="#cb28-66" aria-hidden="true" tabindex="-1"></a>There were <span class="in">`r n_PID`</span> participants and <span class="in">`r n_stim`</span> words in <span class="in">`rt_dat`</span>. The summary tables suggests the audiovisual modality does indeed retard response times over audio-only, but increased accuracy.</span>
+<span id="cb28-67"><a href="#cb28-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-70"><a href="#cb28-70" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-71"><a href="#cb28-71" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb28-72"><a href="#cb28-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb28-73"><a href="#cb28-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-74"><a href="#cb28-74" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(</span>
+<span id="cb28-75"><a href="#cb28-75" aria-hidden="true" tabindex="-1"></a>  rt_dat,</span>
+<span id="cb28-76"><a href="#cb28-76" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> modality,</span>
+<span id="cb28-77"><a href="#cb28-77" aria-hidden="true" tabindex="-1"></a>  <span class="at">include =</span> <span class="sc">-</span><span class="fu">c</span>(PID, stim),</span>
+<span id="cb28-78"><a href="#cb28-78" aria-hidden="true" tabindex="-1"></a>  <span class="at">statistic =</span> <span class="fu">list</span>(gtsummary<span class="sc">::</span><span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean}, {sd}"</span>)</span>
+<span id="cb28-79"><a href="#cb28-79" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb28-80"><a href="#cb28-80" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">as_gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb28-81"><a href="#cb28-81" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"rt_dat"</span>)</span>
+<span id="cb28-82"><a href="#cb28-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-83"><a href="#cb28-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-84"><a href="#cb28-84" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
+<span id="cb28-85"><a href="#cb28-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-88"><a href="#cb28-88" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-89"><a href="#cb28-89" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb28-90"><a href="#cb28-90" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb28-91"><a href="#cb28-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-92"><a href="#cb28-92" aria-hidden="true" tabindex="-1"></a>gtsummary<span class="sc">::</span><span class="fu">tbl_summary</span>(</span>
+<span id="cb28-93"><a href="#cb28-93" aria-hidden="true" tabindex="-1"></a>  acc_dat,</span>
+<span id="cb28-94"><a href="#cb28-94" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> modality,</span>
+<span id="cb28-95"><a href="#cb28-95" aria-hidden="true" tabindex="-1"></a>  <span class="at">include =</span> <span class="sc">-</span><span class="fu">c</span>(PID, stim)</span>
+<span id="cb28-96"><a href="#cb28-96" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb28-97"><a href="#cb28-97" aria-hidden="true" tabindex="-1"></a>  gtsummary<span class="sc">::</span><span class="fu">as_gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb28-98"><a href="#cb28-98" aria-hidden="true" tabindex="-1"></a>  gt<span class="sc">::</span><span class="fu">tab_header</span>(<span class="at">title =</span> <span class="st">"acc_dat"</span>)</span>
+<span id="cb28-99"><a href="#cb28-99" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-100"><a href="#cb28-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-101"><a href="#cb28-101" aria-hidden="true" tabindex="-1"></a>&lt;br&gt;</span>
+<span id="cb28-102"><a href="#cb28-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-103"><a href="#cb28-103" aria-hidden="true" tabindex="-1"></a><span class="in">`PID`</span> and <span class="in">`stim`</span> are important covariates because people differ in their ability to multitask, and words vary in difficulty.</span>
+<span id="cb28-104"><a href="#cb28-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-107"><a href="#cb28-107" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-108"><a href="#cb28-108" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb28-109"><a href="#cb28-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-110"><a href="#cb28-110" aria-hidden="true" tabindex="-1"></a><span class="fu">bind_rows</span>(</span>
+<span id="cb28-111"><a href="#cb28-111" aria-hidden="true" tabindex="-1"></a>  <span class="at">Participants =</span> <span class="fu">summarize</span>(rt_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, PID), <span class="at">M =</span> <span class="fu">mean</span>(RT)),</span>
+<span id="cb28-112"><a href="#cb28-112" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stimulus =</span> <span class="fu">summarize</span>(rt_dat, <span class="at">.by =</span> <span class="fu">c</span>(modality, stim), <span class="at">M =</span> <span class="fu">mean</span>(RT)),</span>
+<span id="cb28-113"><a href="#cb28-113" aria-hidden="true" tabindex="-1"></a>  <span class="at">.id =</span> <span class="st">"Factor"</span></span>
+<span id="cb28-114"><a href="#cb28-114" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb28-115"><a href="#cb28-115" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb28-116"><a href="#cb28-116" aria-hidden="true" tabindex="-1"></a>    <span class="at">Factor =</span> <span class="fu">case_when</span>(</span>
+<span id="cb28-117"><a href="#cb28-117" aria-hidden="true" tabindex="-1"></a>      Factor <span class="sc">==</span> <span class="st">"Participants"</span> <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"Participants (n = {n_PID})"</span>),</span>
+<span id="cb28-118"><a href="#cb28-118" aria-hidden="true" tabindex="-1"></a>      Factor <span class="sc">==</span> <span class="st">"Stimulus"</span> <span class="sc">~</span> <span class="fu">glue</span>(<span class="st">"Word Stimulus (n = {n_stim})"</span>)</span>
+<span id="cb28-119"><a href="#cb28-119" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb28-120"><a href="#cb28-120" aria-hidden="true" tabindex="-1"></a>    <span class="at">grp =</span> <span class="fu">coalesce</span>(PID, stim)</span>
+<span id="cb28-121"><a href="#cb28-121" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb28-122"><a href="#cb28-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> modality)) <span class="sc">+</span></span>
+<span id="cb28-123"><a href="#cb28-123" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> M, <span class="at">group =</span> grp), <span class="at">alpha =</span> .<span class="dv">3</span>, <span class="at">color =</span> <span class="st">"dodgerblue3"</span>) <span class="sc">+</span></span>
+<span id="cb28-124"><a href="#cb28-124" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="at">facets =</span> <span class="fu">vars</span>(Factor)) <span class="sc">+</span></span>
+<span id="cb28-125"><a href="#cb28-125" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb28-126"><a href="#cb28-126" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Modality Effect on Mean Response Time"</span>,</span>
+<span id="cb28-127"><a href="#cb28-127" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"by Participant and Word Stimulas"</span>,</span>
+<span id="cb28-128"><a href="#cb28-128" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"milliseconds (ms)"</span></span>
+<span id="cb28-129"><a href="#cb28-129" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb28-130"><a href="#cb28-130" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-131"><a href="#cb28-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-132"><a href="#cb28-132" aria-hidden="true" tabindex="-1"></a><span class="fu">## LMM Model</span></span>
+<span id="cb28-133"><a href="#cb28-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-134"><a href="#cb28-134" aria-hidden="true" tabindex="-1"></a>Mixed-effects models are called “mixed” because they simultaneously model fixed and random effects. Fixed effects are population-level effects that should persist across experiments. Fixed effects are the traditional predictors in a regression model. <span class="in">`modality`</span> is a fixed effect. Random effects are level effects that account for variability at different levels of the data hierarchy. <span class="in">`PID`</span> and <span class="in">`stim`</span> are random effects because they are randomly sampled and you expect variability within the populations.</span>
+<span id="cb28-135"><a href="#cb28-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-136"><a href="#cb28-136" aria-hidden="true" tabindex="-1"></a>LMM represents the $i$-th observation for the $j$-th random-effects group as</span>
+<span id="cb28-137"><a href="#cb28-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-138"><a href="#cb28-138" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb28-139"><a href="#cb28-139" aria-hidden="true" tabindex="-1"></a>y_{ij} = \beta_0 + \beta_1x_{ij} + u_j + \epsilon_{ij}</span>
+<span id="cb28-140"><a href="#cb28-140" aria-hidden="true" tabindex="-1"></a>$$ {#eq-lmm-model}</span>
+<span id="cb28-141"><a href="#cb28-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-142"><a href="#cb28-142" aria-hidden="true" tabindex="-1"></a>Where $\beta_0$ and $\beta_1$ are the fixed effect intercept and slope, and $u_j$ is the random effect for the $j$-th group. The $u_j$ terms are the group deviations from the population mean and are assumed to be normally distributed with mean 0 and variance $\sigma_u^2$. The residual term is also assumed to be normally distributed with mean 0 and variance $\sigma_\epsilon^2$</span>
+<span id="cb28-143"><a href="#cb28-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-144"><a href="#cb28-144" aria-hidden="true" tabindex="-1"></a>In our study, $\beta_0$ and $\beta_1$ are the fixed effects of <span class="in">`modality`</span>; $u_j$ is the $j$ = <span class="in">`r n_PID`</span> <span class="in">`PID`</span> levels; and the model includes an additional term, $\eta_k$, for the $k$ = <span class="in">`r n_stim`</span> <span class="in">`stim`</span> levels.</span>
+<span id="cb28-145"><a href="#cb28-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-146"><a href="#cb28-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb28-147"><a href="#cb28-147" aria-hidden="true" tabindex="-1"></a>y_{ij} = \beta_0 + \beta_1x_{ij} + u_j + \eta_k + \epsilon_{ijk}</span>
+<span id="cb28-148"><a href="#cb28-148" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb28-149"><a href="#cb28-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-150"><a href="#cb28-150" aria-hidden="true" tabindex="-1"></a><span class="fu">## The _lmer_ Engine</span></span>
+<span id="cb28-151"><a href="#cb28-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-152"><a href="#cb28-152" aria-hidden="true" tabindex="-1"></a>Fit an LMM with the _lmer_ package. The pipes (\|) in the formula indicate the value to the left varies by the variable to the right. 1 is the intercept (no interactions). You can model the random effects two ways:</span>
+<span id="cb28-153"><a href="#cb28-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-154"><a href="#cb28-154" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`(1|PID) + (1|stim)`</span>: level effects by participant and stimulus.</span>
+<span id="cb28-155"><a href="#cb28-155" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`(1 + modality|PID) + (1 + modality|stim)`</span>: level effects plus interaction effects.</span>
+<span id="cb28-156"><a href="#cb28-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-157"><a href="#cb28-157" aria-hidden="true" tabindex="-1"></a>Start with the level effect model.</span>
+<span id="cb28-158"><a href="#cb28-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-159"><a href="#cb28-159" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fit-1}</span></span>
+<span id="cb28-160"><a href="#cb28-160" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: false</span></span>
+<span id="cb28-161"><a href="#cb28-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-162"><a href="#cb28-162" aria-hidden="true" tabindex="-1"></a><span class="in">rt_fit_1 &lt;-</span></span>
+<span id="cb28-163"><a href="#cb28-163" aria-hidden="true" tabindex="-1"></a><span class="in">  linear_reg() |&gt;</span></span>
+<span id="cb28-164"><a href="#cb28-164" aria-hidden="true" tabindex="-1"></a><span class="in">  set_engine("lmer") |&gt;</span></span>
+<span id="cb28-165"><a href="#cb28-165" aria-hidden="true" tabindex="-1"></a><span class="in">  fit(</span></span>
+<span id="cb28-166"><a href="#cb28-166" aria-hidden="true" tabindex="-1"></a><span class="in">  RT ~ 1 + modality + (1|PID) + (1|stim),</span></span>
+<span id="cb28-167"><a href="#cb28-167" aria-hidden="true" tabindex="-1"></a><span class="in">    data = rt_dat</span></span>
+<span id="cb28-168"><a href="#cb28-168" aria-hidden="true" tabindex="-1"></a><span class="in">  )</span></span>
+<span id="cb28-169"><a href="#cb28-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-170"><a href="#cb28-170" aria-hidden="true" tabindex="-1"></a><span class="in">extract_fit_engine(rt_fit_1) |&gt; summary()</span></span>
+<span id="cb28-171"><a href="#cb28-171" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-172"><a href="#cb28-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-173"><a href="#cb28-173" aria-hidden="true" tabindex="-1"></a>Let's walk through these sections. </span>
+<span id="cb28-174"><a href="#cb28-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-175"><a href="#cb28-175" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb28-176"><a href="#cb28-176" aria-hidden="true" tabindex="-1"></a>Use <span class="in">`broom.mixed::tidy()`</span> to pull the coefficient estimates.</span>
+<span id="cb28-179"><a href="#cb28-179" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-180"><a href="#cb28-180" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb28-181"><a href="#cb28-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-182"><a href="#cb28-182" aria-hidden="true" tabindex="-1"></a>(tidy_fit <span class="ot">&lt;-</span> broom.mixed<span class="sc">::</span><span class="fu">tidy</span>(rt_fit_1))</span>
+<span id="cb28-183"><a href="#cb28-183" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-184"><a href="#cb28-184" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb28-185"><a href="#cb28-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-186"><a href="#cb28-186" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The *Random effects* show the variability in <span class="in">`RT`</span> due to <span class="in">`stim`</span> and <span class="in">`PID`</span>. The variability among participants (<span class="in">`PID`</span> sd = <span class="in">`r tidy_fit |&gt; filter(group == "PID", term == "sd__(Intercept)") |&gt; pull(estimate) |&gt; comma()`</span> ms) is much greater than the variability among words (<span class="in">`stim`</span> sd = <span class="in">`r tidy_fit |&gt; filter(group == "stim", term == "sd__(Intercept)") |&gt; pull(estimate) |&gt; comma()`</span> ms).</span>
+<span id="cb28-187"><a href="#cb28-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-188"><a href="#cb28-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The *Fixed effects* show audio-visual modality slows <span class="in">`RT`</span> by <span class="in">`r tidy_fit |&gt; filter(effect == "fixed", term == "modalityAudiovisual") |&gt; pull(estimate) |&gt; comma(.1)`</span> ms over audio-only.</span>
+<span id="cb28-189"><a href="#cb28-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-190"><a href="#cb28-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The *Correlation of Fixed Effects* shows a weak negative correlation between the intercept and the audio-visual modality effect (<span class="in">`modltyAdvsl`</span> = <span class="in">`r extract_fit_engine(rt_fit_1) |&gt; summary() |&gt; pluck("vcov", "factors", "correlation") |&gt; pluck("x", 3) |&gt; comma(.001)`</span> ms). This means when <span class="in">`RT`</span> times were high, audiovisual effect was somewhat diminished.</span>
+<span id="cb28-191"><a href="#cb28-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-192"><a href="#cb28-192" aria-hidden="true" tabindex="-1"></a>To add interactions between the fixed effect variable(s) and the random effects variable(s), change the random intercept (1) to the fixed effect variable. Then both the intercept and the slope can vary.</span>
+<span id="cb28-193"><a href="#cb28-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-194"><a href="#cb28-194" aria-hidden="true" tabindex="-1"></a><span class="in">```{r fit-2}</span></span>
+<span id="cb28-195"><a href="#cb28-195" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: false</span></span>
+<span id="cb28-196"><a href="#cb28-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-197"><a href="#cb28-197" aria-hidden="true" tabindex="-1"></a><span class="in">rt_fit_2 &lt;-</span></span>
+<span id="cb28-198"><a href="#cb28-198" aria-hidden="true" tabindex="-1"></a><span class="in">  linear_reg() |&gt;</span></span>
+<span id="cb28-199"><a href="#cb28-199" aria-hidden="true" tabindex="-1"></a><span class="in">  set_engine("lmer") |&gt;</span></span>
+<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a><span class="in">  fit(</span></span>
+<span id="cb28-201"><a href="#cb28-201" aria-hidden="true" tabindex="-1"></a><span class="in">    RT ~ 1 + modality + (1 + modality|PID) + (1 + modality|stim),</span></span>
+<span id="cb28-202"><a href="#cb28-202" aria-hidden="true" tabindex="-1"></a><span class="in">    data = rt_dat</span></span>
+<span id="cb28-203"><a href="#cb28-203" aria-hidden="true" tabindex="-1"></a><span class="in">  )</span></span>
+<span id="cb28-204"><a href="#cb28-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-205"><a href="#cb28-205" aria-hidden="true" tabindex="-1"></a><span class="in">summary(extract_fit_engine(rt_fit_2))</span></span>
+<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-207"><a href="#cb28-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-208"><a href="#cb28-208" aria-hidden="true" tabindex="-1"></a>This formulation includes random slopes for <span class="in">`modality`</span> within <span class="in">`PID`</span> and <span class="in">`stim`</span>, meaning you’re accounting for differences in how each participant and stimulus responds to modality. Response times varied around <span class="in">`r broom.mixed::tidy(rt_fit_2) %&gt;% filter(term == "(Intercept)") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms by sd = <span class="in">`r broom.mixed::tidy(rt_fit_2) %&gt;% filter(term == "sd__(Intercept)", group == "stim") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms for <span class="in">`stim`</span> and sd = <span class="in">`r broom.mixed::tidy(rt_fit_2) %&gt;% filter(term == "sd__(Intercept)", group == "PID") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms for <span class="in">`PID`</span>. The modality effect on response times varied around <span class="in">`r broom.mixed::tidy(rt_fit_2) %&gt;% filter(term == "modalityAudiovisual") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms by sd = <span class="in">`r broom.mixed::tidy(rt_fit_2) %&gt;% filter(term == "sd__modalityAudiovisual", group == "stim") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms for <span class="in">`stim`</span> and sd = <span class="in">`r broom.mixed::tidy(rt_fit_2) %&gt;% filter(term == "sd__modalityAudiovisual", group == "PID") %&gt;% pull(estimate) %&gt;% comma(1)`</span> ms for PID. That last statistic means a participant whose slope is 1 sd below the mean would have a slope near zero - a modality effect of zero.</span>
+<span id="cb28-209"><a href="#cb28-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-210"><a href="#cb28-210" aria-hidden="true" tabindex="-1"></a>The added correlations in the *Random effects* section show how the intercept and slopes for <span class="in">`modality`</span> vary together within each group. The <span class="in">`r broom.mixed::tidy(rt_fit_2) %&gt;% filter(term == "cor__(Intercept).modalityAudiovisual", group == "stim") %&gt;% pull(estimate) %&gt;% comma(.01)`</span> correlation between the stimuli and fixed-effect intercepts indicates that stimuli with longer response times in the audio modality tended to have more positive slopes (stronger positive audiovisual effect). The <span class="in">`r broom.mixed::tidy(rt_fit_2) %&gt;% filter(term == "cor__(Intercept).modalityAudiovisual", group == "PID") %&gt;% pull(estimate) %&gt;% comma(.01)`</span> correlation between the participant and fixed-effect intercepts indicates that participants with longer response times in the audio modality tended to have a less positive slope (weaker positive, or possibly even a negative, audiovisual effect).</span>
+<span id="cb28-211"><a href="#cb28-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-212"><a href="#cb28-212" aria-hidden="true" tabindex="-1"></a>The audio-visual modality slows <span class="in">`RT`</span> by <span class="in">`r broom.mixed::tidy(rt_fit_2) |&gt; filter(effect == "fixed", term == "modalityAudiovisual") |&gt; pull(estimate) |&gt; comma()`</span> ms over audio-only - same as in the first model. The REML criterion fell, so adding the random slopes for modality improved the fit.</span>
+<span id="cb28-213"><a href="#cb28-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-214"><a href="#cb28-214" aria-hidden="true" tabindex="-1"></a><span class="fu">## Assumptions</span></span>
+<span id="cb28-215"><a href="#cb28-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-216"><a href="#cb28-216" aria-hidden="true" tabindex="-1"></a>The linear regression model assumptions still apply: the relationship between the predictors and the response is linear and the residuals are independent random variables normally distributed with mean zero and constant variance. Additionally, the the random effects intercepts and slopes are assumed to follow a normal distribution. Use residual plots to assess linearity, homoscedasticity, and independence. Use Q-Q plots to check the normality of residuals and random effects. Variance inflation factors (VIFs) can help detect multicollinearity among predictors.</span>
+<span id="cb28-217"><a href="#cb28-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-220"><a href="#cb28-220" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-221"><a href="#cb28-221" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb28-222"><a href="#cb28-222" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb28-223"><a href="#cb28-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-224"><a href="#cb28-224" aria-hidden="true" tabindex="-1"></a><span class="fu">resid_panel</span>(<span class="fu">extract_fit_engine</span>(rt_fit_2), <span class="at">smoother =</span> <span class="cn">TRUE</span>, <span class="at">qqbands =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-225"><a href="#cb28-225" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-226"><a href="#cb28-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-227"><a href="#cb28-227" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluation</span></span>
+<span id="cb28-228"><a href="#cb28-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-229"><a href="#cb28-229" aria-hidden="true" tabindex="-1"></a>To determine whether <span class="in">`modality`</span> affects response times, compare the model to a nested model without <span class="in">`modality`</span> using a likelihood-ratio test (LRT). LRT calculates the model likelihoods using maximum likelihood estimation then compares those likelihoods. A significant test result indicates the full model fits the data better.</span>
+<span id="cb28-230"><a href="#cb28-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-231"><a href="#cb28-231" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb28-232"><a href="#cb28-232" aria-hidden="true" tabindex="-1"></a><span class="fu">### Why not rely on the Wald (coefficient t-) test?</span></span>
+<span id="cb28-233"><a href="#cb28-233" aria-hidden="true" tabindex="-1"></a>Degrees-of-freedom are tricky for mixed models and Wald *p*-values use approximations that can be unrliable in complex random structures. </span>
+<span id="cb28-234"><a href="#cb28-234" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb28-235"><a href="#cb28-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-236"><a href="#cb28-236" aria-hidden="true" tabindex="-1"></a><span class="in">```{r rt-lrt}</span></span>
+<span id="cb28-237"><a href="#cb28-237" aria-hidden="true" tabindex="-1"></a><span class="in"># reduced model exlcludes the `modality` predictor.</span></span>
+<span id="cb28-238"><a href="#cb28-238" aria-hidden="true" tabindex="-1"></a><span class="in">rt_reduced &lt;- linear_reg() |&gt;</span></span>
+<span id="cb28-239"><a href="#cb28-239" aria-hidden="true" tabindex="-1"></a><span class="in">  set_engine("lmer") |&gt;</span></span>
+<span id="cb28-240"><a href="#cb28-240" aria-hidden="true" tabindex="-1"></a><span class="in">  fit(</span></span>
+<span id="cb28-241"><a href="#cb28-241" aria-hidden="true" tabindex="-1"></a><span class="in">    RT ~ 1 + (1 + modality|PID) + (1 + modality|stim),</span></span>
+<span id="cb28-242"><a href="#cb28-242" aria-hidden="true" tabindex="-1"></a><span class="in">    data = rt_dat</span></span>
+<span id="cb28-243"><a href="#cb28-243" aria-hidden="true" tabindex="-1"></a><span class="in">  )</span></span>
+<span id="cb28-244"><a href="#cb28-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-245"><a href="#cb28-245" aria-hidden="true" tabindex="-1"></a><span class="in">rt_lrt &lt;- anova(</span></span>
+<span id="cb28-246"><a href="#cb28-246" aria-hidden="true" tabindex="-1"></a><span class="in">  extract_fit_engine(rt_fit_2),</span></span>
+<span id="cb28-247"><a href="#cb28-247" aria-hidden="true" tabindex="-1"></a><span class="in">  extract_fit_engine(rt_reduced)</span></span>
+<span id="cb28-248"><a href="#cb28-248" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb28-249"><a href="#cb28-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-250"><a href="#cb28-250" aria-hidden="true" tabindex="-1"></a><span class="in">tidy(rt_lrt)</span></span>
+<span id="cb28-251"><a href="#cb28-251" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-252"><a href="#cb28-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-253"><a href="#cb28-253" aria-hidden="true" tabindex="-1"></a>The likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, $\chi^2$(1) = <span class="in">`r comma(rt_lrt$Chisq[2], .1)`</span>, *p* <span class="sc">\&lt;</span> .001.</span>
+<span id="cb28-254"><a href="#cb28-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-255"><a href="#cb28-255" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reporting</span></span>
+<span id="cb28-256"><a href="#cb28-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-259"><a href="#cb28-259" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-260"><a href="#cb28-260" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: false</span></span>
+<span id="cb28-261"><a href="#cb28-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-262"><a href="#cb28-262" aria-hidden="true" tabindex="-1"></a>av_terms <span class="ot">&lt;-</span> broom.mixed<span class="sc">::</span><span class="fu">tidy</span>(rt_fit_2) <span class="sc">|&gt;</span> <span class="fu">filter</span>(term <span class="sc">==</span> <span class="st">"modalityAudiovisual"</span>)</span>
+<span id="cb28-263"><a href="#cb28-263" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-264"><a href="#cb28-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-265"><a href="#cb28-265" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; A likelihood-ratio test indicated that the model including modality provided a better fit for the data than a model without it, $\chi^2$(1) = </span><span class="in">`r comma(rt_lrt$Chisq[2], .1)`</span><span class="at">, *p* \&lt; .001. Examination of the summary output for the full model indicated that response times were on average an estimated `r comma(av_terms[1, ]$estimate, .1)` ms slower in the audiovisual relative to the audio-only condition ($\hat{\beta}$ = `r comma(av_terms[1, ]$estimate, .1)`, *SE* = `r comma(av_terms[1, ]$std.error, .1)`, *t* = `r comma(av_terms[1, ]$estimate, .1)`, *SE* = </span><span class="in">`r comma(av_terms[1, ]$statistic, .1)`</span><span class="at">).</span></span>
+<span id="cb28-266"><a href="#cb28-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-267"><a href="#cb28-267" aria-hidden="true" tabindex="-1"></a><span class="in">```{r message=FALSE}</span></span>
+<span id="cb28-268"><a href="#cb28-268" aria-hidden="true" tabindex="-1"></a><span class="in">#| code-fold: false</span></span>
+<span id="cb28-269"><a href="#cb28-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-270"><a href="#cb28-270" aria-hidden="true" tabindex="-1"></a><span class="in">gtsummary::tbl_regression(rt_fit_2)</span></span>
+<span id="cb28-271"><a href="#cb28-271" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-272"><a href="#cb28-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-273"><a href="#cb28-273" aria-hidden="true" tabindex="-1"></a><span class="fu">## Logistic Regression</span></span>
+<span id="cb28-274"><a href="#cb28-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-275"><a href="#cb28-275" aria-hidden="true" tabindex="-1"></a>This section fits a logistic LMM to the <span class="in">`acc_dat`</span> dataset.</span>
+<span id="cb28-276"><a href="#cb28-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-277"><a href="#cb28-277" aria-hidden="true" tabindex="-1"></a><span class="in">```{r acc-fit}</span></span>
+<span id="cb28-278"><a href="#cb28-278" aria-hidden="true" tabindex="-1"></a><span class="in">acc_fit &lt;-</span></span>
+<span id="cb28-279"><a href="#cb28-279" aria-hidden="true" tabindex="-1"></a><span class="in">  logistic_reg() |&gt;</span></span>
+<span id="cb28-280"><a href="#cb28-280" aria-hidden="true" tabindex="-1"></a><span class="in">  set_engine("glmer") |&gt;</span></span>
+<span id="cb28-281"><a href="#cb28-281" aria-hidden="true" tabindex="-1"></a><span class="in">  set_mode("classification") |&gt;</span></span>
+<span id="cb28-282"><a href="#cb28-282" aria-hidden="true" tabindex="-1"></a><span class="in">  fit(</span></span>
+<span id="cb28-283"><a href="#cb28-283" aria-hidden="true" tabindex="-1"></a><span class="in">    acc ~ 1 + modality + (1 + 1|PID) + (1 + 1|stim),</span></span>
+<span id="cb28-284"><a href="#cb28-284" aria-hidden="true" tabindex="-1"></a><span class="in">    data = acc_dat,</span></span>
+<span id="cb28-285"><a href="#cb28-285" aria-hidden="true" tabindex="-1"></a><span class="in">    family = "binomial"</span></span>
+<span id="cb28-286"><a href="#cb28-286" aria-hidden="true" tabindex="-1"></a><span class="in">  )</span></span>
+<span id="cb28-287"><a href="#cb28-287" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-288"><a href="#cb28-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-289"><a href="#cb28-289" aria-hidden="true" tabindex="-1"></a>Fit a reduced model lacking the <span class="in">`modality`</span> fixed effect to use in a likelihood ratio test.</span>
+<span id="cb28-290"><a href="#cb28-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-291"><a href="#cb28-291" aria-hidden="true" tabindex="-1"></a><span class="in">```{r acc-lrt}</span></span>
+<span id="cb28-292"><a href="#cb28-292" aria-hidden="true" tabindex="-1"></a><span class="in">acc_reduced_fit &lt;-</span></span>
+<span id="cb28-293"><a href="#cb28-293" aria-hidden="true" tabindex="-1"></a><span class="in">  logistic_reg() |&gt;</span></span>
+<span id="cb28-294"><a href="#cb28-294" aria-hidden="true" tabindex="-1"></a><span class="in">  set_engine("glmer") |&gt;</span></span>
+<span id="cb28-295"><a href="#cb28-295" aria-hidden="true" tabindex="-1"></a><span class="in">  set_mode("classification") |&gt;</span></span>
+<span id="cb28-296"><a href="#cb28-296" aria-hidden="true" tabindex="-1"></a><span class="in">  fit(</span></span>
+<span id="cb28-297"><a href="#cb28-297" aria-hidden="true" tabindex="-1"></a><span class="in">    acc ~ 1 + (1 + 1|PID) + (1 + 1|stim),</span></span>
+<span id="cb28-298"><a href="#cb28-298" aria-hidden="true" tabindex="-1"></a><span class="in">    data = acc_dat,</span></span>
+<span id="cb28-299"><a href="#cb28-299" aria-hidden="true" tabindex="-1"></a><span class="in">    family = "binomial"</span></span>
+<span id="cb28-300"><a href="#cb28-300" aria-hidden="true" tabindex="-1"></a><span class="in">  )</span></span>
+<span id="cb28-301"><a href="#cb28-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-302"><a href="#cb28-302" aria-hidden="true" tabindex="-1"></a><span class="in">lrt_acc &lt;- anova(</span></span>
+<span id="cb28-303"><a href="#cb28-303" aria-hidden="true" tabindex="-1"></a><span class="in">  extract_fit_engine(acc_fit),</span></span>
+<span id="cb28-304"><a href="#cb28-304" aria-hidden="true" tabindex="-1"></a><span class="in">  extract_fit_engine(acc_reduced_fit)</span></span>
+<span id="cb28-305"><a href="#cb28-305" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb28-306"><a href="#cb28-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-307"><a href="#cb28-307" aria-hidden="true" tabindex="-1"></a><span class="in">tidy(lrt_acc)</span></span>
+<span id="cb28-308"><a href="#cb28-308" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
